@@ -262,6 +262,7 @@ export default function TablesPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onSelect={(e) => e.preventDefault()}
+                                onClick={() => handleGenerateQrCode(table.id)}
                               >
                                 <QrCode className="mr-2 w-4 h-4" />
                                 Generate QR Code

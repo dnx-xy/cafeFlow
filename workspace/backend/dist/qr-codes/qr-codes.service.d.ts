@@ -5,8 +5,8 @@ export declare class QrCodesService {
     private qrCodesRepository;
     private tablesRepository;
     constructor(qrCodesRepository: Repository<QrCode>, tablesRepository: Repository<Table>);
-    generateQrCode(tableId: string, tenantId: string): Promise<QrCode>;
-    getQrCodeByTable(tableId: string, tenantId: string): Promise<QrCode | null>;
-    scanQrCode(code: string, tenantId: string): Promise<QrCode>;
+    generateQrCode(tableId: string, businessId: string): Promise<QrCode>;
+    getQrCodeByTable(tableId: string, businessId: string): Promise<QrCode | null>;
+    scanQrCode(code: string, businessId: string): Promise<QrCode>;
     getQrCodesByBusiness(businessId: string, active?: boolean): Promise<QrCode[]>;
 }

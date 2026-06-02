@@ -48,10 +48,10 @@ export default function QrCodesPage() {
     fetchTables();
   }, []);
 
-  const filteredTables = tables.filter(table => 
+  const filteredTables = tables && tables.filter(table => 
     table.tableNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     table.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) || [];
 
   const handleCreateTable = async () => {
     try {
