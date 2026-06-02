@@ -24,6 +24,9 @@ let TablesService = class TablesService {
         this.qrCodesRepository = qrCodesRepository;
     }
     async create(tableData, tenantId, outletId) {
+        if (!tableData.number) {
+            tableData.number = `T${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+        }
         const table = this.tablesRepository.create({
             ...tableData,
             tenantId,
@@ -33,7 +36,7 @@ let TablesService = class TablesService {
         const qrCode = this.qrCodesRepository.create({
             code: `cf-${tenantId.substring(0, 6)}-${savedTable.number.toLowerCase()}`,
             tableId: savedTable.id,
-            businessId: savedTable.outletId,
+            businessId: tableData.businessId || '',
         });
         await this.qrCodesRepository.save(qrCode);
         return await this.findOne(savedTable.id, tenantId);

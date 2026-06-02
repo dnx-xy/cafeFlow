@@ -24,11 +24,9 @@ import {
   Edit,
   Trash2,
   Eye,
-  Check,
-  X,
+  QrCode,
   Wifi,
   AlertTriangle,
-  QrCode,
   Table
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -50,37 +48,24 @@ export default function TablesPage() {
     fetchTables();
   }, []);
 
-  const filteredTables = tables.filter(table => 
+  const filteredTables = tables && tables.filter(table => 
     table.tableNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     table.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) || [];
 
   const handleCreateTable = async () => {
     try {
-      await createTable(newTable);
+      // Generate a default table number if none provided
+      const tableData = {
+        ...newTable,
+        tableNumber: newTable.tableNumber || `T${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+      };
+      await createTable(tableData);
       setIsCreating(false);
       setNewTable({ tableNumber: '', name: '', capacity: 1, isActive: true });
       toast.success('Table created successfully');
     } catch (err) {
       toast.error('Failed to create table');
-    }
-  };
-
-  const handleUpdateTable = async (id: string, data: any) => {
-    try {
-      await updateTable(id, data);
-      toast.success('Table updated successfully');
-    } catch (err) {
-      toast.error('Failed to update table');
-    }
-  };
-
-  const handleDeleteTable = async (id: string) => {
-    try {
-      await deleteTable(id);
-      toast.success('Table deleted successfully');
-    } catch (err) {
-      toast.error('Failed to delete table');
     }
   };
 
@@ -95,7 +80,7 @@ export default function TablesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Tables</h1>
-          <p className="text-muted-foreground">Manage your restaurant tables and QR codes</p>
+          <p className="text-muted-foreground">Manage restaurant tables</p>
         </div>
         <Button onClick={() => setIsCreating(true)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -163,7 +148,7 @@ export default function TablesPage() {
       {/* Tables Table */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base font-semibold">Tables</CardTitle>
+          <CardTitle className="text-base font-semibold">All Tables</CardTitle>
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -247,9 +232,12 @@ export default function TablesPage() {
                         <td className="py-4 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger>
-                              <Button variant="ghost" size="icon">
+                              <button 
+                                type="button" 
+                                className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                              >
                                 <div className="w-4 h-4">⋯</div>
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

@@ -15,6 +15,12 @@ export class TablesService {
   ) {}
 
   async create(tableData: Partial<Table>, tenantId: string, outletId: string): Promise<Table> {
+    // Ensure table number is provided
+    if (!tableData.number) {
+      // Generate default table number if not provided
+      tableData.number = `T${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    }
+    
     const table = this.tablesRepository.create({
       ...tableData,
       tenantId,
@@ -27,7 +33,7 @@ export class TablesService {
     const qrCode = this.qrCodesRepository.create({
       code: `cf-${tenantId.substring(0, 6)}-${savedTable.number.toLowerCase()}`,
       tableId: savedTable.id,
-      businessId: savedTable.outletId, // This should be businessId, but we don't have it here
+      businessId: tableData.businessId || '', // We need to get businessId from somewhere
     });
     
     await this.qrCodesRepository.save(qrCode);

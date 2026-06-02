@@ -22,7 +22,12 @@ let TablesController = class TablesController {
         this.tablesService = tablesService;
     }
     async create(body, user) {
-        return await this.tablesService.create(body, user.tenantId, user.businessId);
+        const tableData = {
+            ...body,
+            number: body.tableNumber,
+            outletId: user.businessId,
+        };
+        return await this.tablesService.create(tableData, user.tenantId, user.businessId);
     }
     async findAll(outletId, user) {
         return await this.tablesService.findAll(user.tenantId, outletId);

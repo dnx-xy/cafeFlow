@@ -13,8 +13,15 @@ export class TablesController {
     @Body() body: any,
     @AuthenticatedUser() user: any,
   ) {
+    // Map frontend field names to backend entity field names
+    const tableData = {
+      ...body,
+      number: body.tableNumber, // Convert frontend "tableNumber" to backend "number"
+      outletId: user.businessId, // Use businessId as outletId for now
+    };
+    
     return await this.tablesService.create(
-      body,
+      tableData,
       user.tenantId,
       user.businessId,
     );
