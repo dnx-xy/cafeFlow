@@ -37,9 +37,9 @@ export class QrCodesController {
   @Get('business/:businessId')
   @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async getQrCodesByBusiness(
+    @AuthenticatedUser() user: any,
     @Param('businessId', ParseUUIDPipe) businessId: string,
     @Query('active') active?: boolean,
-    @AuthenticatedUser() user: any,
   ) {
     return await this.qrCodesService.getQrCodesByBusiness(businessId, active);
   }

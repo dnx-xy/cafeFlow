@@ -7,5 +7,5 @@ export declare class QrCodesController {
     }): Promise<import("../entities/qr-code.entity").QrCode>;
     getQrCodeByTable(tableId: string, user: any): Promise<import("../entities/qr-code.entity").QrCode>;
     scanQrCode(code: string, user: any): Promise<import("../entities/qr-code.entity").QrCode>;
-    getQrCodesByBusiness(businessId: string, active?: boolean, user: any): Promise<import("../entities/qr-code.entity").QrCode[]>;
+    getQrCodesByBusiness(user: any, businessId: string, active?: boolean): Promise<import("../entities/qr-code.entity").QrCode[]>;
 }

@@ -14,10 +14,10 @@ export class QrCodesService {
     private tablesRepository: Repository<Table>,
   ) {}
 
-  async generateQrCode(tableId: string, businessId: string): Promise<QrCode> {
+  async generateQrCode(tableId: string, tenantId: string): Promise<QrCode> {
     // Check if table exists and belongs to business
     const table = await this.tablesRepository.findOne({
-      where: { id: tableId, businessId },
+      where: { id: tableId, tenantId },
     });
 
     if (!table) {
