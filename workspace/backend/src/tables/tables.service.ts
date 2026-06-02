@@ -46,7 +46,7 @@ export class TablesService {
   async findOne(id: string, tenantId: string): Promise<Table> {
     return await this.tablesRepository.findOne({
       where: { id, tenantId },
-      relations: { qrCode: true },
+      relations: { qrCodes: true },
     });
   }
 

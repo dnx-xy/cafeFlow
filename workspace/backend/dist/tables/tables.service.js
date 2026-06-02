@@ -48,7 +48,7 @@ let TablesService = class TablesService {
     async findOne(id, tenantId) {
         return await this.tablesRepository.findOne({
             where: { id, tenantId },
-            relations: { qrCode: true },
+            relations: { qrCodes: true },
         });
     }
     async update(id, updateTableDto, tenantId) {
