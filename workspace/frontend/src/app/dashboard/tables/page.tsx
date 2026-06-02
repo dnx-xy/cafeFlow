@@ -231,7 +231,7 @@ export default function TablesPage() {
                           </Badge>
                         </td>
                         <td className="py-4">
-                          {table.qrCode ? (
+                          {table.qrCodes && table.qrCodes.length > 0 ? (
                             <div className="flex items-center">
                               <Badge variant="secondary" className="text-xs flex items-center">
                                 <QrCode className="w-3 h-3 mr-1" />

@@ -11,12 +11,12 @@ export interface Table {
   tenantId: string;
   isActive: boolean;
   capacity: number;
-  qrCode?: {
+  qrCodes?: {
     id: string;
     code: string;
     scannedAt: string;
     isActive: boolean;
-  };
+  }[];
 }
 
 // Tables context
