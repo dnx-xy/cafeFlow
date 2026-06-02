@@ -246,23 +246,30 @@ export default function TablesPage() {
                         </td>
                         <td className="py-4 text-right">
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                            <DropdownMenuTrigger>
                               <Button variant="ghost" size="icon">
                                 <div className="w-4 h-4">⋯</div>
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Eye className="mr-2 w-4 h-4" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Edit className="mr-2 w-4 h-4" />
                                 Edit Table
                               </DropdownMenuItem>
                               <DropdownMenuItem 
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <QrCode className="mr-2 w-4 h-4" />
+                                Generate QR Code
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
                                 className="text-red-600"
-                                onClick={() => handleDeleteTable(table.id)}
+                                onSelect={(e) => e.preventDefault()}
+                                onClick={() => deleteTable(table.id)}
                               >
                                 <Trash2 className="mr-2 w-4 h-4" />
                                 Delete Table

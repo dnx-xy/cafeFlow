@@ -235,7 +235,7 @@ export default function QrCodesPage() {
                         </td>
                         <td className="py-4 text-right">
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                            <DropdownMenuTrigger>
                               <Button variant="ghost" size="icon">
                                 <div className="w-4 h-4">⋯</div>
                               </Button>
