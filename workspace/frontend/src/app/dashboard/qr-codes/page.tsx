@@ -235,10 +235,10 @@ export default function QrCodesPage() {
                         </td>
                         <td className="py-4 text-right">
                           <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Button variant="ghost" size="icon">
+                            <DropdownMenuTrigger asChild>
+                              <button className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                 <div className="w-4 h-4">⋯</div>
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
