@@ -19,6 +19,7 @@ const menu_entity_1 = require("./menu.entity");
 const order_entity_1 = require("./order.entity");
 const customer_entity_1 = require("./customer.entity");
 const loyalty_program_entity_1 = require("./loyalty-program.entity");
+const qr_code_entity_1 = require("./qr-code.entity");
 let Business = class Business extends base_entity_1.BaseEntity {
 };
 exports.Business = Business;
@@ -82,6 +83,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => loyalty_program_entity_1.LoyaltyProgram, (program) => program.business),
     __metadata("design:type", Array)
 ], Business.prototype, "loyaltyPrograms", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => qr_code_entity_1.QrCode, (qrCode) => qrCode.business),
+    __metadata("design:type", Array)
+], Business.prototype, "qrCodes", void 0);
 exports.Business = Business = __decorate([
     (0, typeorm_1.Entity)('businesses')
 ], Business);

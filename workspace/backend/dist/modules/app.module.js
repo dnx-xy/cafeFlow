@@ -23,6 +23,7 @@ const staff_module_1 = require("../staff/staff.module");
 const notifications_module_1 = require("../notifications/notifications.module");
 const payments_module_1 = require("../payments/payments.module");
 const integration_module_1 = require("../integration/integration.module");
+const qr_codes_module_1 = require("../qr-codes/qr-codes.module");
 const business_entity_1 = require("../entities/business.entity");
 const custom_attribute_entity_1 = require("../entities/custom-attribute.entity");
 const custom_attribute_value_entity_1 = require("../entities/custom-attribute-value.entity");
@@ -96,6 +97,7 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             payments_module_1.PaymentsModule,
             integration_module_1.IntegrationModule,
+            qr_codes_module_1.QrCodesModule,
         ],
         controllers: [],
         providers: [],

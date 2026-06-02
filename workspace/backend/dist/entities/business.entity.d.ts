@@ -6,6 +6,7 @@ import { Menu } from './menu.entity';
 import { Order } from './order.entity';
 import { Customer } from './customer.entity';
 import { LoyaltyProgram } from './loyalty-program.entity';
+import { QrCode } from './qr-code.entity';
 export declare class Business extends BaseEntity {
     name: string;
     description: string;
@@ -22,4 +23,5 @@ export declare class Business extends BaseEntity {
     orders: Order[];
     customers: Customer[];
     loyaltyPrograms: LoyaltyProgram[];
+    qrCodes: QrCode[];
 }

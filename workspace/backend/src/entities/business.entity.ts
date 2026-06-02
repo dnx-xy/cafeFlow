@@ -7,6 +7,7 @@ import { Menu } from './menu.entity';
 import { Order } from './order.entity';
 import { Customer } from './customer.entity';
 import { LoyaltyProgram } from './loyalty-program.entity';
+import { QrCode } from './qr-code.entity';
 
 @Entity('businesses')
 export class Business extends BaseEntity {
@@ -54,4 +55,7 @@ export class Business extends BaseEntity {
 
   @OneToMany(() => LoyaltyProgram, (program) => program.business)
   loyaltyPrograms: LoyaltyProgram[];
+
+  @OneToMany(() => QrCode, (qrCode) => qrCode.business)
+  qrCodes: QrCode[];
 }

@@ -1,10 +1,12 @@
 import { BaseEntity } from './base.entity';
 import { Table } from './table.entity';
+import { Business } from './business.entity';
 export declare class QrCode extends BaseEntity {
     code: string;
     tableId: string;
-    tenantId: string;
-    active: boolean;
-    usageCount: number;
+    businessId: string;
+    scannedAt: Date;
+    isActive: boolean;
     table: Table;
+    business: Business;
 }

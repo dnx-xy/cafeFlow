@@ -13,11 +13,12 @@ exports.QrCode = void 0;
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("./base.entity");
 const table_entity_1 = require("./table.entity");
+const business_entity_1 = require("./business.entity");
 let QrCode = class QrCode extends base_entity_1.BaseEntity {
 };
 exports.QrCode = QrCode;
 __decorate([
-    (0, typeorm_1.Column)({ unique: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', unique: true }),
     __metadata("design:type", String)
 ], QrCode.prototype, "code", void 0);
 __decorate([
@@ -27,19 +28,23 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
-], QrCode.prototype, "tenantId", void 0);
+], QrCode.prototype, "businessId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: true }),
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], QrCode.prototype, "scannedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
-], QrCode.prototype, "active", void 0);
+], QrCode.prototype, "isActive", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 0 }),
-    __metadata("design:type", Number)
-], QrCode.prototype, "usageCount", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => table_entity_1.Table, (table) => table.qrCode),
+    (0, typeorm_1.ManyToOne)(() => table_entity_1.Table, (table) => table.qrCodes),
     __metadata("design:type", table_entity_1.Table)
 ], QrCode.prototype, "table", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => business_entity_1.Business, (business) => business.qrCodes),
+    __metadata("design:type", business_entity_1.Business)
+], QrCode.prototype, "business", void 0);
 exports.QrCode = QrCode = __decorate([
     (0, typeorm_1.Entity)('qr_codes')
 ], QrCode);

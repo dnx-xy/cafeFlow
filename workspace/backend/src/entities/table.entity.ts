@@ -24,6 +24,9 @@ export class Table extends BaseEntity {
   @OneToMany(() => Order, (order) => order.table)
   orders: Order[];
 
+  @OneToMany(() => QrCode, (qrCode) => qrCode.table)
+  qrCodes: QrCode[];
+
   @OneToOne(() => QrCode, (qrCode) => qrCode.table)
   qrCode: QrCode;
 }

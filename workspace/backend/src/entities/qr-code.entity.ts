@@ -1,26 +1,28 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Table } from './table.entity';
-import { Outlet } from './outlet.entity';
-import { Order } from './order.entity';
+import { Business } from './business.entity';
 
 @Entity('qr_codes')
 export class QrCode extends BaseEntity {
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   code: string;
 
   @Column({ type: 'varchar' })
   tableId: string;
 
   @Column({ type: 'varchar' })
-  tenantId: string;
+  businessId: string;
 
-  @Column({ default: true })
-  active: boolean;
+  @Column({ type: 'timestamp', nullable: true })
+  scannedAt: Date;
 
-  @Column({ default: 0 })
-  usageCount: number;
+  @Column({ default: false })
+  isActive: boolean;
 
-  @ManyToOne(() => Table, (table) => table.qrCode)
+  @ManyToOne(() => Table, (table) => table.qrCodes)
   table: Table;
+
+  @ManyToOne(() => Business, (business) => business.qrCodes)
+  business: Business;
 }

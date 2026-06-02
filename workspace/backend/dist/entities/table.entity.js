@@ -43,6 +43,10 @@ __decorate([
     __metadata("design:type", Array)
 ], Table.prototype, "orders", void 0);
 __decorate([
+    (0, typeorm_1.OneToMany)(() => qr_code_entity_1.QrCode, (qrCode) => qrCode.table),
+    __metadata("design:type", Array)
+], Table.prototype, "qrCodes", void 0);
+__decorate([
     (0, typeorm_1.OneToOne)(() => qr_code_entity_1.QrCode, (qrCode) => qrCode.table),
     __metadata("design:type", qr_code_entity_1.QrCode)
 ], Table.prototype, "qrCode", void 0);
