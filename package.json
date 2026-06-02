@@ -1,0 +1,23 @@
+{
+  "name": "cafe-flow-workspace",
+  "version": "1.0.0",
+  "description": "CafeFlow - Digital Ordering Platform",
+  "scripts": {
+    "dev": "bash /home/dnx-xy/Developments/Cafe-R/run-dev.sh",
+    "dev:backend": "cd /home/dnx-xy/Developments/Cafe-R/workspace/backend && npm run start:dev",
+    "dev:frontend": "cd /home/dnx-xy/Developments/Cafe-R/workspace/frontend && npm run dev",
+    "dev:stop": "cd /home/dnx-xy/Developments/Cafe-R/workspace && docker compose down",
+    "build": "cd /home/dnx-xy/Developments/Cafe-R/workspace/frontend && npm run build",
+    "start": "cd /home/dnx-xy/Developments/Cafe-R/workspace/frontend && npm start",
+    "lint": "cd /home/dnx-xy/Developments/Cafe-R/workspace/frontend && npm run lint"
+  },
+  "keywords": [
+    "cafe",
+    "ordering",
+    "restaurant",
+    "digital-menu",
+    "qr-code"
+  ],
+  "author": "CafeFlow Team",
+  "license": "MIT"
+}

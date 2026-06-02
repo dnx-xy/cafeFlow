@@ -1,0 +1,30 @@
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  PREPARING = 'PREPARING',
+  READY = 'READY',
+  DELIVERED = 'DELIVERED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
+
+export enum OrderType {
+  DINING_IN = 'DINING_IN',
+  TAKEAWAY = 'TAKEAWAY',
+  DELIVERY = 'DELIVERY'
+}
+
+export enum PaymentMethod {
+  CASH = 'CASH',
+  CARD = 'CARD',
+  QRIS = 'QRIS',
+  WA_TRANSFER = 'WA_TRANSFER',
+  BANK_TRANSFER = 'BANK_TRANSFER'
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED'
+}

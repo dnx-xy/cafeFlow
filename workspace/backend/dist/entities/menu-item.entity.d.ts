@@ -1,0 +1,34 @@
+import { BaseEntity } from './base.entity';
+import { MenuCategory } from './menu-category.entity';
+import { MenuGroup } from './menu-group.entity';
+import { Menu } from './menu.entity';
+import { CustomAttribute } from './custom-attribute.entity';
+import { MenuOption } from './menu-option.entity';
+import { OrderItem } from './order-item.entity';
+import { PromotionItem } from './promotion-item.entity';
+export declare class MenuItem extends BaseEntity {
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    available: boolean;
+    soldOut: boolean;
+    hidden: boolean;
+    stockQuantity: number;
+    categorySortIndex: number;
+    groupSortIndex: number;
+    popularityScore: number;
+    isFeatured: boolean;
+    isSpecialOffer: boolean;
+    menuCategoryId: string;
+    menuGroupId: string;
+    menuId: string;
+    tenantId: string;
+    category: MenuCategory;
+    group: MenuGroup;
+    menu: Menu;
+    customAttributes: CustomAttribute[];
+    menuOptions: MenuOption[];
+    orderItems: OrderItem[];
+    promotionItems: PromotionItem[];
+}
