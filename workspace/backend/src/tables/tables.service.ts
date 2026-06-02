@@ -33,7 +33,7 @@ export class TablesService {
     const qrCode = this.qrCodesRepository.create({
       code: `cf-${tenantId.substring(0, 6)}-${savedTable.number.toLowerCase()}`,
       tableId: savedTable.id,
-      businessId: tableData.businessId || '', // We need to get businessId from somewhere
+      businessId: '', // We'll need to get this from auth context or pass it properly
     });
     
     await this.qrCodesRepository.save(qrCode);
