@@ -15,6 +15,8 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { IntegrationModule } from '../integration/integration.module';
 import { QrCodesModule } from '../qr-codes/qr-codes.module';
+import { PublicModule } from '../public/public.module';
+import { PlansModule } from '../plans/plans.module';
 import { Business } from '../entities/business.entity';
 import { CustomAttribute } from '../entities/custom-attribute.entity';
 import { CustomAttributeValue } from '../entities/custom-attribute-value.entity';
@@ -86,6 +88,8 @@ import { User } from '../entities/user.entity';
     PaymentsModule,
     IntegrationModule,
     QrCodesModule,
+    PublicModule,
+    PlansModule,
   ],
   controllers: [],
   providers: [],

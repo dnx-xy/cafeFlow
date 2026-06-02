@@ -2,15 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Outlet } from '../entities/outlet.entity';
+import { PlansService } from '../plans/plans.service';
 
 @Injectable()
 export class OutletsService {
   constructor(
     @InjectRepository(Outlet)
     private outletsRepository: Repository<Outlet>,
+    private plansService: PlansService,
   ) {}
 
   async create(outletData: Partial<Outlet>, tenantId: string, businessId: string): Promise<Outlet> {
+    await this.plansService.enforceOutletLimit(businessId);
     const outlet = this.outletsRepository.create({
       ...outletData,
       tenantId,

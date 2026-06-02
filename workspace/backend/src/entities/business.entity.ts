@@ -29,6 +29,9 @@ export class Business extends BaseEntity {
   @Column({ nullable: true })
   countryCode: string;
 
+  @Column({ type: 'varchar', default: 'FREE' })
+  plan: string;
+
   @Column({ type: 'varchar' })
   ownerId: string;
 

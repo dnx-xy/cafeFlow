@@ -17,11 +17,14 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const outlet_entity_1 = require("../entities/outlet.entity");
+const plans_service_1 = require("../plans/plans.service");
 let OutletsService = class OutletsService {
-    constructor(outletsRepository) {
+    constructor(outletsRepository, plansService) {
         this.outletsRepository = outletsRepository;
+        this.plansService = plansService;
     }
     async create(outletData, tenantId, businessId) {
+        await this.plansService.enforceOutletLimit(businessId);
         const outlet = this.outletsRepository.create({
             ...outletData,
             tenantId,
@@ -53,6 +56,7 @@ exports.OutletsService = OutletsService;
 exports.OutletsService = OutletsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(outlet_entity_1.Outlet)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        plans_service_1.PlansService])
 ], OutletsService);
 //# sourceMappingURL=outlets.service.js.map

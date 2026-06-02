@@ -13,13 +13,14 @@ const qr_codes_controller_1 = require("./qr-codes.controller");
 const qr_codes_service_1 = require("./qr-codes.service");
 const qr_code_entity_1 = require("../entities/qr-code.entity");
 const table_entity_1 = require("../entities/table.entity");
+const outlet_entity_1 = require("../entities/outlet.entity");
 let QrCodesModule = class QrCodesModule {
 };
 exports.QrCodesModule = QrCodesModule;
 exports.QrCodesModule = QrCodesModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([qr_code_entity_1.QrCode, table_entity_1.Table]),
+            typeorm_1.TypeOrmModule.forFeature([qr_code_entity_1.QrCode, table_entity_1.Table, outlet_entity_1.Outlet]),
         ],
         controllers: [qr_codes_controller_1.QrCodesController],
         providers: [qr_codes_service_1.QrCodesService],

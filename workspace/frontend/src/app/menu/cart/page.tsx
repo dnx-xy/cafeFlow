@@ -9,12 +9,11 @@ import {
   Minus,
   Trash2,
   Coffee,
-  UtensilsCrossed,
-  ChefHat,
-  Leaf,
   CreditCard,
   Clock,
   MapPin,
+  MessageCircle,
+  ShoppingBag,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,94 +21,63 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-
-interface CartItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  quantity: number;
-  customization: {
-    size?: string;
-    milk?: string;
-    sugar?: string;
-    ice?: string;
-  };
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: "1",
-    name: "Signature Latte",
-    description: "Rich espresso with velvety steamed milk",
-    price: 5.50,
-    image: "https://images.unsplash.com/photo-1570968992193-6e584a94f04a?w=200&auto=format&fit=crop",
-    quantity: 2,
-    customization: {
-      size: "Medium (12oz)",
-      milk: "Oat Milk",
-      sugar: "50%",
-      ice: "Hot",
-    },
-  },
-  {
-    id: "12",
-    name: "Butter Croissant",
-    description: "Flaky, buttery French pastry",
-    price: 3.75,
-    image: "https://images.unsplash.com/photo-1555507036-ab1f40388085?w=200&auto=format&fit=crop",
-    quantity: 1,
-    customization: {},
-  },
-];
+import { useMenuCart } from "@/hooks/useMenuCart";
+import { usePublicOrder } from "@/hooks/usePublicOrder";
+import { generateWhatsAppMessage } from "@/lib/whatsapp";
 
 const cafeInfo = {
   name: "Brew Haven Coffee",
   tableNumber: 12,
 };
 
+const upsellItems = [
+  { id: "7", name: "Mocha", price: 5.75, image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?w=200&auto=format&fit=crop" },
+  { id: "13", name: "Almond Croissant", price: 4.50, image: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=200&auto=format&fit=crop" },
+  { id: "10", name: "Green Tea", price: 3.00, image: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=200&auto=format&fit=crop" },
+];
+
 export default function CartPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
+  const { items: cartItems, count, subtotal, updateQuantity, removeItem } = useMenuCart();
+  const { submitOrder } = usePublicOrder();
   const [orderNotes, setOrderNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.08;
   const total = subtotal + tax;
 
-  const updateQuantity = (id: string, delta: number) => {
-    setCartItems((items) =>
-      items
-        .map((item) =>
-          item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
+  const handleWhatsApp = () => {
+    const url = generateWhatsAppMessage(cartItems, String(cafeInfo.tableNumber), orderNotes, cafeInfo.name);
+    window.open(url, '_blank');
+    toast.success("WhatsApp opened with your order");
   };
 
-  const removeItem = (id: string) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-    toast.success("Item removed from cart");
-  };
-
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
-    // Simulate checkout
-    toast.success("Order placed successfully!");
-    router.push("/menu/confirmation");
+    setSubmitting(true);
+    try {
+      const orderData = {
+        tableId: window.location.pathname.includes('table=') ? window.location.pathname.split('table=')[1] : '1',
+        items: cartItems.map(i => ({ menuItemId: i.id, quantity: i.quantity, notes: Object.values(i.customization || {}).filter(Boolean).join(', ') })),
+        notes: orderNotes,
+      };
+      const result = await submitOrder(orderData);
+      localStorage.setItem('last_order', JSON.stringify(result));
+      toast.success("Order placed successfully!");
+      router.push("/menu/confirmation");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to place order");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const getCustomizationString = (item: CartItem) => {
-    const parts = [];
-    if (item.customization.size) parts.push(item.customization.size);
-    if (item.customization.milk) parts.push(item.customization.milk);
-    if (item.customization.sugar) parts.push(item.customization.sugar + " sugar");
-    if (item.customization.ice) parts.push(item.customization.ice);
-    return parts.join(" | ");
+  const getCustomizationString = (item: typeof cartItems[0]) => {
+    if (!item.customization) return "";
+    return Object.values(item.customization).filter(Boolean).join(" | ");
   };
 
   return (
@@ -124,7 +92,7 @@ export default function CartPage() {
           </Link>
           <div>
             <h1 className="text-lg font-semibold">Your Cart</h1>
-            <p className="text-xs text-muted-foreground">{cartItems.length} items</p>
+            <p className="text-xs text-muted-foreground">{count} items</p>
           </div>
         </div>
       </div>
@@ -164,7 +132,7 @@ export default function CartPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               Add some delicious items to get started
             </p>
-            <Link href="/menu">
+          <Link href="/menu">
               <Button className="mt-4 bg-gradient-to-r from-amber-500 to-orange-500">
                 Browse Menu
               </Button>
@@ -172,8 +140,8 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {cartItems.map((item) => (
-              <Card key={item.id} className="overflow-hidden border-0 shadow-sm">
+            {cartItems.map((item, idx) => (
+              <Card key={item.id + '-' + idx} className="overflow-hidden border-0 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex gap-3">
                     <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
@@ -197,7 +165,7 @@ export default function CartPage() {
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeItem(item.id, item.customization)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -211,7 +179,7 @@ export default function CartPage() {
                             variant="outline"
                             size="icon"
                             className="h-7 w-7 rounded-full border-border/50"
-                            onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => updateQuantity(item.id, -1, item.customization)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -222,7 +190,7 @@ export default function CartPage() {
                             variant="outline"
                             size="icon"
                             className="h-7 w-7 rounded-full border-border/50"
-                            onClick={() => updateQuantity(item.id, 1)}
+                            onClick={() => updateQuantity(item.id, 1, item.customization)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -236,17 +204,49 @@ export default function CartPage() {
           </div>
         )}
 
-        {/* Add More Items */}
+        {/* Add More Items + WhatsApp Order */}
         {cartItems.length > 0 && (
-          <Link href="/menu">
+          <div className="mt-3 flex gap-2">
+            <Link href="/menu" className="flex-1">
+              <Button variant="outline" className="w-full border-dashed border-border/50 text-muted-foreground">
+                <Plus className="mr-2 h-4 w-4" />
+                Add more
+              </Button>
+            </Link>
             <Button
               variant="outline"
-              className="mt-3 w-full border-dashed border-border/50 text-muted-foreground"
+              className="border-green-300 text-green-700 hover:bg-green-50 hover:text-green-800"
+              onClick={handleWhatsApp}
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Add more items
+              <MessageCircle className="mr-2 h-4 w-4" />
+              WA Order
             </Button>
-          </Link>
+          </div>
+        )}
+
+        {/* Upsell Suggestions */}
+        {cartItems.length > 0 && (
+          <div className="mt-6">
+            <h3 className="mb-3 text-sm font-semibold flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4 text-amber-500" />
+              You might also like
+            </h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {upsellItems.filter(u => !cartItems.find(c => c.id === u.id)).slice(0, 3).map(item => (
+                <Link key={item.id} href={"/menu/item/" + item.id}>
+                  <Card className="min-w-[140px] flex-shrink-0 overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="h-20 overflow-hidden">
+                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                    </div>
+                    <CardContent className="p-2">
+                      <h4 className="text-xs font-medium">{item.name}</h4>
+                      <p className="mt-1 text-xs font-bold text-amber-600">${item.price.toFixed(2)}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Order Notes */}
@@ -302,16 +302,31 @@ export default function CartPage() {
       {/* Fixed Checkout Button */}
       {cartItems.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 p-4 backdrop-blur">
-          <div className="mx-auto flex max-w-md items-center justify-between gap-4">
-            <div>
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            <Button
+              variant="outline"
+              className="border-green-300 text-green-700 hover:bg-green-50 px-3"
+              onClick={handleWhatsApp}
+            >
+              <MessageCircle className="h-5 w-5" />
+            </Button>
+            <div className="flex-1">
               <p className="text-xs text-muted-foreground">Total</p>
               <p className="text-xl font-bold text-amber-600">${total.toFixed(2)}</p>
             </div>
             <Button
               className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
               onClick={handleCheckout}
+              disabled={submitting}
             >
-              Checkout
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Placing Order...
+                </span>
+              ) : (
+                'Checkout'
+              )}
             </Button>
           </div>
         </div>

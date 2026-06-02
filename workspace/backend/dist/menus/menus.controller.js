@@ -22,7 +22,7 @@ let MenusController = class MenusController {
         this.menusService = menusService;
     }
     async create(body, user) {
-        return await this.menusService.create(body, user.tenantId, user.businessId);
+        return await this.menusService.create(body, user.tenantId, body.outletId, user.businessId);
     }
     async findAll(outletId, user) {
         return await this.menusService.findAll(user.tenantId, outletId);
@@ -41,6 +41,26 @@ let MenusController = class MenusController {
     async remove(id, user) {
         await this.menusService.remove(id, user.tenantId);
         return { message: 'Menu deleted successfully' };
+    }
+    async createCategory(menuId, body, user) {
+        return await this.menusService.createCategory(menuId, body, user.tenantId);
+    }
+    async updateCategory(id, body, user) {
+        return await this.menusService.updateCategory(id, body, user.tenantId);
+    }
+    async removeCategory(id, user) {
+        await this.menusService.removeCategory(id, user.tenantId);
+        return { message: 'Category deleted successfully' };
+    }
+    async createItem(menuId, body, user) {
+        return await this.menusService.createItem(menuId, body, user.tenantId, user.businessId);
+    }
+    async updateItem(id, body, user) {
+        return await this.menusService.updateItem(id, body, user.tenantId);
+    }
+    async removeItem(id, user) {
+        await this.menusService.removeItem(id, user.tenantId);
+        return { message: 'Item deleted successfully' };
     }
 };
 exports.MenusController = MenusController;
@@ -100,6 +120,64 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], MenusController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':menuId/categories'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('menuId', common_1.ParseUUIDPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.Put)('categories/:id'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "updateCategory", null);
+__decorate([
+    (0, common_1.Delete)('categories/:id'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "removeCategory", null);
+__decorate([
+    (0, common_1.Post)(':menuId/items'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('menuId', common_1.ParseUUIDPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "createItem", null);
+__decorate([
+    (0, common_1.Put)('items/:id'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "updateItem", null);
+__decorate([
+    (0, common_1.Delete)('items/:id'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], MenusController.prototype, "removeItem", null);
 exports.MenusController = MenusController = __decorate([
     (0, common_1.Controller)('menus'),
     __metadata("design:paramtypes", [menus_service_1.MenusService])

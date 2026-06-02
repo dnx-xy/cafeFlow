@@ -18,6 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import { QRCodeSVG } from 'qrcode.react';
 import { 
   Search,
   Plus,
@@ -25,7 +30,7 @@ import {
   Trash2,
   Eye,
   QrCode,
-  Wifi,
+  Download,
   AlertTriangle,
   Table
 } from 'lucide-react';
@@ -42,8 +47,8 @@ export default function QrCodesPage() {
     capacity: 1,
     isActive: true
   });
+  const [viewingQr, setViewingQr] = useState<{ tableNumber: string; code: string } | null>(null);
 
-  // Load tables on component mount
   useEffect(() => {
     fetchTables();
   }, []);
@@ -64,10 +69,11 @@ export default function QrCodesPage() {
     }
   };
 
-  const handleGenerateQrCode = async (tableId: string) => {
+  const handleGenerateQrCode = async (tableId: string, tableNumber: string) => {
     try {
-      await generateQrCode(tableId);
-      toast.success('QR code generated successfully');
+      const qr = await generateQrCode(tableId);
+      setViewingQr({ tableNumber, code: qr.code });
+      toast.success('QR code generated');
     } catch (err) {
       toast.error('Failed to generate QR code');
     }
@@ -79,7 +85,7 @@ export default function QrCodesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" suppressHydrationWarning>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -222,10 +228,15 @@ export default function QrCodesPage() {
                         <td className="py-4">
                           {table.qrCodes && table.qrCodes.length > 0 ? (
                             <div className="flex items-center">
-                              <Badge variant="secondary" className="text-xs flex items-center">
-                                <QrCode className="w-3 h-3 mr-1" />
-                                Generated
-                              </Badge>
+                              <button type="button" onClick={() => {
+                                const lastQr = table.qrCodes![table.qrCodes!.length - 1];
+                                setViewingQr({ tableNumber: table.tableNumber, code: lastQr.code });
+                              }}>
+                                <Badge variant="secondary" className="text-xs flex items-center cursor-pointer hover:bg-muted-foreground/20">
+                                  <QrCode className="w-3 h-3 mr-1" />
+                                  Generated
+                                </Badge>
+                              </button>
                             </div>
                           ) : (
                             <Badge variant="destructive" className="text-xs">
@@ -235,7 +246,7 @@ export default function QrCodesPage() {
                         </td>
                         <td className="py-4 text-right">
                           <DropdownMenu>
-                            <DropdownMenuTrigger>
+                            <DropdownMenuTrigger asChild>
                               <button 
                                 type="button" 
                                 className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -244,24 +255,20 @@ export default function QrCodesPage() {
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              <DropdownMenuItem onClick={() => toast.info(`Table #${table.tableNumber} - ${table.name || 'No name'}\nCapacity: ${table.capacity}`)}>
                                 <Eye className="mr-2 w-4 h-4" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              <DropdownMenuItem onClick={() => toast.info('Edit feature coming soon')}>
                                 <Edit className="mr-2 w-4 h-4" />
                                 Edit Table
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onSelect={(e) => e.preventDefault()}
-                                onClick={() => handleGenerateQrCode(table.id)}
-                              >
+                              <DropdownMenuItem onClick={() => handleGenerateQrCode(table.id, table.tableNumber)}>
                                 <QrCode className="mr-2 w-4 h-4" />
                                 Generate QR Code
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 className="text-red-600"
-                                onSelect={(e) => e.preventDefault()}
                                 onClick={() => deleteTable(table.id)}
                               >
                                 <Trash2 className="mr-2 w-4 h-4" />
@@ -292,6 +299,51 @@ export default function QrCodesPage() {
           )}
         </CardContent>
       </Card>
+      {/* QR Code Dialog */}
+      <Dialog open={viewingQr !== null} onOpenChange={(open) => { if (!open) setViewingQr(null); }}>
+        <DialogContent className="sm:max-w-sm qr-code-dialog">
+          <div className="flex flex-col items-center gap-4 py-4">
+            <h3 className="text-lg font-semibold">Table #{viewingQr?.tableNumber}</h3>
+            <div className="bg-white p-4 rounded-lg">
+              {viewingQr && (
+                <QRCodeSVG
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${viewingQr.code}`}
+                  size={200}
+                  level="M"
+                />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground text-center break-all max-w-full">
+              Scan to open menu for Table #{viewingQr?.tableNumber}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const svg = document.querySelector('.qr-code-dialog svg');
+                if (svg) {
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const img = new Image();
+                  img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx?.drawImage(img, 0, 0);
+                    const link = document.createElement('a');
+                    link.download = `table-${viewingQr?.tableNumber}-qr.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                  };
+                  img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
+                }
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download QR
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -13,18 +13,21 @@ export class TablesController {
     @Body() body: any,
     @AuthenticatedUser() user: any,
   ) {
-    // Map frontend field names to backend entity field names
-    const tableData = {
-      ...body,
-      number: body.tableNumber, // Convert frontend "tableNumber" to backend "number"
-      outletId: user.businessId, // Use businessId as outletId for now
+    const { tableNumber, isActive, ...rest } = body;
+    const tableData: any = {
+      ...rest,
+      number: tableNumber,
+      active: isActive,
     };
-    
-    return await this.tablesService.create(
+
+    const table = await this.tablesService.create(
       tableData,
       user.tenantId,
       user.businessId,
+      body.outletId,
     );
+
+    return { ...table, tableNumber: table.number, isActive: table.active };
   }
 
   @Get()
@@ -33,7 +36,8 @@ export class TablesController {
     @Query('outletId') outletId: string,
     @AuthenticatedUser() user: any,
   ) {
-    return await this.tablesService.findAll(user.tenantId, outletId);
+    const tables = await this.tablesService.findAll(user.tenantId, outletId);
+    return tables.map((t: any) => ({ ...t, tableNumber: t.number, isActive: t.active }));
   }
 
   @Get(':id')
@@ -42,7 +46,8 @@ export class TablesController {
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
   ) {
-    return await this.tablesService.findOne(id, user.tenantId);
+    const table = await this.tablesService.findOne(id, user.tenantId);
+    return { ...table, tableNumber: table.number, isActive: table.active };
   }
 
   @Put(':id')
@@ -52,11 +57,15 @@ export class TablesController {
     @Body() body: any,
     @AuthenticatedUser() user: any,
   ) {
-    return await this.tablesService.update(
-      id,
-      body,
-      user.tenantId,
-    );
+    const { tableNumber, isActive, ...rest } = body;
+    const updateData: any = {
+      ...rest,
+      number: tableNumber,
+      active: isActive,
+    };
+
+    const table = await this.tablesService.update(id, updateData, user.tenantId);
+    return { ...table, tableNumber: table.number, isActive: table.active };
   }
 
   @Delete(':id')

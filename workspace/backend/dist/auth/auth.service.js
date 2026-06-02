@@ -52,13 +52,15 @@ const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../entities/user.entity");
 const tenant_entity_1 = require("../entities/tenant.entity");
 const business_entity_1 = require("../entities/business.entity");
+const outlet_entity_1 = require("../entities/outlet.entity");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcryptjs"));
 let AuthService = class AuthService {
-    constructor(usersRepository, tenantsRepository, businessesRepository, jwtService) {
+    constructor(usersRepository, tenantsRepository, businessesRepository, outletsRepository, jwtService) {
         this.usersRepository = usersRepository;
         this.tenantsRepository = tenantsRepository;
         this.businessesRepository = businessesRepository;
+        this.outletsRepository = outletsRepository;
         this.jwtService = jwtService;
     }
     async validateUser(email, password) {
@@ -119,6 +121,12 @@ let AuthService = class AuthService {
             ownerId: '',
         });
         const savedBusiness = await this.businessesRepository.save(business);
+        const outlet = this.outletsRepository.create({
+            name: 'Main Outlet',
+            businessId: savedBusiness.id,
+            tenantId: savedTenant.id,
+        });
+        await this.outletsRepository.save(outlet);
         const userInput = {
             name: userData.name || '',
             email: userData.email || '',
@@ -141,7 +149,9 @@ exports.AuthService = AuthService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(1, (0, typeorm_1.InjectRepository)(tenant_entity_1.Tenant)),
     __param(2, (0, typeorm_1.InjectRepository)(business_entity_1.Business)),
+    __param(3, (0, typeorm_1.InjectRepository)(outlet_entity_1.Outlet)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         jwt_1.JwtService])

@@ -79,15 +79,29 @@ let QrCodesService = class QrCodesService {
             order: { createdAt: 'DESC' },
         });
     }
-    async scanQrCode(code, businessId) {
+    async scanQrCode(code) {
         const qrCode = await this.qrCodesRepository.findOne({
-            where: { code, businessId, isActive: true },
+            where: { code, isActive: true },
         });
         if (!qrCode) {
             throw new Error('Invalid or inactive QR code');
         }
+        const table = await this.tablesRepository.findOne({
+            where: { id: qrCode.tableId },
+            relations: { outlet: { business: true } },
+        });
+        if (!table) {
+            throw new Error('Table not found');
+        }
         qrCode.scannedAt = new Date();
-        return await this.qrCodesRepository.save(qrCode);
+        await this.qrCodesRepository.save(qrCode);
+        return {
+            tableId: qrCode.tableId,
+            code: qrCode.code,
+            outletId: table.outletId,
+            tenantId: table.tenantId,
+            businessId: table.outlet?.businessId || '',
+        };
     }
     async getQrCodesByBusiness(businessId, active) {
         const where = { businessId };

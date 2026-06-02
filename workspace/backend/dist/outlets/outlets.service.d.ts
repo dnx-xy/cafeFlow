@@ -1,8 +1,10 @@
 import { Repository } from 'typeorm';
 import { Outlet } from '../entities/outlet.entity';
+import { PlansService } from '../plans/plans.service';
 export declare class OutletsService {
     private outletsRepository;
-    constructor(outletsRepository: Repository<Outlet>);
+    private plansService;
+    constructor(outletsRepository: Repository<Outlet>, plansService: PlansService);
     create(outletData: Partial<Outlet>, tenantId: string, businessId: string): Promise<Outlet>;
     findAll(tenantId: string, businessId?: string): Promise<Outlet[]>;
     findOne(id: string, tenantId: string): Promise<Outlet>;

@@ -12,11 +12,13 @@ import {
   Star,
   Coffee,
   Leaf,
+  ShoppingCart,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useMenuCart } from "@/hooks/useMenuCart";
 
 interface MenuItem {
   id: string;
@@ -201,11 +203,25 @@ export default function ProductDetailPage() {
   const initialIceIndex = item.category === "pastries" || item.category === "food" ? 0 : 0;
   const [selectedIce, setSelectedIce] = useState(initialIceIndex);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { addItem, count: cartCount } = useMenuCart();
 
   const sizePrice = item.customization.sizes[selectedSize]?.price || 0;
   const totalPrice = (item.price + sizePrice) * quantity;
 
   const handleAddToCart = () => {
+    const customization: Record<string, string> = {};
+    if (item.customization.sizes[selectedSize]) customization.Size = item.customization.sizes[selectedSize].name;
+    if (item.customization.milkOptions[selectedMilk]) customization.Milk = item.customization.milkOptions[selectedMilk];
+    if (item.customization.sugarLevels[selectedSugar]) customization.Sugar = item.customization.sugarLevels[selectedSugar];
+    if (item.customization.iceLevels[selectedIce]) customization.Temp = item.customization.iceLevels[selectedIce];
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: totalPrice / quantity,
+      image: item.image,
+      quantity,
+      customization,
+    });
     toast.success(item.name + " added to cart!", {
       description: "Quantity: " + quantity + " | $" + totalPrice.toFixed(2),
     });
@@ -240,6 +256,20 @@ export default function ProductDetailPage() {
             </Button>
           </Link>
           <div className="flex gap-2">
+            <Link href="/menu/cart" className="relative">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white"
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
             <Button
               variant="secondary"
               size="icon"

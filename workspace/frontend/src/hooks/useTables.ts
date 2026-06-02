@@ -34,8 +34,8 @@ export const useTables = () => {
       const queryString = params.toString();
       const url = queryString ? `/tables?${queryString}` : '/tables';
       
-      const response = await apiClient.get<{ data: Table[]; pagination: any }>(url);
-      setTables(response.data.data);
+      const response = await apiClient.get<Table[]>(url);
+      setTables(Array.isArray(response.data) ? response.data : (response.data as any).data ?? []);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch tables';
@@ -50,7 +50,7 @@ export const useTables = () => {
   const createTable = async (tableData: Partial<Table>) => {
     try {
       const response = await apiClient.post<Table>('/tables', tableData);
-      setTables(prev => [...prev, response.data]);
+      setTables(prev => [...(prev ?? []), response.data]);
       return response.data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create table';
@@ -87,9 +87,9 @@ export const useTables = () => {
     try {
       const response = await apiClient.post(`/qr-codes/generate`, { tableId });
       // Update the table with the new QR code
-      setTables(prev => prev.map(table => 
-        table.id === tableId 
-          ? { ...table, qrCode: response.data } 
+      setTables(prev => prev.map(table =>
+        table.id === tableId
+          ? { ...table, qrCodes: [...(table.qrCodes ?? []), response.data] }
           : table
       ));
       return response.data;

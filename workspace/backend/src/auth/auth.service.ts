@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User, UserRole } from '../entities/user.entity';
 import { Tenant } from '../entities/tenant.entity';
 import { Business } from '../entities/business.entity';
+import { Outlet } from '../entities/outlet.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
@@ -16,6 +17,8 @@ export class AuthService {
     private tenantsRepository: Repository<Tenant>,
     @InjectRepository(Business)
     private businessesRepository: Repository<Business>,
+    @InjectRepository(Outlet)
+    private outletsRepository: Repository<Outlet>,
     private jwtService: JwtService,
   ) {}
 
@@ -85,6 +88,13 @@ export class AuthService {
       ownerId: '', // will update after user creation
     });
     const savedBusiness = await this.businessesRepository.save(business);
+
+    const outlet = this.outletsRepository.create({
+      name: 'Main Outlet',
+      businessId: savedBusiness.id,
+      tenantId: savedTenant.id,
+    });
+    await this.outletsRepository.save(outlet);
 
     const userInput: Partial<User> = {
       name: userData.name || '',

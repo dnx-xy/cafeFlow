@@ -48,6 +48,10 @@ __decorate([
     __metadata("design:type", String)
 ], Business.prototype, "countryCode", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'FREE' }),
+    __metadata("design:type", String)
+], Business.prototype, "plan", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
 ], Business.prototype, "ownerId", void 0);

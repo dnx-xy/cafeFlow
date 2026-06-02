@@ -2,22 +2,35 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Table } from '../entities/table.entity';
+import { Outlet } from '../entities/outlet.entity';
 import { QrCode } from '../entities/qr-code.entity';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TablesService {
   constructor(
     @InjectRepository(Table)
     private tablesRepository: Repository<Table>,
+    @InjectRepository(Outlet)
+    private outletsRepository: Repository<Outlet>,
     @InjectRepository(QrCode)
     private qrCodesRepository: Repository<QrCode>,
   ) {}
 
-  async create(tableData: Partial<Table>, tenantId: string, outletId: string): Promise<Table> {
-    // Ensure table number is provided
+  async create(tableData: Partial<Table>, tenantId: string, businessId: string, outletId?: string): Promise<Table> {
+    if (!outletId) {
+      let outlet = await this.outletsRepository.findOne({ where: { businessId }, order: { createdAt: 'ASC' } });
+      if (!outlet) {
+        outlet = this.outletsRepository.create({
+          name: 'Main Outlet',
+          businessId,
+          tenantId,
+        });
+        outlet = await this.outletsRepository.save(outlet);
+      }
+      outletId = outlet.id;
+    }
+    
     if (!tableData.number) {
-      // Generate default table number if not provided
       tableData.number = `T${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     }
     
@@ -29,11 +42,10 @@ export class TablesService {
     
     const savedTable = await this.tablesRepository.save(table);
     
-    // Generate QR code for the table
     const qrCode = this.qrCodesRepository.create({
-      code: `cf-${tenantId.substring(0, 6)}-${savedTable.number.toLowerCase()}`,
+      code: `cf-${tenantId.substring(0, 6)}-${savedTable.id.substring(0, 8)}`,
       tableId: savedTable.id,
-      businessId: '', // We'll need to get this from auth context or pass it properly
+      businessId,
     });
     
     await this.qrCodesRepository.save(qrCode);

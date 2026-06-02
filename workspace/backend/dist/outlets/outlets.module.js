@@ -13,12 +13,13 @@ const outlets_controller_1 = require("./outlets.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const outlet_entity_1 = require("../entities/outlet.entity");
 const business_entity_1 = require("../entities/business.entity");
+const plans_module_1 = require("../plans/plans.module");
 let OutletsModule = class OutletsModule {
 };
 exports.OutletsModule = OutletsModule;
 exports.OutletsModule = OutletsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([outlet_entity_1.Outlet, business_entity_1.Business])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([outlet_entity_1.Outlet, business_entity_1.Business]), plans_module_1.PlansModule],
         controllers: [outlets_controller_1.OutletsController],
         providers: [outlets_service_1.OutletsService],
         exports: [outlets_service_1.OutletsService],

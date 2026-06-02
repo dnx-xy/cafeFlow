@@ -22,13 +22,13 @@ let QrCodesController = class QrCodesController {
         this.qrCodesService = qrCodesService;
     }
     async generateQrCode(user, body) {
-        return await this.qrCodesService.generateQrCode(body.tableId, user.tenantId);
+        return await this.qrCodesService.generateQrCode(body.tableId, user.businessId);
     }
     async getQrCodeByTable(tableId, user) {
-        return await this.qrCodesService.getQrCodeByTable(tableId, user.tenantId);
+        return await this.qrCodesService.getQrCodeByTable(tableId, user.businessId);
     }
-    async scanQrCode(code, user) {
-        return await this.qrCodesService.scanQrCode(code, user.businessId);
+    async scanQrCode(code) {
+        return await this.qrCodesService.scanQrCode(code);
     }
     async getQrCodesByBusiness(user, businessId, active) {
         return await this.qrCodesService.getQrCodesByBusiness(businessId, active);
@@ -55,11 +55,10 @@ __decorate([
 ], QrCodesController.prototype, "getQrCodeByTable", null);
 __decorate([
     (0, common_1.Get)('scan/:code'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Public)(),
     __param(0, (0, common_1.Param)('code')),
-    __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], QrCodesController.prototype, "scanQrCode", null);
 __decorate([

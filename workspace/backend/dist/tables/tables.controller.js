@@ -22,21 +22,32 @@ let TablesController = class TablesController {
         this.tablesService = tablesService;
     }
     async create(body, user) {
+        const { tableNumber, isActive, ...rest } = body;
         const tableData = {
-            ...body,
-            number: body.tableNumber,
-            outletId: user.businessId,
+            ...rest,
+            number: tableNumber,
+            active: isActive,
         };
-        return await this.tablesService.create(tableData, user.tenantId, user.businessId);
+        const table = await this.tablesService.create(tableData, user.tenantId, user.businessId, body.outletId);
+        return { ...table, tableNumber: table.number, isActive: table.active };
     }
     async findAll(outletId, user) {
-        return await this.tablesService.findAll(user.tenantId, outletId);
+        const tables = await this.tablesService.findAll(user.tenantId, outletId);
+        return tables.map((t) => ({ ...t, tableNumber: t.number, isActive: t.active }));
     }
     async findOne(id, user) {
-        return await this.tablesService.findOne(id, user.tenantId);
+        const table = await this.tablesService.findOne(id, user.tenantId);
+        return { ...table, tableNumber: table.number, isActive: table.active };
     }
     async update(id, body, user) {
-        return await this.tablesService.update(id, body, user.tenantId);
+        const { tableNumber, isActive, ...rest } = body;
+        const updateData = {
+            ...rest,
+            number: tableNumber,
+            active: isActive,
+        };
+        const table = await this.tablesService.update(id, updateData, user.tenantId);
+        return { ...table, tableNumber: table.number, isActive: table.active };
     }
     async remove(id, user) {
         await this.tablesService.remove(id, user.tenantId);

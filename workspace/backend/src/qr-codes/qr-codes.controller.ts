@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { QrCodesService } from './qr-codes.service';
-import { AuthenticatedUser, Roles } from '../auth/decorators/auth.decorators';
+import { AuthenticatedUser, Roles, Public } from '../auth/decorators/auth.decorators';
 import { UserRole } from '../entities/user.entity';
 
 @Controller('qr-codes')
@@ -13,7 +13,7 @@ export class QrCodesController {
     @AuthenticatedUser() user: any,
     @Body() body: { tableId: string },
   ) {
-    return await this.qrCodesService.generateQrCode(body.tableId, user.tenantId);
+    return await this.qrCodesService.generateQrCode(body.tableId, user.businessId);
   }
 
   @Get('table/:tableId')
@@ -22,16 +22,15 @@ export class QrCodesController {
     @Param('tableId', ParseUUIDPipe) tableId: string,
     @AuthenticatedUser() user: any,
   ) {
-    return await this.qrCodesService.getQrCodeByTable(tableId, user.tenantId);
+    return await this.qrCodesService.getQrCodeByTable(tableId, user.businessId);
   }
 
   @Get('scan/:code')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Public()
   async scanQrCode(
     @Param('code') code: string,
-    @AuthenticatedUser() user: any,
   ) {
-    return await this.qrCodesService.scanQrCode(code, user.businessId);
+    return await this.qrCodesService.scanQrCode(code);
   }
 
   @Get('business/:businessId')

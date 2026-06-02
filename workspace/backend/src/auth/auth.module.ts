@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Tenant } from '../entities/tenant.entity';
 import { Business } from '../entities/business.entity';
+import { Outlet } from '../entities/outlet.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Business } from '../entities/business.entity';
       secret: process.env.JWT_SECRET || 'secretKey',
       signOptions: { expiresIn: '1h' },
     }),
-    TypeOrmModule.forFeature([User, Tenant, Business]),
+    TypeOrmModule.forFeature([User, Tenant, Business, Outlet]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, LocalStrategy, {

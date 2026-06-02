@@ -15,6 +15,12 @@ export class Table extends BaseEntity {
   @Column({ type: 'varchar' })
   outletId: string;
 
+  @Column({ type: 'int', default: 1 })
+  capacity: number;
+
+  @Column({ default: true })
+  active: boolean;
+
   @Column({ type: 'varchar' })
   tenantId: string;
 

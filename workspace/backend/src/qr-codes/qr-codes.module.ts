@@ -5,9 +5,11 @@ import { QrCodesService } from './qr-codes.service';
 import { QrCode } from '../entities/qr-code.entity';
 import { Table } from '../entities/table.entity';
 
+import { Outlet } from '../entities/outlet.entity';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([QrCode, Table]),
+    TypeOrmModule.forFeature([QrCode, Table, Outlet]),
   ],
   controllers: [QrCodesController],
   providers: [QrCodesService],

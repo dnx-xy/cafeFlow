@@ -17,13 +17,27 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const table_entity_1 = require("../entities/table.entity");
+const outlet_entity_1 = require("../entities/outlet.entity");
 const qr_code_entity_1 = require("../entities/qr-code.entity");
 let TablesService = class TablesService {
-    constructor(tablesRepository, qrCodesRepository) {
+    constructor(tablesRepository, outletsRepository, qrCodesRepository) {
         this.tablesRepository = tablesRepository;
+        this.outletsRepository = outletsRepository;
         this.qrCodesRepository = qrCodesRepository;
     }
-    async create(tableData, tenantId, outletId) {
+    async create(tableData, tenantId, businessId, outletId) {
+        if (!outletId) {
+            let outlet = await this.outletsRepository.findOne({ where: { businessId }, order: { createdAt: 'ASC' } });
+            if (!outlet) {
+                outlet = this.outletsRepository.create({
+                    name: 'Main Outlet',
+                    businessId,
+                    tenantId,
+                });
+                outlet = await this.outletsRepository.save(outlet);
+            }
+            outletId = outlet.id;
+        }
         if (!tableData.number) {
             tableData.number = `T${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
         }
@@ -34,9 +48,9 @@ let TablesService = class TablesService {
         });
         const savedTable = await this.tablesRepository.save(table);
         const qrCode = this.qrCodesRepository.create({
-            code: `cf-${tenantId.substring(0, 6)}-${savedTable.number.toLowerCase()}`,
+            code: `cf-${tenantId.substring(0, 6)}-${savedTable.id.substring(0, 8)}`,
             tableId: savedTable.id,
-            businessId: '',
+            businessId,
         });
         await this.qrCodesRepository.save(qrCode);
         return await this.findOne(savedTable.id, tenantId);
@@ -86,8 +100,10 @@ exports.TablesService = TablesService;
 exports.TablesService = TablesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(table_entity_1.Table)),
-    __param(1, (0, typeorm_1.InjectRepository)(qr_code_entity_1.QrCode)),
+    __param(1, (0, typeorm_1.InjectRepository)(outlet_entity_1.Outlet)),
+    __param(2, (0, typeorm_1.InjectRepository)(qr_code_entity_1.QrCode)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], TablesService);
 //# sourceMappingURL=tables.service.js.map

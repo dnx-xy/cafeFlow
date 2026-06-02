@@ -21,9 +21,11 @@ interface DropdownMenuTriggerProps extends MenuPrimitive.Trigger.Props {
 function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTriggerProps) {
   if (asChild && React.isValidElement(children)) {
     return (
-      <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props}>
-        {children}
-      </MenuPrimitive.Trigger>
+      <MenuPrimitive.Trigger
+        data-slot="dropdown-menu-trigger"
+        render={children}
+        {...props}
+      />
     );
   }
   return (

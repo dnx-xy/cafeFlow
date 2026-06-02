@@ -13,12 +13,13 @@ const staff_controller_1 = require("./staff.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const staff_entity_1 = require("../entities/staff.entity");
 const user_entity_1 = require("../entities/user.entity");
+const plans_module_1 = require("../plans/plans.module");
 let StaffModule = class StaffModule {
 };
 exports.StaffModule = StaffModule;
 exports.StaffModule = StaffModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([staff_entity_1.Staff, user_entity_1.User])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([staff_entity_1.Staff, user_entity_1.User]), plans_module_1.PlansModule],
         controllers: [staff_controller_1.StaffController],
         providers: [staff_service_1.StaffService],
         exports: [staff_service_1.StaffService],

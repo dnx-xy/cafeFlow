@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QrCode } from '../entities/qr-code.entity';
 import { Table } from '../entities/table.entity';
+import { Outlet } from '../entities/outlet.entity';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -45,18 +46,34 @@ export class QrCodesService {
     });
   }
 
-  async scanQrCode(code: string, businessId: string): Promise<QrCode> {
+  async scanQrCode(code: string): Promise<{ tableId: string; code: string; outletId: string; tenantId: string; businessId: string }> {
     const qrCode = await this.qrCodesRepository.findOne({
-      where: { code, businessId, isActive: true },
+      where: { code, isActive: true },
     });
 
     if (!qrCode) {
       throw new Error('Invalid or inactive QR code');
     }
 
-    // Update scanned timestamp
+    const table = await this.tablesRepository.findOne({
+      where: { id: qrCode.tableId },
+      relations: { outlet: { business: true } },
+    });
+
+    if (!table) {
+      throw new Error('Table not found');
+    }
+
     qrCode.scannedAt = new Date();
-    return await this.qrCodesRepository.save(qrCode);
+    await this.qrCodesRepository.save(qrCode);
+
+    return {
+      tableId: qrCode.tableId,
+      code: qrCode.code,
+      outletId: table.outletId,
+      tenantId: table.tenantId,
+      businessId: table.outlet?.businessId || '',
+    };
   }
 
   async getQrCodesByBusiness(businessId: string, active?: boolean): Promise<QrCode[]> {
