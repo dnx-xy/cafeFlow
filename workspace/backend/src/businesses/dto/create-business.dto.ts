@@ -24,4 +24,8 @@ export class CreateBusinessDto {
   @IsOptional()
   @IsString()
   countryCode?: string;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
 }

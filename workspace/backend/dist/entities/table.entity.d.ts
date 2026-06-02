@@ -6,6 +6,8 @@ export declare class Table extends BaseEntity {
     number: string;
     name: string;
     outletId: string;
+    capacity: number;
+    active: boolean;
     tenantId: string;
     outlet: Outlet;
     orders: Order[];

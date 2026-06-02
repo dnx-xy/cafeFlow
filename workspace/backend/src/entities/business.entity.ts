@@ -32,6 +32,9 @@ export class Business extends BaseEntity {
   @Column({ type: 'varchar', default: 'FREE' })
   plan: string;
 
+  @Column({ type: 'varchar', default: 'USD' })
+  currency: string;
+
   @Column({ type: 'varchar' })
   ownerId: string;
 

@@ -52,6 +52,10 @@ __decorate([
     __metadata("design:type", String)
 ], Business.prototype, "plan", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'USD' }),
+    __metadata("design:type", String)
+], Business.prototype, "currency", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
 ], Business.prototype, "ownerId", void 0);

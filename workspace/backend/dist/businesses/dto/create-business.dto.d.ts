@@ -5,4 +5,5 @@ export declare class CreateBusinessDto {
     address?: string;
     city?: string;
     countryCode?: string;
+    currency?: string;
 }

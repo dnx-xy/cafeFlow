@@ -15,6 +15,7 @@ export declare class Business extends BaseEntity {
     city: string;
     countryCode: string;
     plan: string;
+    currency: string;
     ownerId: string;
     tenantId: string;
     tenant: Tenant;

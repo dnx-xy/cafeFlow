@@ -11,6 +11,7 @@ export interface Business {
   address?: string;
   city?: string;
   countryCode?: string;
+  currency?: string;
   ownerId: string;
   tenantId: string;
 }
@@ -23,6 +24,7 @@ const MOCK_BUSINESS: Business = {
   address: '123 Coffee Street',
   city: 'Jakarta',
   countryCode: 'ID',
+  currency: 'USD',
   ownerId: 'u1',
   tenantId: 't1',
 };

@@ -6,21 +6,34 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
+import {
   TrendingUp,
   TrendingDown,
   DollarSign,
   ShoppingCart,
   Users,
   Award,
-  Star,
   Clock,
   QrCode,
   BarChart3,
-  ChevronRight
+  ArrowRight,
+  Activity,
+  Percent,
 } from 'lucide-react';
 import { useOrders, useCustomers } from '@/hooks/useAuth';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { formatCurrency } from '@/lib/currency';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from 'recharts';
 
 const revenueData = [
   { name: 'Mon', revenue: 2400, orders: 24 },
@@ -41,319 +54,244 @@ const topProducts = [
 ];
 
 export default function DashboardPage() {
-  const { orders, loading: ordersLoading, error: ordersError, fetchOrders } = useOrders();
-  const { customers, loading: customersLoading, error: customersError, fetchCustomers } = useCustomers();
+  const { currency } = useCurrency();
+  const { orders, loading: ordersLoading, fetchOrders } = useOrders();
+  const { customers, loading: customersLoading, fetchCustomers } = useCustomers();
   const [stats, setStats] = useState({
-    revenue: 0,
-    orders: 0,
-    customers: 0,
-    qrScans: 0,
-    returning: 0,
-    avgOrder: 0
+    revenue: 24580,
+    orders: 1247,
+    customers: 892,
+    qrScans: 3842,
+    returning: 42,
+    avgOrder: 19.72,
   });
 
-  // Load data on component mount
   useEffect(() => {
     fetchOrders();
     fetchCustomers();
-    
-    // Set sample stats for now (in a real app, this would come from API)
-    setStats({
-      revenue: 24580,
-      orders: 1247,
-      customers: 892,
-      qrScans: 3842,
-      returning: 42,
-      avgOrder: 19.72
-    });
   }, []);
 
   const statusColors: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    CONFIRMED: 'bg-blue-100 text-blue-800 border-blue-200',
-    PREPARING: 'bg-blue-100 text-blue-800 border-blue-200',
-    READY: 'bg-green-100 text-green-800 border-green-200',
-    DELIVERED: 'bg-gray-100 text-gray-800 border-gray-200',
-    COMPLETED: 'bg-gray-100 text-gray-800 border-gray-200',
-    CANCELLED: 'bg-red-100 text-red-800 border-red-200',
+    PENDING: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    CONFIRMED: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+    PREPARING: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+    READY: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20',
+    DELIVERED: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
+    COMPLETED: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
+    CANCELLED: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
   };
 
   return (
-    <div className="space-y-8">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Good morning, John 👋</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Here&apos;s what&apos;s happening at The Daily Grind today.</p>
+        </div>
+        <Badge variant="outline" className="text-xs font-normal text-gray-500 dark:text-gray-400">
+          <Activity className="w-3 h-3 mr-1.5" />
+          Live
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
         {[
-          { 
-            title: 'Revenue', 
-            value: `$${stats.revenue.toLocaleString()}`, 
-            change: '+12%', 
-            icon: DollarSign, 
-            trend: 'up',
-            color: 'bg-green-100 text-green-600'
-          },
-          { 
-            title: 'Orders', 
-            value: stats.orders.toLocaleString(), 
-            change: '+8%', 
-            icon: ShoppingCart, 
-            trend: 'up',
-            color: 'bg-blue-100 text-blue-600'
-          },
-          { 
-            title: 'Customers', 
-            value: stats.customers.toLocaleString(), 
-            change: '+5%', 
-            icon: Users, 
-            trend: 'up',
-            color: 'bg-purple-100 text-purple-600'
-          },
-          { 
-            title: 'QR Scans', 
-            value: stats.qrScans.toLocaleString(), 
-            change: '+24%', 
-            icon: QrCode, 
-            trend: 'up',
-            color: 'bg-amber-100 text-amber-600'
-          },
-          { 
-            title: 'Returning', 
-            value: `${stats.returning}%`, 
-            change: '+5%', 
-            icon: Award, 
-            trend: 'up',
-            color: 'bg-rose-100 text-rose-600'
-          },
-          { 
-            title: 'Avg Order', 
-            value: `$${stats.avgOrder.toFixed(2)}`, 
-            change: '-2%', 
-            icon: TrendingUp, 
-            trend: 'down',
-            color: 'bg-indigo-100 text-indigo-600'
-          },
-        ].map((kpi, index) => (
-          <Card key={index} className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 ${kpi.color} rounded-lg flex items-center justify-center`}>
-                  <kpi.icon className="w-5 h-5" />
-                </div>
-                <div className={`flex items-center text-xs font-medium ${kpi.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                  {kpi.trend === 'up' ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                  {kpi.change}
-                </div>
+          { title: 'Revenue', value: formatCurrency(stats.revenue, currency), change: '+12%', icon: DollarSign, trend: 'up' as const },
+          { title: 'Orders', value: stats.orders.toLocaleString(), change: '+8%', icon: ShoppingCart, trend: 'up' as const },
+          { title: 'Customers', value: stats.customers.toLocaleString(), change: '+5%', icon: Users, trend: 'up' as const },
+          { title: 'QR Scans', value: stats.qrScans.toLocaleString(), change: '+24%', icon: QrCode, trend: 'up' as const },
+          { title: 'Returning', value: `${stats.returning}%`, change: '+5%', icon: Award, trend: 'up' as const },
+          { title: 'Avg Order', value: formatCurrency(stats.avgOrder, currency), change: '-2%', icon: Percent, trend: 'down' as const },
+        ].map((kpi, i) => (
+          <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-9 h-9 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
+                <kpi.icon className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
               </div>
-              <div className="text-2xl font-bold text-foreground">{kpi.value}</div>
-              <div className="text-xs text-muted-foreground">{kpi.title}</div>
-            </CardContent>
-          </Card>
+              <span className={`flex items-center text-[11px] font-medium ${kpi.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {kpi.trend === 'up' ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
+                {kpi.change}
+              </span>
+            </div>
+            <div className="text-xl font-bold text-gray-900 dark:text-white">{kpi.value}</div>
+            <div className="text-[11px] text-gray-400 dark:text-gray-500">{kpi.title}</div>
+          </div>
         ))}
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
-        <Card className="lg:col-span-2 border-0 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div>
-              <CardTitle className="text-base font-semibold">Revenue Overview</CardTitle>
-              <p className="text-sm text-muted-foreground">Daily revenue and orders</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Overview</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Daily revenue and orders this week</p>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-xs">This Week</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
+            <Badge variant="outline" className="text-[11px] font-normal text-gray-500 dark:text-gray-400">This Week</Badge>
+          </div>
+          <div className="p-5 pt-2">
+            <div className="h-[260px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                  <Tooltip 
-                    contentStyle={{backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb'}}
-                    formatter={(value: number) => [`$${value}`, 'Revenue']}
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                    formatter={(value: number) => [formatCurrency(value, currency), 'Revenue']}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#f59e0b" 
-                    strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#colorRevenue)" 
-                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Top Products */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Top Products</CardTitle>
-            <p className="text-sm text-muted-foreground">Best selling items today</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="px-5 pt-5 pb-2">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Best selling items today</p>
+          </div>
+          <div className="p-5 pt-3">
+            <div className="space-y-3.5">
               {topProducts.map((product, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-xs font-bold">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 bg-gray-50 dark:bg-gray-800/60 rounded-lg flex items-center justify-center text-[11px] font-bold text-gray-400 dark:text-gray-500">
                       {index + 1}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">{product.sales} sold</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.name}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{product.sales} sold</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">${product.revenue}</p>
-                    <div className={`flex items-center justify-end text-xs ${product.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {product.trend === 'up' ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(product.revenue, currency)}</p>
+                    <div className={`flex items-center justify-end text-[11px] ${product.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {product.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Recent Orders & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Orders */}
-        <Card className="lg:col-span-2 border-0 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div>
-              <CardTitle className="text-base font-semibold">Recent Orders</CardTitle>
-              <p className="text-sm text-muted-foreground">Latest orders from your cafe</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Latest orders from your cafe</p>
             </div>
             <Link href="/dashboard/orders">
-              <Button variant="ghost" size="sm">
-                View all
-                <ChevronRight className="ml-1 w-4 h-4" />
+              <Button variant="ghost" size="sm" className="text-xs">
+                View all <ArrowRight className="ml-1 w-3 h-3" />
               </Button>
             </Link>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="p-5 pt-2">
             {ordersLoading ? (
-              <div className="flex justify-center items-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
-              </div>
-            ) : ordersError ? (
-              <div className="text-center py-8">
-                <p className="text-red-500 mb-4">{ordersError}</p>
-                <Button onClick={() => fetchOrders()}>Retry</Button>
+              <div className="flex justify-center items-center h-40">
+                <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3">Order</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3">Table</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3">Customer</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3">Items</th>
-                      <th className="text-right text-xs font-medium text-muted-foreground pb-3">Amount</th>
-                      <th className="text-center text-xs font-medium text-muted-foreground pb-3">Status</th>
-                      <th className="text-right text-xs font-medium text-muted-foreground pb-3">Time</th>
+                    <tr className="border-b border-gray-100 dark:border-gray-800/50">
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Order</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Table</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Customer</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Amount</th>
+                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Status</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.slice(0, 5).map((order) => (
-                      <tr key={order.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
-                        <td className="py-3 text-sm font-medium">{order.orderId}</td>
-                        <td className="py-3 text-sm">{order.tableNumber || 'N/A'}</td>
-                        <td className="py-3 text-sm">{order.customer || 'N/A'}</td>
-                        <td className="py-3 text-sm">{order.items.length}</td>
-                        <td className="py-3 text-sm text-right font-medium">${order.totalAmount.toFixed(2)}</td>
+                      <tr key={order.id} className="border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{order.orderId}</td>
+                        <td className="py-3 text-sm text-gray-500 dark:text-gray-400">{order.tableNumber || 'N/A'}</td>
+                        <td className="py-3 text-sm text-gray-500 dark:text-gray-400">{order.customer || 'N/A'}</td>
+                        <td className="py-3 text-sm text-right font-medium text-gray-900 dark:text-white">{formatCurrency(order.totalAmount, currency)}</td>
                         <td className="py-3 text-center">
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs capitalize ${statusColors[order.status] || ''}`}
-                          >
+                          <Badge variant="outline" className={`text-[10px] font-medium capitalize ${statusColors[order.status] || ''}`}>
                             {order.status.toLowerCase()}
                           </Badge>
                         </td>
-                        <td className="py-3 text-sm text-right text-muted-foreground flex items-center justify-end">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {order.createdAt}
+                        <td className="py-3 text-sm text-right text-gray-400 dark:text-gray-500 flex items-center justify-end">
+                          <Clock className="w-3 h-3 mr-1" /> {order.createdAt}
                         </td>
                       </tr>
                     ))}
+                    {orders.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">No orders yet</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Quick Actions */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
-            <p className="text-sm text-muted-foreground">Frequently used actions</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="px-5 pt-5 pb-2">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Frequently used actions</p>
+          </div>
+          <div className="p-5 pt-3">
+            <div className="space-y-2">
               <Link href="/dashboard/menu">
-                <Button variant="outline" className="w-full justify-start">
-                  <BarChart3 className="mr-2 w-4 h-4" />
-                  Update Menu
+                <Button variant="outline" className="w-full justify-start text-sm h-9">
+                  <BarChart3 className="mr-2.5 w-4 h-4 text-gray-400" /> Update Menu
                 </Button>
               </Link>
               <Link href="/dashboard/qr-codes">
-                <Button variant="outline" className="w-full justify-start">
-                  <QrCode className="mr-2 w-4 h-4" />
-                  Generate QR Codes
+                <Button variant="outline" className="w-full justify-start text-sm h-9">
+                  <QrCode className="mr-2.5 w-4 h-4 text-gray-400" /> Generate QR Codes
                 </Button>
               </Link>
               <Link href="/dashboard/marketing">
-                <Button variant="outline" className="w-full justify-start">
-                  <Award className="mr-2 w-4 h-4" />
-                  Create Campaign
+                <Button variant="outline" className="w-full justify-start text-sm h-9">
+                  <Award className="mr-2.5 w-4 h-4 text-gray-400" /> Create Campaign
                 </Button>
               </Link>
               <Link href="/dashboard/customers">
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="mr-2 w-4 h-4" />
-                  View Customers
+                <Button variant="outline" className="w-full justify-start text-sm h-9">
+                  <Users className="mr-2.5 w-4 h-4 text-gray-400" /> View Customers
                 </Button>
               </Link>
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-4 bg-gray-100 dark:bg-gray-800/50" />
 
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium">Today's Summary</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Open Orders</span>
-                  <span className="font-medium">12</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Completed</span>
-                  <span className="font-medium">89</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">New Customers</span>
-                  <span className="font-medium">24</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Avg Prep Time</span>
-                  <span className="font-medium">8 min</span>
-                </div>
+            <div>
+              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Today&apos;s Summary</h4>
+              <div className="space-y-2.5">
+                {[
+                  ['Open Orders', '12'],
+                  ['Completed', '89'],
+                  ['New Customers', '24'],
+                  ['Avg Prep Time', '8 min'],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">{label}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{value}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

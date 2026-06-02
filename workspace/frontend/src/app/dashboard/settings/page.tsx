@@ -6,13 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Tabs, TabsList, TabsTrigger, TabsContent,
-} from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusiness } from '@/hooks/useBusiness';
 import { Badge } from '@/components/ui/badge';
-import { Save, Store, Clock, Bell, Loader2, Image } from 'lucide-react';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Save, Store, Clock, Bell, Loader2, Image, DollarSign } from 'lucide-react';
+import { CURRENCIES } from '@/lib/currency';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 const operatingHours = [
   { day: 'Monday', open: '07:00', close: '22:00' },
@@ -27,25 +30,15 @@ const operatingHours = [
 export default function SettingsPage() {
   const { user } = useAuth();
   const { business, loading, fetchBusiness, updateBusiness } = useBusiness();
+  const { setCurrency } = useCurrency();
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', address: '', city: '', logoUrl: '' });
+  const [form, setForm] = useState({ name: '', description: '', address: '', city: '', logoUrl: '', currency: 'USD' });
   const [activeTab, setActiveTab] = useState('general');
 
-  useEffect(() => {
-    if (user?.businessId) {
-      fetchBusiness(user.businessId);
-    }
-  }, [user?.businessId]);
-
+  useEffect(() => { if (user?.businessId) fetchBusiness(user.businessId); }, [user?.businessId]);
   useEffect(() => {
     if (business) {
-      setForm({
-        name: business.name || '',
-        description: business.description || '',
-        address: business.address || '',
-        city: business.city || '',
-        logoUrl: business.logoUrl || '',
-      });
+      setForm({ name: business.name || '', description: business.description || '', address: business.address || '', city: business.city || '', logoUrl: business.logoUrl || '', currency: business.currency || 'USD' });
     }
   }, [business]);
 
@@ -54,17 +47,16 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await updateBusiness(user.businessId, form);
-    } finally {
-      setSaving(false);
-    }
+      setCurrency(form.currency as any);
+    } finally { setSaving(false); }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Settings</h2>
-          <p className="text-sm text-muted-foreground">Manage your business profile and preferences</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Manage your business profile and preferences</p>
         </div>
       </div>
 
@@ -75,125 +67,101 @@ export default function SettingsPage() {
           <TabsTrigger value="notifications" className="sm:flex-1"><Bell className="w-4 h-4 mr-2" /> Notifications</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="mt-6 space-y-6">
+        <TabsContent value="general" className="mt-5 space-y-5">
           {loading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500" />
-            </div>
+            <div className="flex items-center justify-center h-32"><div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
           ) : (
             <>
-              <Card className="border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">Business Information</CardTitle>
-                  <CardDescription>Update your café details displayed to customers</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2 md:col-span-2">
-                      <Label>Business Name</Label>
-                      <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-                    </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <Label>Description</Label>
-                      <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Address</Label>
-                      <Input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>City</Label>
-                      <Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} />
-                    </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <Label>Logo URL</Label>
-                      <Input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder="https://example.com/logo.png" />
-                    </div>
+              <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Business Information</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Update your café details displayed to customers</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">Business Name</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="h-9 text-sm" /></div>
+                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} className="text-sm" /></div>
+                  <div className="space-y-2"><Label className="text-xs">Address</Label><Input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="h-9 text-sm" /></div>
+                  <div className="space-y-2"><Label className="text-xs">City</Label><Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className="h-9 text-sm" /></div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Currency</Label>
+                    <Select value={form.currency} onValueChange={v => setForm(p => ({ ...p, currency: v }))}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <DollarSign className="w-4 h-4 mr-2 text-gray-400" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map(c => (
+                          <SelectItem key={c.code} value={c.code}>{c.symbol} {c.code} - {c.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">Logo URL</Label><Input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder="https://example.com/logo.png" className="h-9 text-sm" /></div>
+                </div>
+              </div>
 
-              <Card className="border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">Branding</CardTitle>
-                  <CardDescription>Customize your digital presence</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center text-muted-foreground overflow-hidden shrink-0">
-                      {form.logoUrl ? (
-                        <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                      ) : (
-                        <Image className="w-8 h-8" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{form.name || 'Your Business'}</p>
-                      <p className="text-xs text-muted-foreground">{form.city || 'No city set'}</p>
-                    </div>
+              <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Branding</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Customize your digital presence</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800/60 rounded-xl flex items-center justify-center text-gray-400 overflow-hidden shrink-0">
+                    {form.logoUrl ? <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" /> : <Image className="w-7 h-7" />}
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{form.name || 'Your Business'}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{form.city || 'No city set'}</p>
+                  </div>
+                </div>
+              </div>
 
-              <div className="flex justify-end pt-4">
-                <Button onClick={handleSave} disabled={saving}>
-                  {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  <Save className="w-4 h-4 mr-2" /> Save Changes
+              <div className="flex justify-end pt-2">
+                <Button onClick={handleSave} disabled={saving} size="sm">
+                  {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Save className="w-4 h-4 mr-2" />Save Changes
                 </Button>
               </div>
             </>
           )}
         </TabsContent>
 
-        <TabsContent value="hours" className="mt-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Operating Hours</CardTitle>
-              <CardDescription>Set your café&apos;s opening and closing times</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {operatingHours.map(h => (
-                  <div key={h.day} className="flex items-center justify-between py-2 border-b last:border-0 gap-3">
-                    <span className="text-sm font-medium w-20 md:w-28 shrink-0">{h.day}</span>
-                    <div className="flex items-center gap-2">
-                      <Input className="w-20 md:w-24 text-center" defaultValue={h.open} type="time" />
-                      <span className="text-muted-foreground text-sm">to</span>
-                      <Input className="w-20 md:w-24 text-center" defaultValue={h.close} type="time" />
-                    </div>
+        <TabsContent value="hours" className="mt-5">
+          <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Operating Hours</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Set your café&apos;s opening and closing times</p>
+            <div className="space-y-2">
+              {operatingHours.map(h => (
+                <div key={h.day} className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-800/50 last:border-0 gap-3">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24 shrink-0">{h.day}</span>
+                  <div className="flex items-center gap-2">
+                    <Input className="w-20 text-center h-9 text-sm" defaultValue={h.open} type="time" />
+                    <span className="text-xs text-gray-400">to</span>
+                    <Input className="w-20 text-center h-9 text-sm" defaultValue={h.close} type="time" />
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              ))}
+            </div>
+          </div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="mt-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Notification Preferences</CardTitle>
-              <CardDescription>Choose which updates you want to receive</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { label: 'New Orders', desc: 'When a customer places a new order' },
-                  { label: 'Order Updates', desc: 'When order status changes' },
-                  { label: 'New Reviews', desc: 'When customers leave feedback' },
-                  { label: 'Low Stock Alerts', desc: 'When inventory runs low' },
-                  { label: 'Daily Reports', desc: 'End of day sales summary' },
-                ].map(n => (
-                  <div key={n.label} className="flex items-center justify-between py-2 gap-4">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{n.label}</p>
-                      <p className="text-xs text-muted-foreground">{n.desc}</p>
-                    </div>
-                    <Badge variant="outline" className="text-green-600 bg-green-50 shrink-0">Enabled</Badge>
+        <TabsContent value="notifications" className="mt-5">
+          <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Notification Preferences</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Choose which updates you want to receive</p>
+            <div className="space-y-3">
+              {[
+                { label: 'New Orders', desc: 'When a customer places a new order' },
+                { label: 'Order Updates', desc: 'When order status changes' },
+                { label: 'New Reviews', desc: 'When customers leave feedback' },
+                { label: 'Low Stock Alerts', desc: 'When inventory runs low' },
+                { label: 'Daily Reports', desc: 'End of day sales summary' },
+              ].map(n => (
+                <div key={n.label} className="flex items-center justify-between py-2.5 gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{n.label}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{n.desc}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <Badge variant="outline" className="text-[10px] text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 shrink-0">Enabled</Badge>
+                </div>
+              ))}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

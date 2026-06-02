@@ -4,265 +4,223 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Target,
-  Clock, ArrowUpRight, ArrowDownRight, BarChart3, Percent, RefreshCw
+  Clock, ArrowUpRight, ArrowDownRight, BarChart3, Percent, Activity, RefreshCw,
 } from 'lucide-react';
 import { useAnalytics, AnalyticsData } from '@/hooks/useAnalytics';
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { formatCurrency } from '@/lib/currency';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend
+  ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 
 const COLORS = ['#f59e0b', '#10b981', '#6366f1', '#ef4444', '#8b5cf6', '#ec4899'];
 
-interface KPICardProps {
-  title: string;
-  value: string;
-  change: number;
-  icon: React.ElementType;
-  color: string;
-  prefix?: string;
-}
-
-function KPICard({ title, value, change, icon: Icon, color, prefix }: KPICardProps) {
-  const isUp = change >= 0;
+function KpiCard({ title, value, change, icon: Icon }: {
+  title: string; value: string; change: number; icon: React.ElementType;
+}) {
+  const up = change >= 0;
   return (
-    <Card className="border-0 shadow-sm">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className={`w-10 h-10 ${color} rounded-lg flex items-center justify-center`}>
-            <Icon className="w-5 h-5" />
-          </div>
-          <Badge variant="outline" className={`text-xs font-medium ${isUp ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
-            {isUp ? <ArrowUpRight className="w-3 h-3 mr-0.5 inline" /> : <ArrowDownRight className="w-3 h-3 mr-0.5 inline" />}
-            {Math.abs(change)}%
-          </Badge>
+    <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
+      <div className="flex items-center justify-between mb-2">
+        <div className="w-9 h-9 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
+          <Icon className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
         </div>
-        <div className="text-2xl font-bold text-foreground">{prefix}{value}</div>
-        <div className="text-xs text-muted-foreground mt-1">{title}</div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function StatCard({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div className="bg-muted/30 rounded-lg p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-lg font-bold text-foreground mt-1">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+        <Badge variant="outline" className={`text-[10px] font-medium ${up ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20' : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20'}`}>
+          {up ? <ArrowUpRight className="w-3 h-3 mr-0.5 inline" /> : <ArrowDownRight className="w-3 h-3 mr-0.5 inline" />}
+          {Math.abs(change)}%
+        </Badge>
+      </div>
+      <div className="text-xl font-bold text-gray-900 dark:text-white">{value}</div>
+      <div className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{title}</div>
     </div>
   );
 }
 
 export default function AnalyticsPage() {
+  const { currency } = useCurrency();
   const { data, loading, error, fetchAnalytics } = useAnalytics();
   const [period, setPeriod] = useState('week');
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
+  useEffect(() => { fetchAnalytics(); }, []);
 
   if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
-      </div>
-    );
+    return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-red-500">{error}</p>
-        <Button onClick={fetchAnalytics} variant="outline">Retry</Button>
-      </div>
-    );
+    return <div className="flex flex-col items-center justify-center h-64 gap-3"><p className="text-red-500 text-sm">{error}</p><Button variant="outline" size="sm" onClick={fetchAnalytics}>Retry</Button></div>;
   }
 
   if (!data) return null;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Performance Overview</h2>
-          <p className="text-sm text-muted-foreground">Track your café&apos;s key metrics and trends</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Analytics</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Track your café&apos;s key metrics and trends</p>
         </div>
         <div className="flex items-center gap-3">
           <Tabs value={period} onValueChange={setPeriod}>
-            <TabsList>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="month">Month</TabsTrigger>
-              <TabsTrigger value="year">Year</TabsTrigger>
+            <TabsList className="h-8">
+              <TabsTrigger value="week" className="text-xs px-3">Week</TabsTrigger>
+              <TabsTrigger value="month" className="text-xs px-3">Month</TabsTrigger>
+              <TabsTrigger value="year" className="text-xs px-3">Year</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button variant="outline" size="icon" onClick={fetchAnalytics}>
+          <Button variant="outline" size="icon" className="w-8 h-8" onClick={fetchAnalytics}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <KPICard title="Revenue" value={`$${data.revenue.total.toLocaleString()}`} change={data.revenue.change} icon={DollarSign} color="bg-green-100 text-green-600" prefix="$" />
-        <KPICard title="Orders" value={data.orders.total.toLocaleString()} change={data.orders.change} icon={ShoppingCart} color="bg-blue-100 text-blue-600" />
-        <KPICard title="Customers" value={data.customers.total.toLocaleString()} change={data.customers.change} icon={Users} color="bg-purple-100 text-purple-600" />
-        <KPICard title="Avg Order" value={`$${data.avgOrderValue.value.toFixed(2)}`} change={data.avgOrderValue.change} icon={Target} color="bg-indigo-100 text-indigo-600" />
-        <KPICard title="Conversion" value={`${data.conversionRate.value}%`} change={data.conversionRate.change} icon={Percent} color="bg-rose-100 text-rose-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <KpiCard title="Revenue" value={formatCurrency(data.revenue.total, currency)} change={data.revenue.change} icon={DollarSign} />
+        <KpiCard title="Orders" value={data.orders.total.toLocaleString()} change={data.orders.change} icon={ShoppingCart} />
+        <KpiCard title="Customers" value={data.customers.total.toLocaleString()} change={data.customers.change} icon={Users} />
+        <KpiCard title="Avg Order" value={formatCurrency(data.avgOrderValue.value, currency)} change={data.avgOrderValue.change} icon={Target} />
+        <KpiCard title="Conversion" value={`${data.conversionRate.value}%`} change={data.conversionRate.change} icon={Percent} />
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Trend */}
-        <Card className="lg:col-span-2 border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base font-semibold">Revenue & Orders Trend</CardTitle>
-                <CardDescription>Daily performance over the selected period</CardDescription>
-              </div>
-              <Badge variant="outline" className="text-xs">Last 7 days</Badge>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="flex items-center justify-between px-5 pt-5 pb-1">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue & Orders Trend</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Daily performance over the selected period</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] relative">
+            <Badge variant="outline" className="text-[10px] font-normal">Last 7 days</Badge>
+          </div>
+          <div className="p-5 pt-3">
+            <div className="h-[280px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data.revenueChart}>
                   <defs>
                     <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }} />
-                  <Area yAxisId="left" type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#revGrad)" name="Revenue" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} />
+                  <Area yAxisId="left" type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#revGrad)" name="Revenue" />
                   <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#6366f1" strokeWidth={2} dot={false} name="Orders" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Peak Hours */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base font-semibold">Peak Hours</CardTitle>
-                <CardDescription>Orders by hour</CardDescription>
-              </div>
-              <Clock className="w-4 h-4 text-muted-foreground" />
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="flex items-center justify-between px-5 pt-5 pb-1">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Peak Hours</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Orders by hour</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] relative">
+            <Clock className="w-4 h-4 text-gray-400" />
+          </div>
+          <div className="p-5 pt-3">
+            <div className="h-[280px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.peakHours}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }} />
-                  <Bar dataKey="orders" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                  <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #e5e7eb' }} />
+                  <Bar dataKey="orders" fill="#f59e0b" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Items */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Top Selling Items</CardTitle>
-            <CardDescription>Best performers this period</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="px-5 pt-5 pb-1">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Selling Items</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Best performers this period</p>
+          </div>
+          <div className="p-5 pt-3">
+            <div className="space-y-3.5">
               {data.topItems.map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-xs font-bold text-muted-foreground">
-                      {i + 1}
-                    </div>
+                    <div className="w-7 h-7 bg-gray-50 dark:bg-gray-800/60 rounded-lg flex items-center justify-center text-[11px] font-bold text-gray-400">{i + 1}</div>
                     <div>
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.sales} sold · ${item.revenue}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.name}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{item.sales} sold · {formatCurrency(item.revenue, currency)}</p>
                     </div>
                   </div>
-                  <div className={item.trend === 'up' ? 'text-green-600' : 'text-red-600'}>
+                  <div className={item.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                     {item.trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Customer Retention */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Customer Retention</CardTitle>
-            <CardDescription>New vs returning customers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] relative">
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="px-5 pt-5 pb-1">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Customer Retention</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">New vs returning customers</p>
+          </div>
+          <div className="p-5 pt-3">
+            <div className="h-[180px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'Returning', value: data.customerRetention.returningCustomers },
-                      { name: 'New', value: data.customerRetention.newCustomers },
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
+                  <Pie data={[
+                    { name: 'Returning', value: data.customerRetention.returningCustomers },
+                    { name: 'New', value: data.customerRetention.newCustomers },
+                  ]}
+                    cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={4} dataKey="value"
                   >
-                    {[COLORS[1], COLORS[2]].map((color, i) => (
-                      <Cell key={i} fill={color} />
-                    ))}
+                    {[COLORS[1], COLORS[2]].map((color, i) => <Cell key={i} fill={color} />)}
                   </Pie>
                   <Tooltip />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-2 text-center">
-              <p className="text-2xl font-bold text-foreground">{data.customerRetention.rate}%</p>
-              <p className="text-xs text-muted-foreground">Retention Rate</p>
+            <div className="text-center mt-1">
+              <p className="text-xl font-bold text-gray-900 dark:text-white">{data.customerRetention.rate}%</p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500">Retention Rate</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Summary Stats */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Quick Stats</CardTitle>
-            <CardDescription>Summary at a glance</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
+          <div className="px-5 pt-5 pb-1">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Summary at a glance</p>
+          </div>
+          <div className="p-5 pt-3">
             <div className="grid grid-cols-2 gap-3">
-              <StatCard label="Total Revenue" value={`$${(data.revenue.total * 1.5).toLocaleString()}`} sub="This month" />
-              <StatCard label="Avg Daily Orders" value={Math.round(data.orders.total / 30).toString()} sub="Last 30 days" />
-              <StatCard label="Peak Hour" value="09:00" sub="32 orders avg" />
-              <StatCard label="Avg Prep Time" value="8 min" sub="Across all items" />
-              <StatCard label="Table Turnover" value="45 min" sub="Average per table" />
-              <StatCard label="Top Category" value="Coffee" sub="42% of sales" />
+              {[
+                ['Total Revenue', formatCurrency(data.revenue.total * 1.5, currency), 'This month'],
+                ['Avg Daily Orders', Math.round(data.orders.total / 30).toString(), 'Last 30 days'],
+                ['Peak Hour', '09:00', '32 orders avg'],
+                ['Avg Prep Time', '8 min', 'Across all items'],
+                ['Table Turnover', '45 min', 'Average per table'],
+                ['Top Category', 'Coffee', '42% of sales'],
+              ].map(([label, value, sub]) => (
+                <div key={label} className="bg-gray-50 dark:bg-gray-800/40 rounded-lg p-3">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500">{label}</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{value}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
