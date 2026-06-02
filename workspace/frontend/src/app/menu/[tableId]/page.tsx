@@ -7,19 +7,46 @@ import {
   Search,
   ShoppingCart,
   Star,
-  Flame,
   Coffee,
   Leaf,
   UtensilsCrossed,
   ChefHat,
-  ChevronDown,
   MapPin,
   Clock,
   Award,
   Gift,
   Loader2,
   Plus,
+  MessageCircle,
   Bell,
+  ChevronDown,
+  CupSoda,
+  BottleWine,
+  Beer,
+  Soup,
+  Salad,
+  Sandwich,
+  Pizza,
+  Beef,
+  Fish,
+  Drumstick,
+  Egg,
+  EggFried,
+  IceCreamCone,
+  IceCreamBowl,
+  Cake,
+  CakeSlice,
+  Cookie,
+  Croissant,
+  Cherry,
+  Apple,
+  Banana,
+  Grape,
+  Citrus,
+  Milk,
+  GlassWater,
+  Carrot,
+  Flame,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,15 +55,135 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { useMenuCart } from "@/hooks/useMenuCart";
 import { usePublicMenu } from "@/hooks/usePublicMenu";
-import { useMenuSocket } from "@/hooks/useMenuSocket";
+import { usePublicOrder } from "@/hooks/usePublicOrder";
+import { findUpsell, UpsellRule } from "@/lib/upsell-rules";
 import { formatIDR } from "@/lib/format-idr";
 import { toast } from "sonner";
+import { generateWhatsAppMessage } from "@/lib/whatsapp";
 
 const categoryIcons: Record<string, any> = {
+  // Coffee & Espresso
   coffee: Coffee,
-  tea: Leaf,
-  pastries: UtensilsCrossed,
+  espresso: Coffee,
+  latte: Coffee,
+  cappuccino: Coffee,
+  americano: Coffee,
+  mocha: Coffee,
+  macchiato: Coffee,
+  flatwhite: Coffee,
+  kopi: Coffee,
+  
+  // Tea
+  tea: CupSoda,
+  teh: CupSoda,
+  matcha: CupSoda,
+  greentea: Leaf,
+  blacktea: CupSoda,
+  thaitea: CupSoda,
+  
+  // Juices & Smoothies
+  juice: GlassWater,
+  jus: GlassWater,
+  smoothie: CupSoda,
+  blend: CupSoda,
+  milkshake: Milk,
+  
+  // Soft Drinks & Water
+  soda: CupSoda,
+  softdrink: CupSoda,
+  water: GlassWater,
+  air: GlassWater,
+  minuman: CupSoda,
+  beverage: CupSoda,
+  drink: CupSoda,
+  
+  // Alcoholic
+  beer: Beer,
+  wine: BottleWine,
+  cocktail: GlassWater,
+  alcohol: BottleWine,
+  
+  // Rice & Noodles
+  rice: Soup,
+  nasi: Soup,
+  noodle: Soup,
+  mie: Soup,
+  noodles: Soup,
+  kwetiau: Soup,
+  bihun: Soup,
+  pasta: Soup,
+  spaghetti: Soup,
+  ramen: Soup,
+  udon: Soup,
+  
+  // Indonesian Specials
+  sate: Beef,
+  satay: Beef,
+  bakso: Soup,
+  gadogado: Salad,
+  rendang: Beef,
+  gulai: Soup,
+  soto: Soup,
+  sop: Soup,
+  ayam: Drumstick,
+  chicken: Drumstick,
+  
+  // Western
+  burger: Sandwich,
+  pizza: Pizza,
+  steak: Beef,
+  beef: Beef,
+  lamb: Beef,
+  
+  // Seafood
+  fish: Fish,
+  seafood: Fish,
+  shrimp: Fish,
+  squid: Fish,
+  
+  // Breakfast
+  breakfast: Egg,
+  pancake: Cake,
+  waffle: Cake,
+  toast: Croissant,
+  
+  // Snacks & Appetizers
+  snack: UtensilsCrossed,
+  appetizer: UtensilsCrossed,
+  springroll: UtensilsCrossed,
+  lumpia: UtensilsCrossed,
+  
+  // Desserts
+  dessert: IceCreamCone,
+  icecream: IceCreamCone,
+  cake: Cake,
+  pastry: Croissant,
+  pastryshop: Croissant,
+  roti: Croissant,
+  bread: Croissant,
+  cookie: Cookie,
+  kue: CakeSlice,
+  
+  // Salads & Healthy
+  salad: Salad,
+  healthy: Carrot,
+  vegan: Leaf,
+  vegetarian: Leaf,
+  
+  // Fruits
+  fruit: Apple,
+  buah: Apple,
+  
+  // Spicy
+  spicy: Flame,
+  pedas: Flame,
+  sambal: Flame,
+  
+  // Default
   food: ChefHat,
+  dishes: UtensilsCrossed,
+  maincourse: UtensilsCrossed,
+  menu: ChefHat,
 };
 
 function AnimatedCarousel({ items }: { items: any[] }) {
@@ -131,14 +278,14 @@ function AnimatedCarousel({ items }: { items: any[] }) {
 function Skeleton() {
   return (
     <div className="min-h-screen bg-background pb-24">
-      <div className="h-48 w-full bg-gradient-to-br from-amber-200 to-orange-200 animate-pulse" />
+      <div className="h-52 w-full bg-gradient-to-br from-amber-200 to-orange-200 animate-pulse" />
       <div className="p-4">
         <div className="mb-6 h-12 rounded-lg bg-muted animate-pulse" />
         <div className="mb-6 h-32 rounded-xl bg-muted animate-pulse" />
         <div className="mb-4 h-11 rounded-lg bg-muted animate-pulse" />
-        <div className="space-y-3">
+        <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 w-full rounded-xl bg-muted animate-pulse" />
+            <div key={i} className="h-28 w-full rounded-xl bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -152,11 +299,12 @@ export default function MenuHomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isStuck, setIsStuck] = useState(false);
+  const [upsell, setUpsell] = useState<{ item: any; rule: UpsellRule } | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const { count: cartCount, addItem } = useMenuCart();
+  const { count: cartCount, items: cartItems, addItem } = useMenuCart();
   const { menu, cafe, loading, error, fetchMenuByTable } = usePublicMenu();
+  const { submitOrder } = usePublicOrder();
   const businessId = cafe?.businessId || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('last_order') || '{}').businessId : null);
-  const { on } = useMenuSocket(businessId);
 
   useEffect(() => {
     if (tableId) {
@@ -168,13 +316,6 @@ export default function MenuHomePage() {
   useEffect(() => {
     if (cafe) localStorage.setItem('cafe_info', JSON.stringify(cafe));
   }, [cafe]);
-
-  useEffect(() => {
-    const unsub = on('menuItem:updated', (data: any) => {
-      fetchMenuByTable(tableId);
-    });
-    return unsub;
-  }, [on, tableId]);
 
   const categories = menu?.categories?.filter(c => c.isActive !== false) || [];
 
@@ -188,6 +329,7 @@ export default function MenuHomePage() {
     observer.observe(el);
     return () => observer.disconnect();
   }, [categories]);
+
   const firstCategoryId = categories[0]?.id || "";
   const currentCategory = categories.find(c => c.id === (selectedCategory || firstCategoryId));
 
@@ -221,6 +363,52 @@ export default function MenuHomePage() {
       quantity: 1,
     });
     toast.success(`${item.name} ditambahkan!`, { duration: 1500 });
+
+    const rule = findUpsell(item.name);
+    if (rule) {
+      setUpsell({ item, rule });
+    }
+  };
+
+  const handleUpsellAdd = () => {
+    if (!upsell) return;
+    addItem({
+      id: `${upsell.item.id}-upsell-${upsell.rule.suggestion.name}`,
+      name: `${upsell.item.name} + ${upsell.rule.suggestion.name}`,
+      price: upsell.item.price + upsell.rule.suggestion.priceAdjustment,
+      image: upsell.item.imageUrl || '',
+      quantity: 1,
+    });
+    toast.success(`${upsell.rule.suggestion.name} ditambahkan!`, { duration: 1500 });
+    setUpsell(null);
+  };
+
+  const handleWaOrder = async () => {
+    if (cartItems.length === 0) {
+      const url = generateWhatsAppMessage([], cafe?.tableNumber || tableId, '', cafe?.name || 'Cafe', cafe?.phoneNumber);
+      window.open(url, '_blank');
+      return;
+    }
+    try {
+      await submitOrder({
+        tableId,
+        items: cartItems.map(i => ({
+          menuItemId: i.id,
+          quantity: i.quantity,
+          notes: i.customization ? Object.values(i.customization).filter(Boolean).join(', ') : '',
+          options: [],
+        })),
+        notes: '',
+        paymentMethod: 'WA_TRANSFER',
+        orderType: 'WHATSAPP',
+      });
+      const url = generateWhatsAppMessage(cartItems, cafe?.tableNumber || tableId, '', cafe?.name || 'Cafe', cafe?.phoneNumber);
+      window.open(url, '_blank');
+      toast.success("Order sent via WhatsApp!");
+    } catch {
+      const url = generateWhatsAppMessage(cartItems, cafe?.tableNumber || tableId, '', cafe?.name || 'Cafe', cafe?.phoneNumber);
+      window.open(url, '_blank');
+    }
   };
 
   const getCategoryIcon = (cat: any) => {
@@ -246,41 +434,41 @@ export default function MenuHomePage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header / Cover Image */}
+      {/* Header */}
       <div className="relative">
-        <div className="h-48 w-full overflow-hidden bg-gradient-to-br from-amber-300 to-orange-400">
+        <div className="h-52 w-full overflow-hidden bg-gradient-to-br from-amber-400 via-orange-400 to-orange-500">
           {cafe?.logo && (
             <img
               src={cafe.logo}
               alt={cafe.name}
-              className="h-full w-full object-cover opacity-60"
+              className="h-full w-full object-cover opacity-50"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         </div>
 
         {/* Cafe Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="absolute bottom-0 left-0 right-0 p-5">
           <div className="flex items-end gap-3">
             {cafe?.logo ? (
               <img
                 src={cafe.logo}
                 alt="Logo"
-                className="h-16 w-16 rounded-full border-4 border-background object-cover shadow-lg"
+                className="h-16 w-16 rounded-full border-[3px] border-white/80 object-cover shadow-lg"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-background bg-amber-100 shadow-lg">
-                <Coffee className="h-8 w-8 text-amber-600" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white/80 bg-white/20 shadow-lg backdrop-blur-sm">
+                <Coffee className="h-8 w-8 text-white" />
               </div>
             )}
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">{cafe?.name || "Cafe"}</h1>
+              <h1 className="text-xl font-bold leading-tight text-white drop-shadow-sm">{cafe?.name || "Cafe"}</h1>
               {cafe?.description && (
-                <p className="text-sm text-white/80">{cafe.description}</p>
+                <p className="mt-0.5 text-sm leading-snug text-white/80">{cafe.description}</p>
               )}
             </div>
-            <div className="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground shadow-lg backdrop-blur">
-              <MapPin className="h-3 w-3" />
+            <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-foreground shadow-md backdrop-blur">
+              <MapPin className="h-3 w-3 text-amber-500" />
               Table {cafe?.tableNumber || tableId}
             </div>
           </div>
@@ -323,36 +511,41 @@ export default function MenuHomePage() {
         </div>
       )}
 
-      <div className="p-4">
-        {/* Search — original location */}
-        <div className="relative mb-5">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      {/* Main Content */}
+      <div className="px-4 pb-4 pt-5">
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search menu..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 border-border/50 bg-card pl-10 pr-4 text-sm shadow-sm"
+            className="h-11 rounded-xl border-border/50 bg-card pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground/60 focus-visible:ring-amber-500/20"
           />
         </div>
 
-        {/* Carousels — promos + featured */}
+        {/* Carousels */}
         {categories.length > 0 && (
           <>
             {!searchQuery && hasPromos && (
-              <div className="mb-5">
-                <div className="mb-2 flex items-center gap-2">
-                  <Award className="h-4 w-4 text-amber-500" />
-                  <h2 className="text-sm font-semibold">Special Offers</h2>
+              <div className="mb-6">
+                <div className="mb-3 flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+                    <Award className="h-3.5 w-3.5 text-amber-600" />
+                  </div>
+                  <h2 className="text-sm font-semibold tracking-tight">Special Offers</h2>
                 </div>
                 <AnimatedCarousel items={promoItems} />
               </div>
             )}
             {!searchQuery && featuredItems.length > 0 && (
-              <div className="mb-5">
-                <div className="mb-2 flex items-center gap-2">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  <h2 className="text-sm font-semibold">Featured Items</h2>
+              <div className="mb-6">
+                <div className="mb-3 flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+                    <Star className="h-3.5 w-3.5 text-amber-600" />
+                  </div>
+                  <h2 className="text-sm font-semibold tracking-tight">Featured Items</h2>
                 </div>
                 <AnimatedCarousel items={featuredItems} />
               </div>
@@ -360,10 +553,10 @@ export default function MenuHomePage() {
           </>
         )}
 
-        {/* Sentinel — detects when sticky kicks in */}
+        {/* Sentinel */}
         <div ref={sentinelRef} />
 
-        {/* Sticky Header — pills at rest, compact dropdown when stuck */}
+        {/* Sticky Header */}
         {categories.length > 0 && (
           <div className={`sticky top-0 z-20 -mx-4 bg-background px-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${isStuck ? "py-2.5" : "pb-2 pt-3 mb-3"}`}>
             {isStuck ? (
@@ -427,14 +620,15 @@ export default function MenuHomePage() {
                         <button
                           key={cat.id}
                           onClick={() => setSelectedCategory(cat.id)}
-                          className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-medium transition-all ${
+                          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all ${
                             isActive
                               ? "border-amber-500 bg-amber-500 text-white shadow-sm"
                               : "border-border bg-card text-muted-foreground hover:border-muted-foreground/30"
                           }`}
                         >
+                          {(() => { const Icon = getCategoryIcon(cat); return <Icon className={`h-3.5 w-3.5 ${isActive ? "text-white" : "text-muted-foreground"}`} />; })()}
                           {cat.name}
-                          <span className="ml-1 text-[10px] opacity-60">({filteredItems(cat.id).length})</span>
+                          <span className="text-[10px] opacity-60">({filteredItems(cat.id).length})</span>
                         </button>
                       );
                     })}
@@ -447,59 +641,63 @@ export default function MenuHomePage() {
 
         {/* Items */}
         {categories.length > 0 && (
-          <div>
-
+          <div className="mt-2">
             {currentCategory && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {visibleItems.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-muted-foreground">
-                    No items found
+                  <div className="py-12 text-center">
+                    <Coffee className="mx-auto h-12 w-12 text-muted-foreground/30" />
+                    <p className="mt-3 text-sm text-muted-foreground">No items found</p>
                   </div>
                 ) : (
                   visibleItems.map((item) => (
                     <div key={item.id} className="group relative">
                       <Link href={`/menu/item/${item.id}`}>
-                        <Card className="overflow-hidden border-0 shadow-sm transition-shadow hover:shadow-md">
-                          <div className="flex gap-3 p-3">
-                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
+                        <Card className="overflow-hidden border border-border/40 bg-card shadow-sm transition-all duration-200 hover:border-amber-200 hover:shadow-md">
+                          <div className="flex gap-4 p-4">
+                            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
                               {item.imageUrl ? (
                                 <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
                               ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-muted">
-                                  <Coffee className="h-6 w-6 text-muted-foreground/50" />
+                                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+                                  <Coffee className="h-8 w-8 text-amber-300" />
                                 </div>
                               )}
                               {item.soldOut && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                  <span className="text-xs font-bold text-white">Sold Out</span>
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
+                                  <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white">Sold Out</span>
                                 </div>
                               )}
                             </div>
-                            <div className="flex min-w-0 flex-1 flex-col justify-center">
-                              <div className="flex items-start justify-between gap-1">
-                                <h3 className={`truncate text-sm font-medium ${item.soldOut ? "text-muted-foreground line-through" : ""}`}>
-                                  {item.name}
-                                </h3>
-                                <div className="flex shrink-0 gap-1">
-                                  {item.isFeatured && (
-                                    <Badge variant="outline" className="px-1.5 py-0 text-[9px] bg-green-100 text-green-700 border-green-200">
-                                      <Star className="mr-0.5 h-2 w-2" />Featured
-                                    </Badge>
-                                  )}
-                                  {item.isSpecialOffer && (
-                                    <Badge variant="outline" className="px-1.5 py-0 text-[9px] bg-amber-100 text-amber-700 border-amber-200">
-                                      <Gift className="mr-0.5 h-2 w-2" />Promo
-                                    </Badge>
-                                  )}
+                            <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
+                              <div>
+                                <div className="flex items-start justify-between gap-2">
+                                  <h3 className={`truncate text-[15px] font-semibold tracking-tight ${item.soldOut ? "text-muted-foreground line-through" : "text-foreground"}`}>
+                                    {item.name}
+                                  </h3>
+                                  <div className="flex shrink-0 gap-1.5">
+                                    {item.isFeatured && (
+                                      <div className="flex h-5 items-center gap-0.5 rounded-full bg-green-100 px-2 text-[10px] font-medium text-green-700">
+                                        <Star className="h-2.5 w-2.5 fill-green-700" />
+                                        Featured
+                                      </div>
+                                    )}
+                                    {item.isSpecialOffer && (
+                                      <div className="flex h-5 items-center gap-0.5 rounded-full bg-amber-100 px-2 text-[10px] font-medium text-amber-700">
+                                        <Gift className="h-2.5 w-2.5" />
+                                        Promo
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
+                                {item.description && (
+                                  <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground/80">
+                                    {item.description}
+                                  </p>
+                                )}
                               </div>
-                              {item.description && (
-                                <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                                  {item.description}
-                                </p>
-                              )}
                               <div className="mt-2 flex items-center justify-between">
-                                <span className={`text-sm font-bold ${item.soldOut ? "text-muted-foreground" : "text-amber-600"}`}>
+                                <span className={`text-[15px] font-bold ${item.soldOut ? "text-muted-foreground" : "text-amber-600"}`}>
                                   {formatIDR(Number(item.price))}
                                 </span>
                               </div>
@@ -508,15 +706,13 @@ export default function MenuHomePage() {
                         </Card>
                       </Link>
                       {!item.soldOut && (
-                        <div className="absolute bottom-2 right-2 flex gap-1.5">
-                          <Button
-                            size="icon"
-                            className="h-9 w-9 rounded-full bg-amber-500 text-white shadow-md hover:bg-amber-600 active:scale-95"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAdd(item); }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Button
+                          size="icon"
+                          className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:bg-amber-600 hover:shadow-amber-600/30 active:scale-95"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAdd(item); }}
+                        >
+                          <Plus className="h-5 w-5" />
+                        </Button>
                       )}
                     </div>
                   ))
@@ -549,17 +745,63 @@ export default function MenuHomePage() {
         </div>
       </Link>
 
-      {/* Call Waiter FAB */}
-      {cafe?.phoneNumber && (
-        <a
-          href={`https://wa.me/${cafe.phoneNumber.replace(/[^0-9]/g, '')}?text=Halo%2C%20saya%20dari%20Meja%20${cafe.tableNumber || tableId}%2C%20minta%20bantuan`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition-transform hover:scale-110 hover:bg-green-600 active:scale-95"
-        >
-          <Bell className="h-6 w-6" />
-        </a>
+      {/* Upsell Popup */}
+      {upsell && (
+        <div className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-md animate-in slide-in-from-bottom-4 fade-in">
+          <Card className="border-0 shadow-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                  <Star className="h-5 w-5 text-amber-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{upsell.rule.suggestion.description}</p>
+                  <p className="text-xs text-muted-foreground">Add to your order?</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setUpsell(null)}>
+                    Skip
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-8 bg-amber-500 text-xs text-white hover:bg-amber-600"
+                    onClick={handleUpsellAdd}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
+
+      {/* FABs */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        {cafe?.phoneNumber && (
+          <>
+            <button
+              onClick={handleWaOrder}
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg transition-transform hover:scale-110 hover:bg-amber-600 active:scale-95"
+            >
+              <MessageCircle className="h-6 w-6" />
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+            <a
+              href={`https://wa.me/${cafe.phoneNumber.replace(/[^0-9]/g, '')}?text=Halo%2C%20saya%20dari%20Meja%20${cafe.tableNumber || tableId}%2C%20minta%20bantuan`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition-transform hover:scale-110 hover:bg-green-600 active:scale-95"
+            >
+              <Bell className="h-6 w-6" />
+            </a>
+          </>
+        )}
+      </div>
     </div>
   );
 }

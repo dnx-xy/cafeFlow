@@ -44,10 +44,33 @@ export default function CartPage() {
   const tax = Math.round(subtotal * 0.08);
   const total = subtotal + tax;
 
-  const handleWhatsApp = () => {
-    const url = generateWhatsAppMessage(cartItems, cafeInfo.tableNumber, orderNotes, cafeInfo.name, cafeInfo.phoneNumber);
-    window.open(url, '_blank');
-    toast.success("WhatsApp terbuka dengan pesanan Anda");
+  const handleWhatsApp = async () => {
+    if (cartItems.length === 0) { toast.error("Keranjang kosong"); return; }
+    if (!tableId) { toast.error("Informasi meja tidak ditemukan"); return; }
+
+    const orderData = {
+      tableId,
+      items: cartItems.map(i => ({
+        menuItemId: i.id,
+        quantity: i.quantity,
+        notes: i.customization ? Object.values(i.customization).filter(Boolean).join(', ') : '',
+        options: [],
+      })),
+      notes: orderNotes,
+      paymentMethod: 'WA_TRANSFER',
+      orderType: 'WHATSAPP',
+    };
+
+    try {
+      await submitOrder(orderData);
+      const url = generateWhatsAppMessage(cartItems, cafeInfo.tableNumber, orderNotes, cafeInfo.name, cafeInfo.phoneNumber);
+      window.open(url, '_blank');
+      toast.success("Pesanan via WhatsApp terkirim!");
+      clearCart();
+      router.push("/menu/confirmation");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Gagal mengirim pesanan");
+    }
   };
 
   const handleCheckout = async () => {
