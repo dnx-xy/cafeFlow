@@ -21,11 +21,11 @@ let QrCodesController = class QrCodesController {
     constructor(qrCodesService) {
         this.qrCodesService = qrCodesService;
     }
-    async generateQrCode(body, user) {
-        return await this.qrCodesService.generateQrCode(body.tableId, user.businessId);
+    async generateQrCode(user, body) {
+        return await this.qrCodesService.generateQrCode(body.tableId, user.tenantId);
     }
     async getQrCodeByTable(tableId, user) {
-        return await this.qrCodesService.getQrCodeByTable(tableId, user.businessId);
+        return await this.qrCodesService.getQrCodeByTable(tableId, user.tenantId);
     }
     async scanQrCode(code, user) {
         return await this.qrCodesService.scanQrCode(code, user.businessId);
@@ -38,8 +38,8 @@ exports.QrCodesController = QrCodesController;
 __decorate([
     (0, common_1.Post)('generate'),
     (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
+    __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)

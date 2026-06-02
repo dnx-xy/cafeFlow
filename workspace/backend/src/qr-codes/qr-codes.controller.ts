@@ -10,10 +10,10 @@ export class QrCodesController {
   @Post('generate')
   @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async generateQrCode(
-    @Body() body: { tableId: string },
     @AuthenticatedUser() user: any,
+    @Body() body: { tableId: string },
   ) {
-    return await this.qrCodesService.generateQrCode(body.tableId, user.businessId);
+    return await this.qrCodesService.generateQrCode(body.tableId, user.tenantId);
   }
 
   @Get('table/:tableId')
@@ -22,7 +22,7 @@ export class QrCodesController {
     @Param('tableId', ParseUUIDPipe) tableId: string,
     @AuthenticatedUser() user: any,
   ) {
-    return await this.qrCodesService.getQrCodeByTable(tableId, user.businessId);
+    return await this.qrCodesService.getQrCodeByTable(tableId, user.tenantId);
   }
 
   @Get('scan/:code')

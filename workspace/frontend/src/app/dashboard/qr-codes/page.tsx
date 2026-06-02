@@ -241,15 +241,16 @@ export default function QrCodesPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Eye className="mr-2 w-4 h-4" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Edit className="mr-2 w-4 h-4" />
                                 Edit Table
                               </DropdownMenuItem>
                               <DropdownMenuItem 
+                                onSelect={(e) => e.preventDefault()}
                                 onClick={() => handleGenerateQrCode(table.id)}
                               >
                                 <QrCode className="mr-2 w-4 h-4" />
@@ -257,6 +258,7 @@ export default function QrCodesPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 className="text-red-600"
+                                onSelect={(e) => e.preventDefault()}
                                 onClick={() => deleteTable(table.id)}
                               >
                                 <Trash2 className="mr-2 w-4 h-4" />
