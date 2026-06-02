@@ -8,7 +8,7 @@ export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
   @Post()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async create(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -22,7 +22,7 @@ export class StaffController {
   }
 
   @Get()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findAll(
     @AuthenticatedUser() user: any,
   ) {
@@ -30,7 +30,7 @@ export class StaffController {
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
@@ -39,7 +39,7 @@ export class StaffController {
   }
 
   @Put(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: any,
@@ -53,7 +53,7 @@ export class StaffController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,

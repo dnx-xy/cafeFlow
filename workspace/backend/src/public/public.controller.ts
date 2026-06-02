@@ -12,15 +12,22 @@ export class PublicController {
     return await this.publicService.getMenuByTable(tableId);
   }
 
+  @Get('menu-items/:id')
+  @Public()
+  async getMenuItem(@Param('id') id: string) {
+    return await this.publicService.getMenuItem(id);
+  }
+
   @Post('orders')
   @Public()
   async createOrder(@Body() body: {
     tableId: string;
-    items: { menuItemId: string; quantity: number; notes?: string }[];
+    items: { menuItemId: string; quantity: number; notes?: string; options?: { optionValueId: string; priceAdjustment?: number }[] }[];
     notes?: string;
     orderType?: string;
     customerName?: string;
     customerWhatsapp?: string;
+    paymentMethod?: string;
   }) {
     return await this.publicService.createOrder(body);
   }

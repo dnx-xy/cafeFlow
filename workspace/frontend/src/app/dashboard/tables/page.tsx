@@ -186,7 +186,7 @@ export default function TablesPage() {
           <div className="flex flex-col items-center gap-4 py-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Table #{viewingQr?.tableNumber}</h3>
             <div className="bg-white p-4 rounded-xl">
-              {viewingQr && <QRCodeSVG value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${viewingQr.code}`} size={200} level="M" />}
+              {viewingQr && <QRCodeSVG value={`${process.env.NEXT_PUBLIC_QR_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/scan/${viewingQr.code}`} size={200} level="M" />}
             </div>
             <p className="text-xs text-gray-400 text-center">Scan to open menu for Table #{viewingQr?.tableNumber}</p>
             <Button variant="outline" size="sm" onClick={() => {

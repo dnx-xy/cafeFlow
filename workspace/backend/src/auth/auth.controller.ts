@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async getProfile(@AuthenticatedUser() user: any) {
     return {
       id: user.id,
@@ -45,7 +45,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async refreshToken(@Body() refreshTokenDto: { refresh_token: string }, @AuthenticatedUser() user: any) {
     // For simplicity, we'll just return a new token with same data
     // In production, you'd want to validate the refresh token properly
@@ -65,7 +65,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async logout(@AuthenticatedUser() user: any) {
     // In a real implementation, you'd invalidate tokens here
     return { message: 'Successfully logged out' };

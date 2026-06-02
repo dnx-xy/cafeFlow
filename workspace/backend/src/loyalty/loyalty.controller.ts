@@ -8,7 +8,7 @@ export class LoyaltyController {
   constructor(private readonly loyaltyService: LoyaltyService) {}
 
   @Get('programs')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async getLoyaltyProgram(
     @AuthenticatedUser() user: any,
   ) {
@@ -16,7 +16,7 @@ export class LoyaltyController {
   }
 
   @Post('transactions')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async createPointsTransaction(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -28,7 +28,7 @@ export class LoyaltyController {
   }
 
   @Get('points/:customerId')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async getCustomerPoints(
     @Param('customerId', ParseUUIDPipe) customerId: string,
     @AuthenticatedUser() user: any,

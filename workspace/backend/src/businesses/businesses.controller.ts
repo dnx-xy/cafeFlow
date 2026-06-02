@@ -9,7 +9,7 @@ export class BusinessesController {
   constructor(private readonly businessesService: BusinessesService) {}
 
   @Post()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async create(
     @Body() createBusinessDto: CreateBusinessDto,
     @AuthenticatedUser() user: any,
@@ -22,13 +22,13 @@ export class BusinessesController {
   }
 
   @Get()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findAll(@AuthenticatedUser() user: any) {
     return await this.businessesService.findAll(user.tenantId);
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
@@ -37,7 +37,7 @@ export class BusinessesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateBusinessDto: Partial<CreateBusinessDto>,
@@ -51,7 +51,7 @@ export class BusinessesController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,

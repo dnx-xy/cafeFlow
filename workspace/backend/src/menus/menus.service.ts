@@ -74,21 +74,20 @@ export class MenusService {
   }
 
   async getMenuWithItems(id: string, tenantId: string, includeCategories: boolean = false, includeItems: boolean = false): Promise<Menu> {
-    const options: any = {
-      where: { id, tenantId },
-    };
+    const relations: Record<string, any> = {};
 
     if (includeCategories || includeItems) {
-      options.relations = {};
-      if (includeCategories) {
-        options.relations.categories = true;
-      }
       if (includeItems) {
-        options.relations['categories.menuItems'] = true;
+        relations.categories = { menuItems: true };
+      } else {
+        relations.categories = true;
       }
     }
 
-    return await this.menusRepository.findOne(options);
+    return await this.menusRepository.findOne({
+      where: { id, tenantId },
+      relations: Object.keys(relations).length > 0 ? relations : undefined,
+    });
   }
 
   // --- Categories ---

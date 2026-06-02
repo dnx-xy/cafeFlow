@@ -189,5 +189,6 @@ export function useMenus() {
     updateItem,
     deleteItem,
     setSelectedMenu,
+    setError,
   };
 }

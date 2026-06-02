@@ -10,6 +10,7 @@ import { Table } from '../entities/table.entity';
 import { Business } from '../entities/business.entity';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
+import { OrderItemMenuOption } from '../entities/order-item-menu-option.entity';
 import { Customer } from '../entities/customer.entity';
 import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
@@ -19,7 +20,7 @@ import { PointTransaction } from '../entities/point-transaction.entity';
   imports: [
     TypeOrmModule.forFeature([
       Menu, MenuCategory, MenuItem, Outlet, Table, Business,
-      Order, OrderItem, Customer, CustomerFeedback,
+      Order, OrderItem, OrderItemMenuOption, Customer, CustomerFeedback,
       LoyaltyProgram, PointTransaction,
     ]),
   ],

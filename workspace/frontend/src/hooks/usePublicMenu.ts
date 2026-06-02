@@ -14,6 +14,8 @@ export interface CafeInfo {
   outletId: string;
   tenantId: string;
   businessId: string;
+  currency?: string;
+  phoneNumber?: string;
 }
 
 export interface MenuItemData {

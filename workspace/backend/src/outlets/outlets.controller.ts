@@ -8,7 +8,7 @@ export class OutletsController {
   constructor(private readonly outletsService: OutletsService) {}
 
   @Post()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async create(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -21,7 +21,7 @@ export class OutletsController {
   }
 
   @Get()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findAll(
     @Query('businessId') businessId: string,
     @AuthenticatedUser() user: any,
@@ -30,7 +30,7 @@ export class OutletsController {
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
@@ -39,7 +39,7 @@ export class OutletsController {
   }
 
   @Put(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: any,
@@ -53,7 +53,7 @@ export class OutletsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,

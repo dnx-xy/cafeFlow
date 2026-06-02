@@ -28,7 +28,7 @@ export default function MenuPage() {
     createMenu, updateMenu, deleteMenu,
     createCategory, updateCategory, deleteCategory,
     createItem, updateItem, deleteItem,
-    setSelectedMenu,
+    setSelectedMenu, setError,
   } = useMenus();
 
   const { currency } = useCurrency();
@@ -41,7 +41,7 @@ export default function MenuPage() {
 
   const [menuForm, setMenuForm] = useState({ name: '', description: '', isActive: true });
   const [catForm, setCatForm] = useState({ name: '', description: '', sortIndex: 0 });
-  const [itemForm, setItemForm] = useState({ name: '', description: '', price: 0, menuCategoryId: '', available: true, hidden: false, categorySortIndex: 0 });
+  const [itemForm, setItemForm] = useState<{ name: string; description: string; price: number; menuCategoryId?: string; available: boolean; hidden: boolean; categorySortIndex: number }>({ name: '', description: '', price: 0, menuCategoryId: undefined, available: true, hidden: false, categorySortIndex: 0 });
 
   useEffect(() => { fetchMenus(); }, []);
 
@@ -75,22 +75,31 @@ export default function MenuPage() {
 
   const handleCreateItem = async () => {
     if (!selectedMenu || !itemForm.name || !itemForm.price) { toast.error('Name and price required'); return; }
-    try { await createItem(selectedMenu.id, itemForm); setShowCreateItem(false); setItemForm({ name: '', description: '', price: 0, menuCategoryId: '', available: true, hidden: false, categorySortIndex: 0 }); toast.success('Item created'); }
+    const payload = { ...itemForm };
+    if (!payload.menuCategoryId) delete payload.menuCategoryId;
+    try { await createItem(selectedMenu.id, payload as any); setShowCreateItem(false); setItemForm({ name: '', description: '', price: 0, menuCategoryId: undefined, available: true, hidden: false, categorySortIndex: 0 }); toast.success('Item created'); }
     catch { toast.error('Failed to create item'); }
   };
 
   const handleUpdateItem = async () => {
     if (!editingItem || !itemForm.name) return;
-    try { await updateItem(editingItem.id, itemForm); setEditingItem(null); setItemForm({ name: '', description: '', price: 0, menuCategoryId: '', available: true, hidden: false, categorySortIndex: 0 }); toast.success('Item updated'); }
+    const payload = { ...itemForm };
+    if (!payload.menuCategoryId) delete payload.menuCategoryId;
+    try { await updateItem(editingItem.id, payload as any); setEditingItem(null); setItemForm({ name: '', description: '', price: 0, menuCategoryId: undefined, available: true, hidden: false, categorySortIndex: 0 }); toast.success('Item updated'); }
     catch { toast.error('Failed to update item'); }
   };
 
-  const openMenu = (menu: Menu) => fetchMenuWithItems(menu.id);
+  const openMenu = async (menu: Menu) => {
+    setSelectedMenu(menu);
+    setError(null);
+    const result = await fetchMenuWithItems(menu.id);
+    if (!result) { toast.error('Failed to load menu items'); setSelectedMenu(null); }
+  };
   const openEditMenu = (menu: Menu) => { setEditingMenu(menu); setMenuForm({ name: menu.name, description: menu.description || '', isActive: menu.isActive }); };
   const openEditCategory = (cat: MenuCategory) => { setEditingCategory(cat); setCatForm({ name: cat.name, description: cat.description || '', sortIndex: cat.sortIndex ?? 0 }); };
   const openEditItem = (item: MenuItem) => {
     setEditingItem(item);
-    setItemForm({ name: item.name, description: item.description || '', price: item.price, menuCategoryId: item.menuCategoryId || '', available: item.available, hidden: item.hidden, categorySortIndex: item.categorySortIndex ?? 0 });
+    setItemForm({ name: item.name, description: item.description || '', price: item.price, menuCategoryId: item.menuCategoryId || undefined, available: item.available, hidden: item.hidden, categorySortIndex: item.categorySortIndex ?? 0 });
   };
 
   if (!selectedMenu) {
@@ -182,9 +191,12 @@ export default function MenuPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">{selectedMenu.description || 'No description'}</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => openEditMenu(selectedMenu)}>
-          <Edit className="w-4 h-4 mr-1.5" /> Edit Menu
-        </Button>
+        <div className="flex items-center gap-2">
+          {loading && <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />}
+          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => openEditMenu(selectedMenu)}>
+            <Edit className="w-4 h-4 mr-1.5" /> Edit Menu
+          </Button>
+        </div>
       </div>
 
       {categories.map(cat => (
@@ -251,7 +263,7 @@ export default function MenuPage() {
         </Button>
         <Button variant="outline" size="sm" className="h-9 text-xs" onClick={() => {
           setShowCreateItem(true);
-          setItemForm({ name: '', description: '', price: 0, menuCategoryId: categories[0]?.id || '', available: true, hidden: false, categorySortIndex: 0 });
+          setItemForm({ name: '', description: '', price: 0, menuCategoryId: categories[0]?.id || undefined, available: true, hidden: false, categorySortIndex: 0 });
         }}>
           <Plus className="w-4 h-4 mr-1.5" /> Add Item
         </Button>

@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { MenuCategory } from './menu-category.entity';
 import { MenuGroup } from './menu-group.entity';
@@ -62,9 +62,11 @@ export class MenuItem extends BaseEntity {
   tenantId: string;
 
   @ManyToOne(() => MenuCategory, (category) => category.menuItems, { nullable: true })
+  @JoinColumn({ name: 'menuCategoryId' })
   category: MenuCategory;
 
   @ManyToOne(() => MenuGroup, (group) => group.menuItems, { nullable: true })
+  @JoinColumn({ name: 'menuGroupId' })
   group: MenuGroup;
 
   @ManyToOne(() => Menu, (menu) => menu.categories)

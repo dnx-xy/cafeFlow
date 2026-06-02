@@ -9,7 +9,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async create(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -21,7 +21,7 @@ export class OrdersController {
   }
 
   @Get()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async findAll(
     @Query('outletId') outletId: string,
     @Query('status') status: string,
@@ -42,7 +42,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
@@ -51,7 +51,7 @@ export class OrdersController {
   }
 
   @Put(':id/status')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { status: string },
@@ -65,7 +65,7 @@ export class OrdersController {
   }
 
   @Put(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: any,
@@ -79,7 +79,7 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,

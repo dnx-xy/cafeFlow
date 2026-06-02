@@ -46,6 +46,7 @@ export class TablesService {
       code: `cf-${tenantId.substring(0, 6)}-${savedTable.id.substring(0, 8)}`,
       tableId: savedTable.id,
       businessId,
+      isActive: true,
     });
     
     await this.qrCodesRepository.save(qrCode);

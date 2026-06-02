@@ -8,6 +8,7 @@ import { Table } from '../entities/table.entity';
 import { Business } from '../entities/business.entity';
 import { Order } from '../entities/order.entity';
 import { OrderItem as OrderItemEntity } from '../entities/order-item.entity';
+import { OrderItemMenuOption } from '../entities/order-item-menu-option.entity';
 import { Customer } from '../entities/customer.entity';
 import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
@@ -39,6 +40,8 @@ export class PublicService {
     private loyaltyProgramsRepository: Repository<LoyaltyProgram>,
     @InjectRepository(PointTransaction)
     private pointTransactionsRepository: Repository<PointTransaction>,
+    @InjectRepository(OrderItemMenuOption)
+    private orderItemMenuOptionsRepository: Repository<OrderItemMenuOption>,
   ) {}
 
   async getMenuByTable(tableId: string) {
@@ -48,11 +51,19 @@ export class PublicService {
     });
     if (!table) throw new NotFoundException('Table not found');
 
-    const menu = await this.menusRepository.findOne({
-      where: { outletId: table.outletId, isActive: true },
-      relations: { categories: { menuItems: true } },
-      order: { createdAt: 'DESC' },
-    });
+    const menu = await this.menusRepository
+      .createQueryBuilder('menu')
+      .leftJoinAndSelect('menu.categories', 'category')
+      .leftJoinAndSelect('category.menuItems', 'menuItem')
+      .leftJoinAndSelect('menuItem.menuOptions', 'menuOption')
+      .leftJoinAndSelect('menuOption.options', 'optionValue')
+      .where('menu.outletId = :outletId', { outletId: table.outletId })
+      .andWhere('menu.isActive = :isActive', { isActive: true })
+      .orderBy('menu.createdAt', 'DESC')
+      .addOrderBy('category.sortIndex', 'ASC')
+      .addOrderBy('menuItem.categorySortIndex', 'ASC')
+      .addOrderBy('menuOption.createdAt', 'ASC')
+      .getOne();
     if (!menu) throw new NotFoundException('No menu found for this table');
 
     const outlet = table.outlet;
@@ -65,23 +76,36 @@ export class PublicService {
         name: business?.name || outlet?.name || 'Cafe',
         description: outlet?.description || business?.description,
         location: outlet?.address,
-        hours: '',
+        hours: '08:00 - 22:00',
         tableNumber: table.number,
         logo: business?.logoUrl || '',
         outletId: table.outletId,
         tenantId: table.tenantId,
         businessId: business?.id,
+        currency: business?.currency || 'IDR',
+        phoneNumber: outlet?.phoneNumber || business?.ownerId || '',
       },
     };
   }
 
+  async getMenuItem(itemId: string) {
+    const item = await this.menuItemsRepository.findOne({
+      where: { id: itemId },
+      relations: { menuOptions: { options: true } },
+      order: { menuOptions: { createdAt: 'ASC' as any } },
+    });
+    if (!item) throw new NotFoundException('Menu item not found');
+    return item;
+  }
+
   async createOrder(data: {
     tableId: string;
-    items: { menuItemId: string; quantity: number; notes?: string }[];
+    items: { menuItemId: string; quantity: number; notes?: string; options?: { optionValueId: string; priceAdjustment?: number }[] }[];
     notes?: string;
     orderType?: string;
     customerName?: string;
     customerWhatsapp?: string;
+    paymentMethod?: string;
   }) {
     const table = await this.tablesRepository.findOne({ where: { id: data.tableId }, relations: { outlet: { business: true } } });
     if (!table) throw new NotFoundException('Table not found');
@@ -99,18 +123,48 @@ export class PublicService {
     let totalAmount = 0;
 
     for (const item of data.items) {
-      const menuItem = await this.menuItemsRepository.findOne({ where: { id: item.menuItemId } });
+      const menuItem = await this.menuItemsRepository.findOne({
+        where: { id: item.menuItemId },
+        relations: { menuOptions: { options: true } },
+      });
       if (!menuItem) continue;
-      const itemTotal = menuItem.price * item.quantity;
+
+      let optionAdjustment = 0;
+      const selectedOptionValues: OrderItemMenuOption[] = [];
+
+      if (item.options?.length) {
+        for (const sel of item.options) {
+          for (const opt of menuItem.menuOptions || []) {
+            const val = opt.options?.find(v => v.id === sel.optionValueId);
+            if (val) {
+              const adj = sel.priceAdjustment ?? val.priceAdjustment ?? 0;
+              optionAdjustment += adj;
+              const optRec = this.orderItemMenuOptionsRepository.create({
+                optionId: opt.id,
+                optionValueId: val.id,
+                quantity: item.quantity,
+                priceAdjustment: adj,
+                orderItemId: '',
+                tenantId,
+              });
+              selectedOptionValues.push(optRec);
+            }
+          }
+        }
+      }
+
+      const unitPrice = menuItem.price + optionAdjustment;
+      const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
       const orderItem = this.orderItemsRepository.create({
         menuItemId: item.menuItemId,
         orderId: '',
         quantity: item.quantity,
-        unitPrice: menuItem.price,
+        unitPrice,
         totalPrice: itemTotal,
         notes: item.notes || '',
         tenantId,
+        menuOptions: selectedOptionValues,
       });
       orderItems.push(orderItem);
     }
@@ -130,6 +184,7 @@ export class PublicService {
       taxAmount: totalAmount * 0.08,
       finalAmount: totalAmount * 1.08,
       currency: 'IDR',
+      paymentMethod: data.paymentMethod as any || undefined,
       paymentStatus: PaymentStatus.PENDING,
       orderItems,
     });

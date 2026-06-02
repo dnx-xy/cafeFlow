@@ -10,11 +10,12 @@ export function usePublicOrder() {
 
   const submitOrder = async (data: {
     tableId: string;
-    items: { menuItemId: string; quantity: number }[];
+    items: { menuItemId: string; quantity: number; notes?: string; options?: { optionValueId: string; priceAdjustment?: number }[] }[];
     notes?: string;
     orderType?: string;
     customerName?: string;
     customerWhatsapp?: string;
+    paymentMethod?: string;
   }) => {
     setLoading(true);
     setError(null);

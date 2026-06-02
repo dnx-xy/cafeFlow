@@ -20,7 +20,7 @@ export class TenantsController {
   }
 
   @Get('current')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async getCurrentTenant(@AuthenticatedUser() user: any) {
     return await this.tenantsService.findOneById(user.tenantId);
   }

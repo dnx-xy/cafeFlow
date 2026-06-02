@@ -8,7 +8,7 @@ export class QrCodesController {
   constructor(private readonly qrCodesService: QrCodesService) {}
 
   @Post('generate')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async generateQrCode(
     @AuthenticatedUser() user: any,
     @Body() body: { tableId: string },
@@ -17,7 +17,7 @@ export class QrCodesController {
   }
 
   @Get('table/:tableId')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async getQrCodeByTable(
     @Param('tableId', ParseUUIDPipe) tableId: string,
     @AuthenticatedUser() user: any,
@@ -34,7 +34,7 @@ export class QrCodesController {
   }
 
   @Get('business/:businessId')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async getQrCodesByBusiness(
     @AuthenticatedUser() user: any,
     @Param('businessId', ParseUUIDPipe) businessId: string,

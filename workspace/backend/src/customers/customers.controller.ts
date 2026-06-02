@@ -8,7 +8,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async create(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -20,7 +20,7 @@ export class CustomersController {
   }
 
   @Get()
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async findAll(
     @AuthenticatedUser() user: any,
   ) {
@@ -29,7 +29,7 @@ export class CustomersController {
   }
 
   @Get('me')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async getProfile(
     @AuthenticatedUser() user: any,
   ) {
@@ -37,7 +37,7 @@ export class CustomersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
@@ -46,7 +46,7 @@ export class CustomersController {
   }
 
   @Put('me')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF, UserRole.CUSTOMER)
   async updateProfile(
     @Body() body: any,
     @AuthenticatedUser() user: any,
@@ -59,7 +59,7 @@ export class CustomersController {
   }
 
   @Put(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: any,
@@ -73,7 +73,7 @@ export class CustomersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.TENANT_OWNER, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @AuthenticatedUser() user: any,
