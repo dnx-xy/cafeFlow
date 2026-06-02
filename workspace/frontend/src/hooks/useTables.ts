@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { apiClient } from '@/lib/apiClient';
+import apiClient from '@/lib/apiClient';
 
 // Define types
 export interface Table {

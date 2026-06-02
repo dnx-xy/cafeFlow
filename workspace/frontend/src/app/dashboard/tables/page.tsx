@@ -185,7 +185,7 @@ export default function TablesPage() {
             <div className="text-center py-12">
               <AlertTriangle className="w-12 h-12 mx-auto text-red-500 mb-4" />
               <p className="text-red-500 mb-4">{error}</p>
-              <Button onClick={fetchTables}>Retry</Button>
+              <Button onClick={() => fetchTables()}>Retry</Button>
             </div>
           ) : (
             <>
