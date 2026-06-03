@@ -15,19 +15,27 @@ export declare class PublicController {
             outletId: string;
             tenantId: string;
             businessId: string;
+            currency: string;
+            phoneNumber: string;
         };
     }>;
+    getMenuItem(id: string): Promise<import("../entities/menu-item.entity").MenuItem>;
     createOrder(body: {
         tableId: string;
         items: {
             menuItemId: string;
             quantity: number;
             notes?: string;
+            options?: {
+                optionValueId: string;
+                priceAdjustment?: number;
+            }[];
         }[];
         notes?: string;
         orderType?: string;
         customerName?: string;
         customerWhatsapp?: string;
+        paymentMethod?: string;
     }): Promise<import("../entities/order.entity").Order>;
     submitFeedback(body: {
         customerName?: string;

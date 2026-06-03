@@ -74,19 +74,19 @@ let MenusService = class MenusService {
         await this.menusRepository.delete({ id, tenantId });
     }
     async getMenuWithItems(id, tenantId, includeCategories = false, includeItems = false) {
-        const options = {
-            where: { id, tenantId },
-        };
+        const relations = {};
         if (includeCategories || includeItems) {
-            options.relations = {};
-            if (includeCategories) {
-                options.relations.categories = true;
-            }
             if (includeItems) {
-                options.relations['categories.menuItems'] = true;
+                relations.categories = { menuItems: true };
+            }
+            else {
+                relations.categories = true;
             }
         }
-        return await this.menusRepository.findOne(options);
+        return await this.menusRepository.findOne({
+            where: { id, tenantId },
+            relations: Object.keys(relations).length > 0 ? relations : undefined,
+        });
     }
     async createCategory(menuId, data, tenantId) {
         const category = this.menuCategoriesRepository.create({

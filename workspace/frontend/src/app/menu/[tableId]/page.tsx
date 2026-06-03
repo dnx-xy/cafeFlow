@@ -204,67 +204,32 @@ function AnimatedCarousel({ items }: { items: any[] }) {
   if (items.length === 0) return null;
 
   return (
-    <div
-      className="relative overflow-hidden rounded-2xl"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      <div
-        className="flex transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${current * 100}%)` }}
-      >
+    <div className="elegant-carousel" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+      <div className="elegant-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         {items.map((item, idx) => (
-          <Link key={item.id} href={`/menu/item/${item.id}`} className="w-full shrink-0">
-            <Card className="mx-0 border-0 shadow-md overflow-hidden rounded-2xl">
-              {item.imageUrl ? (
-                <div className="relative h-44">
-                  <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  <Badge className="absolute left-3 top-3 bg-amber-500 text-white border-0 shadow-md">
-                    {idx === 0 ? "Promo" : "Special"}
-                  </Badge>
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-base font-bold text-white drop-shadow-sm">{item.name}</h3>
-                  </div>
-                </div>
-              ) : (
-                <div className="relative h-44 bg-gradient-to-br from-amber-100 to-orange-100">
-                  <div className="flex h-full items-center justify-center">
-                    <Gift className="h-12 w-12 text-amber-400" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                  <Badge className="absolute left-3 top-3 bg-amber-500 text-white border-0 shadow-md">
-                    {idx === 0 ? "Promo" : "Special"}
-                  </Badge>
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-base font-bold text-white drop-shadow-sm">{item.name}</h3>
-                  </div>
-                </div>
-              )}
-              <div className="px-4 pb-4 pt-3">
-                {item.description && (
-                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                    {item.description}
-                  </p>
-                )}
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-base font-bold text-amber-600">{formatIDR(Number(item.price))}</span>
-                  <span className="text-[11px] text-muted-foreground">Tap to order</span>
-                </div>
+          <Link key={item.id} href={`/menu/item/${item.id}`} className="elegant-carousel-slide">
+            {item.imageUrl ? (
+              <img src={item.imageUrl} alt={item.name} />
+            ) : (
+              <div style={{ height: 180, background: 'linear-gradient(135deg, var(--menu-warm) 0%, var(--menu-warm-hover) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Gift style={{ width: 48, height: 48, color: 'var(--menu-gold-light)' }} />
               </div>
-            </Card>
+            )}
+            <div className="elegant-carousel-gradient" />
+            <div className="elegant-carousel-content">
+              <h3>{item.name}</h3>
+              <div className="price">{formatIDR(Number(item.price))}</div>
+            </div>
           </Link>
         ))}
       </div>
       {items.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-black/35 px-3 py-1.5 backdrop-blur-sm">
+        <div className="elegant-carousel-dots">
           {items.map((_, idx) => (
             <button
               key={idx}
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrent(idx); }}
-              className={`h-1.5 rounded-full transition-all ${
-                idx === current ? "w-5 bg-white" : "w-1.5 bg-white/50"
-              }`}
+              className={`elegant-carousel-dot ${idx === current ? 'active' : ''}`}
             >
               <span className="sr-only">Slide {idx + 1}</span>
             </button>
@@ -277,15 +242,21 @@ function AnimatedCarousel({ items }: { items: any[] }) {
 
 function Skeleton() {
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="h-52 w-full bg-gradient-to-br from-amber-200 to-orange-200 animate-pulse" />
-      <div className="p-4">
-        <div className="mb-6 h-12 rounded-lg bg-muted animate-pulse" />
-        <div className="mb-6 h-32 rounded-xl bg-muted animate-pulse" />
-        <div className="mb-4 h-11 rounded-lg bg-muted animate-pulse" />
+    <div className="min-h-screen pb-24" style={{ background: 'var(--menu-bg)' }}>
+      <div style={{ height: 240, background: 'linear-gradient(135deg, #e8d5a3 0%, #c9a96e 100%)', opacity: 0.3 }} />
+      <div style={{ padding: 16 }}>
+        <div className="elegant-search" style={{ marginTop: 16 }}>
+          <div style={{ height: 48, borderRadius: 'var(--menu-radius)', background: 'var(--menu-card)', opacity: 0.5 }} />
+        </div>
+        <div className="elegant-carousel" style={{ height: 180, background: 'var(--menu-card)', opacity: 0.4, borderRadius: 'var(--menu-radius)', marginBottom: 24 }} />
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          {[1, 2, 3].map(i => (
+            <div key={i} style={{ height: 38, width: 100, borderRadius: 100, background: 'var(--menu-card)', opacity: 0.4 }} />
+          ))}
+        </div>
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-28 w-full rounded-xl bg-muted animate-pulse" />
+            <div key={i} style={{ height: 100, borderRadius: 'var(--menu-radius)', background: 'var(--menu-card)', opacity: 0.5 }} />
           ))}
         </div>
       </div>
@@ -421,107 +392,102 @@ export default function MenuHomePage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center" style={{ background: 'var(--menu-bg)' }}>
         <div className="text-center px-4">
-          <p className="text-sm text-red-500">{error}</p>
-          <Button variant="outline" className="mt-4" onClick={() => fetchMenuByTable(tableId)}>
+          <Coffee style={{ width: 48, height: 48, margin: '0 auto 16px', color: 'var(--menu-text-light)', opacity: 0.4 }} />
+          <p style={{ fontSize: 14, color: 'var(--menu-text-muted)', marginBottom: 20 }}>{error}</p>
+          <button
+            onClick={() => fetchMenuByTable(tableId)}
+            style={{
+              padding: '10px 24px',
+              borderRadius: 100,
+              background: 'var(--menu-charcoal)',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
             Try Again
-          </Button>
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="relative">
-        <div className="h-52 w-full overflow-hidden bg-gradient-to-br from-amber-400 via-orange-400 to-orange-500">
-          {cafe?.logo && (
-            <img
-              src={cafe.logo}
-              alt={cafe.name}
-              className="h-full w-full object-cover opacity-50"
-            />
+    <div className="min-h-screen pb-24" style={{ background: 'var(--menu-bg)' }}>
+      {/* Elegant Header */}
+      <div className="elegant-header">
+        <div className="elegant-header-bg">
+          {cafe?.logo ? (
+            <img src={cafe.logo} alt={cafe.name} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #2d2a27 0%, #4a4540 100%)' }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <div className="elegant-header-overlay" />
         </div>
 
-        {/* Cafe Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <div className="flex items-end gap-3">
+        <div className="elegant-header-content">
+          <div className="elegant-brand">
             {cafe?.logo ? (
-              <img
-                src={cafe.logo}
-                alt="Logo"
-                className="h-16 w-16 rounded-full border-[3px] border-white/80 object-cover shadow-lg"
-              />
+              <img src={cafe.logo} alt="Logo" className="elegant-logo" />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white/80 bg-white/20 shadow-lg backdrop-blur-sm">
-                <Coffee className="h-8 w-8 text-white" />
+              <div className="elegant-logo-placeholder">
+                <Coffee />
               </div>
             )}
-            <div className="flex-1">
-              <h1 className="text-xl font-bold leading-tight text-white drop-shadow-sm">{cafe?.name || "Cafe"}</h1>
+            <div style={{ flex: 1 }}>
+              <h1 className="elegant-cafe-name">{cafe?.name || "Cafe"}</h1>
               {cafe?.description && (
-                <p className="mt-0.5 text-sm leading-snug text-white/80">{cafe.description}</p>
+                <p className="elegant-cafe-desc">{cafe.description}</p>
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-foreground shadow-md backdrop-blur">
-              <MapPin className="h-3 w-3 text-amber-500" />
+            <div className="elegant-table-badge">
+              <MapPin />
               Table {cafe?.tableNumber || tableId}
             </div>
           </div>
         </div>
 
-        {/* Cart Button */}
-        <Link href="/menu/cart">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute right-4 top-4 h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </Button>
+        {/* Cart FAB */}
+        <Link href="/menu/cart" className="elegant-cart-fab">
+          <ShoppingCart />
+          {cartCount > 0 && (
+            <span className="elegant-cart-badge">{cartCount}</span>
+          )}
         </Link>
       </div>
 
-      {/* Cafe Details */}
+      {/* Cafe Detail Bar */}
       {(cafe?.location || cafe?.hours) && (
-        <div className="border-b border-border bg-card px-4 py-3">
-          <div className="space-y-1 text-xs text-muted-foreground">
-            {cafe?.location && (
-              <div className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-                <span>{cafe.location}</span>
-              </div>
-            )}
-            {cafe?.hours && (
-              <div className="flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-                <span>{cafe.hours}</span>
-              </div>
-            )}
-          </div>
+        <div className="elegant-detail-bar">
+          {cafe?.location && (
+            <div className="elegant-detail-item">
+              <MapPin />
+              <span>{cafe.location}</span>
+            </div>
+          )}
+          {cafe?.hours && (
+            <div className="elegant-detail-item">
+              <Clock />
+              <span>{cafe.hours}</span>
+            </div>
+          )}
         </div>
       )}
 
       {/* Main Content */}
-      <div className="px-4 pb-4 pt-5">
+      <div style={{ padding: '16px 20px' }}>
         {/* Search */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
+        <div className="elegant-search">
+          <Search />
+          <input
             type="text"
             placeholder="Search menu..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 rounded-xl border-border/50 bg-card pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground/60 focus-visible:ring-amber-500/20"
           />
         </div>
 
@@ -529,23 +495,19 @@ export default function MenuHomePage() {
         {categories.length > 0 && (
           <>
             {!searchQuery && hasPromos && (
-              <div className="mb-6">
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
-                    <Award className="h-3.5 w-3.5 text-amber-600" />
-                  </div>
-                  <h2 className="text-sm font-semibold tracking-tight">Special Offers</h2>
+              <div style={{ marginBottom: 24 }}>
+                <div className="elegant-section-header">
+                  <div className="icon-circle"><Award /></div>
+                  <h2>Special Offers</h2>
                 </div>
                 <AnimatedCarousel items={promoItems} />
               </div>
             )}
             {!searchQuery && featuredItems.length > 0 && (
-              <div className="mb-6">
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
-                    <Star className="h-3.5 w-3.5 text-amber-600" />
-                  </div>
-                  <h2 className="text-sm font-semibold tracking-tight">Featured Items</h2>
+              <div style={{ marginBottom: 24 }}>
+                <div className="elegant-section-header">
+                  <div className="icon-circle"><Star /></div>
+                  <h2>Featured Items</h2>
                 </div>
                 <AnimatedCarousel items={featuredItems} />
               </div>
@@ -556,163 +518,94 @@ export default function MenuHomePage() {
         {/* Sentinel */}
         <div ref={sentinelRef} />
 
-        {/* Sticky Header */}
+        {/* Category Navigation */}
         {categories.length > 0 && (
-          <div className={`sticky top-0 z-20 -mx-4 bg-background px-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${isStuck ? "py-2.5" : "pb-2 pt-3 mb-3"}`}>
-            {isStuck ? (
-              <div className="flex items-center justify-between">
-                <Select value={selectedCategory || firstCategoryId} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="h-9 gap-2 border border-border/50 bg-card px-3 text-sm font-medium shadow-none [&>span]:flex [&>span]:items-center [&>span]:gap-2">
-                    {categories.map(cat => {
-                      if (cat.id !== (selectedCategory || firstCategoryId)) return null;
-                      const Icon = getCategoryIcon(cat);
-                      return <Icon key={cat.id} className="h-4 w-4 text-amber-500" />;
-                    })}
-                    <span>{currentCategory?.name || "Select"}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {visibleItems.length}
-                    </span>
-                    <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        <span className="flex items-center gap-2">
-                          {(() => { const Icon = getCategoryIcon(cat); return <Icon className="h-3.5 w-3.5 text-muted-foreground" />; })()}
-                          {cat.name}
-                          <span className="text-xs text-muted-foreground">({filteredItems(cat.id).length})</span>
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Link href="/menu/cart" className="relative shrink-0">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                    <ShoppingCart className="h-4 w-4" />
-                    {cartCount > 0 && (
-                      <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[8px] font-bold text-white">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <>
-                <div className="mb-2 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold">Our Menu</h2>
-                  <Link href="/menu/cart" className="relative">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                      <ShoppingCart className="h-4 w-4" />
-                      {cartCount > 0 && (
-                        <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[8px] font-bold text-white">
-                          {cartCount}
-                        </span>
-                      )}
-                    </Button>
-                  </Link>
-                </div>
-                <div className="-mx-4 overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <div className="flex gap-2">
-                    {categories.map((cat) => {
-                      const isActive = cat.id === (selectedCategory || firstCategoryId);
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => setSelectedCategory(cat.id)}
-                          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all ${
-                            isActive
-                              ? "border-amber-500 bg-amber-500 text-white shadow-sm"
-                              : "border-border bg-card text-muted-foreground hover:border-muted-foreground/30"
-                          }`}
-                        >
-                          {(() => { const Icon = getCategoryIcon(cat); return <Icon className={`h-3.5 w-3.5 ${isActive ? "text-white" : "text-muted-foreground"}`} />; })()}
-                          {cat.name}
-                          <span className="text-[10px] opacity-60">({filteredItems(cat.id).length})</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
+          <div className={`elegant-sticky-header ${isStuck ? 'scrolled' : ''}`}>
+            <div className="elegant-section-header" style={{ marginBottom: 12 }}>
+              <h2 style={{ fontSize: 16 }}>Our Menu</h2>
+            </div>
+            <div className="elegant-category-pills">
+              {categories.map((cat) => {
+                const active = cat.id === (selectedCategory || firstCategoryId);
+                const Icon = getCategoryIcon(cat);
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`elegant-category-pill ${active ? 'active' : ''}`}
+                  >
+                    <Icon />
+                    {cat.name}
+                    <span className="count">({filteredItems(cat.id).length})</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {/* Items */}
         {categories.length > 0 && (
-          <div className="mt-2">
+          <div style={{ marginTop: 8 }}>
             {currentCategory && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {visibleItems.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <Coffee className="mx-auto h-12 w-12 text-muted-foreground/30" />
-                    <p className="mt-3 text-sm text-muted-foreground">No items found</p>
+                  <div className="elegant-empty">
+                    <Coffee />
+                    <p>No items found</p>
                   </div>
                 ) : (
                   visibleItems.map((item) => (
-                    <div key={item.id} className="group relative">
-                      <Link href={`/menu/item/${item.id}`}>
-                        <Card className="overflow-hidden border border-border/40 bg-card shadow-sm transition-all duration-200 hover:border-amber-200 hover:shadow-md">
-                          <div className="flex gap-4 p-4">
-                            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
-                              {item.imageUrl ? (
-                                <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-                                  <Coffee className="h-8 w-8 text-amber-300" />
-                                </div>
-                              )}
-                              {item.soldOut && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-                                  <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white">Sold Out</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
-                              <div>
-                                <div className="flex items-start justify-between gap-2">
-                                  <h3 className={`truncate text-[15px] font-semibold tracking-tight ${item.soldOut ? "text-muted-foreground line-through" : "text-foreground"}`}>
-                                    {item.name}
-                                  </h3>
-                                  <div className="flex shrink-0 gap-1.5">
-                                    {item.isFeatured && (
-                                      <div className="flex h-5 items-center gap-0.5 rounded-full bg-green-100 px-2 text-[10px] font-medium text-green-700">
-                                        <Star className="h-2.5 w-2.5 fill-green-700" />
-                                        Featured
-                                      </div>
-                                    )}
-                                    {item.isSpecialOffer && (
-                                      <div className="flex h-5 items-center gap-0.5 rounded-full bg-amber-100 px-2 text-[10px] font-medium text-amber-700">
-                                        <Gift className="h-2.5 w-2.5" />
-                                        Promo
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                                {item.description && (
-                                  <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground/80">
-                                    {item.description}
-                                  </p>
+                    <div key={item.id} className="elegant-item-card">
+                      <Link href={`/menu/item/${item.id}`} style={{ display: 'contents' }}>
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.name} className="elegant-item-image" />
+                        ) : (
+                          <div className="elegant-item-image-placeholder">
+                            <Coffee />
+                          </div>
+                        )}
+                        <div className="elegant-item-info">
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                              <h3 className="elegant-item-name">{item.name}</h3>
+                              <div className="elegant-item-badges">
+                                {item.isFeatured && (
+                                  <span className="elegant-badge featured">Featured</span>
+                                )}
+                                {item.isSpecialOffer && (
+                                  <span className="elegant-badge promo">Promo</span>
                                 )}
                               </div>
-                              <div className="mt-2 flex items-center justify-between">
-                                <span className={`text-[15px] font-bold ${item.soldOut ? "text-muted-foreground" : "text-amber-600"}`}>
-                                  {formatIDR(Number(item.price))}
-                                </span>
-                              </div>
                             </div>
+                            {item.description && (
+                              <p className="elegant-item-desc">{item.description}</p>
+                            )}
                           </div>
-                        </Card>
+                          <div className="elegant-item-footer">
+                            <span className="elegant-item-price">{formatIDR(Number(item.price))}</span>
+                          </div>
+                        </div>
                       </Link>
                       {!item.soldOut && (
-                        <Button
-                          size="icon"
-                          className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:bg-amber-600 hover:shadow-amber-600/30 active:scale-95"
+                        <button
+                          className="elegant-item-add"
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAdd(item); }}
                         >
-                          <Plus className="h-5 w-5" />
-                        </Button>
+                          <Plus />
+                        </button>
+                      )}
+                      {item.soldOut && (
+                        <div style={{
+                          position: 'absolute', inset: 0, borderRadius: 'var(--menu-radius)',
+                          background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(2px)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2,
+                        }}>
+                          <span style={{
+                            padding: '4px 14px', borderRadius: 100, background: 'var(--menu-charcoal)',
+                            color: '#fff', fontSize: 12, fontWeight: 600,
+                          }}>Sold Out</span>
+                        </div>
                       )}
                     </div>
                   ))
@@ -723,81 +616,60 @@ export default function MenuHomePage() {
         )}
 
         {categories.length === 0 && !loading && (
-          <div className="py-12 text-center">
-            <Coffee className="mx-auto h-12 w-12 text-muted-foreground/30" />
-            <p className="mt-3 text-sm text-muted-foreground">Menu is not available</p>
+          <div className="elegant-empty" style={{ paddingTop: 80 }}>
+            <Coffee />
+            <p>Menu is not available</p>
           </div>
         )}
       </div>
 
       {/* Loyalty CTA */}
       <Link href="/menu/loyalty">
-        <div className="mx-4 mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold">Join our Loyalty Program</h3>
-              <p className="text-xs text-white/80">Earn points with every order</p>
-            </div>
-            <Button size="sm" variant="secondary" className="bg-white text-amber-600 hover:bg-white/90">
-              Join Now
-            </Button>
+        <div className="elegant-loyalty-cta">
+          <div>
+            <h3>Join our Loyalty Program</h3>
+            <p>Earn points with every order</p>
           </div>
+          <button>Join Now</button>
         </div>
       </Link>
 
       {/* Upsell Popup */}
       {upsell && (
-        <div className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-md animate-in slide-in-from-bottom-4 fade-in">
-          <Card className="border-0 shadow-xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
-                  <Star className="h-5 w-5 text-amber-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{upsell.rule.suggestion.description}</p>
-                  <p className="text-xs text-muted-foreground">Add to your order?</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setUpsell(null)}>
-                    Skip
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="h-8 bg-amber-500 text-xs text-white hover:bg-amber-600"
-                    onClick={handleUpsellAdd}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="elegant-upsell">
+          <div className="elegant-upsell-card">
+            <div className="elegant-upsell-icon">
+              <Star />
+            </div>
+            <div className="elegant-upsell-text">
+              <p>{upsell.rule.suggestion.description}</p>
+              <span>Add to your order?</span>
+            </div>
+            <div className="elegant-upsell-actions">
+              <button className="skip" onClick={() => setUpsell(null)}>Skip</button>
+              <button className="add" onClick={handleUpsellAdd}>Add</button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* FABs */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+      <div className="elegant-fabs">
         {cafe?.phoneNumber && (
           <>
-            <button
-              onClick={handleWaOrder}
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg transition-transform hover:scale-110 hover:bg-amber-600 active:scale-95"
-            >
-              <MessageCircle className="h-6 w-6" />
+            <button className="elegant-fab wa" onClick={handleWaOrder}>
+              <MessageCircle />
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
+                <span className="elegant-fab-badge">{cartCount}</span>
               )}
             </button>
             <a
               href={`https://wa.me/${cafe.phoneNumber.replace(/[^0-9]/g, '')}?text=Halo%2C%20saya%20dari%20Meja%20${cafe.tableNumber || tableId}%2C%20minta%20bantuan`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition-transform hover:scale-110 hover:bg-green-600 active:scale-95"
+              className="elegant-fab help"
             >
-              <Bell className="h-6 w-6" />
+              <Bell />
             </a>
           </>
         )}

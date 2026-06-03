@@ -49,4 +49,19 @@ export declare class AuthController {
     logout(user: any): Promise<{
         message: string;
     }>;
+    switchTenant(body: {
+        tenantId: string;
+    }, currentUser: any): Promise<{
+        access_token: string;
+        refresh_token: string;
+        expires_in: number;
+        user: {
+            id: any;
+            name: any;
+            email: any;
+            role: any;
+            tenantId: string;
+            businessId: string;
+        };
+    }>;
 }

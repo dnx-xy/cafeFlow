@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Order } from '../entities/order.entity';
 import { OrderStatus } from '../entities/enums';
 import { OrderItem } from '../entities/order-item.entity';
@@ -52,10 +52,11 @@ export class OrdersService {
     }
     
     if (startDate && endDate) {
-      where.createdAt = {
-        $gte: startDate,
-        $lte: endDate,
-      };
+      where.createdAt = Between(startDate, endDate);
+    } else if (startDate) {
+      where.createdAt = MoreThanOrEqual(startDate);
+    } else if (endDate) {
+      where.createdAt = LessThanOrEqual(endDate);
     }
     
     return await this.ordersRepository.find({

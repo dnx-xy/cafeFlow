@@ -7,16 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { formatCurrency } from '@/lib/currency';
+import { toast } from 'sonner';
 import {
   CreditCard, Check, Zap, Building2, GraduationCap, Sparkles,
   Download, ArrowRight, Clock, DollarSign, FileText, Shield,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 
-const plans = [
-  { name: 'Starter', price: 29, icon: GraduationCap, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', features: ['Up to 200 orders/month', '1 outlet', 'Basic analytics', 'Email support', 'QR code generation'], popular: false },
-  { name: 'Pro', price: 79, icon: Zap, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10', features: ['Up to 1000 orders/month', '3 outlets', 'Advanced analytics', 'Priority support', 'Loyalty program', 'Marketing campaigns', 'Staff management'], popular: true },
-  { name: 'Enterprise', price: 199, icon: Building2, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', features: ['Unlimited orders', 'Unlimited outlets', 'Custom analytics', '24/7 support', 'White-label QR codes', 'API access', 'Dedicated account manager'], popular: false },
-];
+// These would be replaced with real API data in production
+const plans = [];
 
 const invoices = [
   { id: 'INV-2026-001', date: 'Jun 1, 2026', amount: 79, status: 'Paid' },
@@ -58,15 +57,20 @@ export default function BillingPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-8 text-xs">Change Plan</Button>
-            <Button size="sm" className="h-8 text-xs bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => toast.success('Change Plan modal would open here')}>Change Plan</Button>
+            <Button size="sm" className="h-8 text-xs bg-gradient-to-r from-amber-500 to-orange-600 text-white" onClick={() => toast.success('Upgrade process would start here')}>
               <Sparkles className="w-3.5 h-3.5 mr-1.5" />Upgrade
             </Button>
           </div>
         </div>
         <Separator className="my-4 bg-amber-100 dark:bg-amber-500/10" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {usageStats.map(s => {
+          {[
+            { label: 'Orders this month', used: 0, limit: 1000, color: 'bg-amber-500' },
+            { label: 'Storage used', used: 0, limit: 5, unit: 'GB', color: 'bg-blue-500' },
+            { label: 'Team members', used: 0, limit: 10, color: 'bg-green-500' },
+            { label: 'QR codes', used: 0, limit: 50, color: 'bg-purple-500' },
+          ].map(s => {
             const pct = (s.used / s.limit) * 100;
             return (
               <div key={s.label}>

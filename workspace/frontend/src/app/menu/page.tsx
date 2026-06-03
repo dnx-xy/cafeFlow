@@ -7,7 +7,6 @@ import {
   Search,
   ShoppingCart,
   Star,
-  Flame,
   Coffee,
   Leaf,
   UtensilsCrossed,
@@ -16,15 +15,8 @@ import {
   MapPin,
   Clock,
   Award,
-  Gift,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-// Mock data
 const cafeInfo = {
   name: "Brew Haven Coffee",
   description: "Artisan coffee & cozy vibes",
@@ -43,60 +35,17 @@ const categories = [
 ];
 
 const featuredItems = [
-  {
-    id: "1",
-    name: "Signature Latte",
-    description: "Rich espresso with velvety steamed milk",
-    price: 5.50,
-    image: "https://images.unsplash.com/photo-1570968992193-6e584a94f04a?w=400&auto=format&fit=crop",
-    tags: ["bestseller"],
-    category: "coffee",
-  },
-  {
-    id: "2",
-    name: "Cold Brew",
-    description: "Smooth 18-hour steeped coffee",
-    price: 4.50,
-    image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&auto=format&fit=crop",
-    tags: ["bestseller"],
-    category: "coffee",
-  },
-  {
-    id: "3",
-    name: "Matcha Latte",
-    description: "Premium Japanese matcha with oat milk",
-    price: 6.00,
-    image: "https://images.unsplash.com/photo-1515825838458-f2a94b20105a?w=400&auto=format&fit=crop",
-    tags: ["new"],
-    category: "tea",
-  },
+  { id: "1", name: "Signature Latte", description: "Rich espresso with velvety steamed milk", price: 5.50, image: "https://images.unsplash.com/photo-1570968992193-6e584a94f04a?w=400&auto=format&fit=crop", tags: ["bestseller"] },
+  { id: "2", name: "Cold Brew", description: "Smooth 18-hour steeped coffee", price: 4.50, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&auto=format&fit=crop", tags: ["bestseller"] },
+  { id: "3", name: "Matcha Latte", description: "Premium Japanese matcha with oat milk", price: 6.00, image: "https://images.unsplash.com/photo-1515825838458-f2a94b20105a?w=400&auto=format&fit=crop", tags: ["new"] },
 ];
 
 const promotions = [
-  {
-    id: "promo1",
-    title: "Happy Hour Deal",
-    description: "20% off all pastries after 4 PM",
-    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop",
-    badge: "Limited Time",
-  },
-  {
-    id: "promo2",
-    title: "Buy 5 Get 1 Free",
-    description: "Collect stamps with every coffee",
-    image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&auto=format&fit=crop",
-    badge: "Loyalty",
-  },
+  { id: "promo1", title: "Happy Hour Deal", description: "20% off all pastries after 4 PM", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop", badge: "Limited Time" },
+  { id: "promo2", title: "Buy 5 Get 1 Free", description: "Collect stamps with every coffee", image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&auto=format&fit=crop", badge: "Loyalty" },
 ];
 
-const menuItems: Record<string, Array<{
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  tags: string[];
-}>> = {
+const menuItems: Record<string, Array<{ id: string; name: string; description: string; price: number; image: string; tags: string[] }>> = {
   coffee: [
     { id: "1", name: "Signature Latte", description: "Rich espresso with velvety steamed milk", price: 5.50, image: "https://images.unsplash.com/photo-1570968992193-6e584a94f04a?w=400&auto=format&fit=crop", tags: ["bestseller"] },
     { id: "2", name: "Cold Brew", description: "Smooth 18-hour steeped coffee", price: 4.50, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&auto=format&fit=crop", tags: ["bestseller"] },
@@ -127,49 +76,11 @@ const menuItems: Record<string, Array<{
   ],
 };
 
-function getTagIcon(tag: string) {
-  switch (tag) {
-    case "bestseller":
-      return <Flame className="h-3 w-3" />;
-    case "new":
-      return <Star className="h-3 w-3" />;
-    case "promo":
-      return <Gift className="h-3 w-3" />;
-    default:
-      return null;
-  }
-}
-
-function getTagStyle(tag: string) {
-  switch (tag) {
-    case "bestseller":
-      return "bg-orange-100 text-orange-700 border-orange-200";
-    case "new":
-      return "bg-green-100 text-green-700 border-green-200";
-    case "promo":
-      return "bg-amber-100 text-amber-700 border-amber-200";
-    default:
-      return "";
-  }
-}
-
-function formatTagName(tag: string) {
-  switch (tag) {
-    case "bestseller":
-      return "Bestseller";
-    case "new":
-      return "New";
-    case "promo":
-      return "Promo";
-    default:
-      return tag;
-  }
-}
-
 export default function MenuHomePage() {
   const params = useParams();
   const tableId = params.tableId || "12";
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeCat, setActiveCat] = useState("coffee");
   const [cartCount] = useState(2);
 
   const filteredItems = (category: string) => {
@@ -181,252 +92,196 @@ export default function MenuHomePage() {
     );
   };
 
+  const tagStyle = (tag: string) => {
+    switch (tag) {
+      case "bestseller": return { bg: "var(--menu-warm)", color: "var(--menu-gold-dark)" };
+      case "new": return { bg: "#f0fdf4", color: "#15803d" };
+      default: return { bg: "var(--menu-card-border)", color: "var(--menu-text-light)" };
+    }
+  };
+
+  const tagName = (tag: string) => {
+    switch (tag) {
+      case "bestseller": return "Bestseller";
+      case "new": return "New";
+      default: return tag;
+    }
+  };
+
+  const card: React.CSSProperties = {
+    background: 'var(--menu-card)', borderRadius: 14,
+    border: '1px solid var(--menu-card-border)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+    overflow: 'hidden',
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header / Cover Image */}
-      <div className="relative">
-        <div className="h-48 w-full overflow-hidden">
-          <img
-            src={cafeInfo.coverImage}
-            alt={cafeInfo.name}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+    <div className="min-h-screen pb-24" style={{ background: 'var(--menu-bg)' }}>
+      <div className="elegant-header" style={{ minHeight: 200, maxHeight: 220 }}>
+        <div className="elegant-header-bg">
+          <img src={cafeInfo.coverImage} alt={cafeInfo.name} />
+          <div className="elegant-header-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
         </div>
-        
-        {/* Cafe Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-end gap-3">
-            <img
-              src={cafeInfo.logo}
-              alt="Logo"
-              className="h-16 w-16 rounded-full border-4 border-background object-cover shadow-lg"
-            />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">{cafeInfo.name}</h1>
-              <p className="text-sm text-white/80">{cafeInfo.description}</p>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, zIndex: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+            <img src={cafeInfo.logo} alt="Logo" style={{ width: 60, height: 60, borderRadius: '50%', border: '3px solid var(--menu-card)', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }} />
+            <div style={{ flex: 1 }}>
+              <h1 className="elegant-cafe-name">{cafeInfo.name}</h1>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{cafeInfo.description}</p>
             </div>
-            <div className="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground shadow-lg backdrop-blur">
-              <MapPin className="h-3 w-3" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', borderRadius: 100, background: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: 500, color: 'var(--menu-charcoal)' }}>
+              <MapPin style={{ width: 12, height: 12 }} />
               Table {tableId}
             </div>
           </div>
         </div>
-
-        {/* Cart Button */}
-        <Link href="/menu/cart">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute right-4 top-4 h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </Button>
+        <Link href="/menu/cart" style={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
+          <button className="elegant-cart-fab" style={{ position: 'static' }}>
+            <ShoppingCart />
+            {cartCount > 0 && <span className="elegant-cart-badge">{cartCount}</span>}
+          </button>
         </Link>
       </div>
 
-      {/* Cafe Details */}
-      <div className="border-b border-border bg-card px-4 py-3">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" />
-              <span>{cafeInfo.location}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
-              <span>{cafeInfo.hours}</span>
-            </div>
-          </div>
+      <div style={{ borderBottom: '1px solid var(--menu-card-border)', padding: '10px 16px', background: 'var(--menu-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 12, color: 'var(--menu-text-light)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin style={{ width: 14, height: 14 }} /><span>{cafeInfo.location}</span></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock style={{ width: 14, height: 14 }} /><span>{cafeInfo.hours}</span></div>
         </div>
       </div>
 
-      <div className="p-4">
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search menu..."
-            value={searchQuery}
+      <div style={{ padding: '16px' }}>
+        <div style={{ position: 'relative', marginBottom: 20 }}>
+          <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 18, height: 18, color: 'var(--menu-text-light)' }} />
+          <input
+            type="text" placeholder="Search menu..." value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-12 border-border/50 bg-card pl-10 pr-4 text-sm shadow-sm"
+            style={{ width: '100%', height: 46, padding: '0 16px 0 42px', borderRadius: 14, border: '1.5px solid var(--menu-card-border)', background: 'var(--menu-card)', outline: 'none', fontSize: 14, color: 'var(--menu-charcoal)' }}
           />
         </div>
 
-        {/* Promotions Section */}
         {!searchQuery && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center gap-2">
-              <Award className="h-4 w-4 text-amber-500" />
-              <h2 className="text-sm font-semibold">Special Offers</h2>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <Award style={{ width: 16, height: 16, color: 'var(--menu-gold)' }} />
+              <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)' }}>Special Offers</h2>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {promotions.map((promo) => (
-                <Card key={promo.id} className="min-w-[280px] flex-shrink-0 overflow-hidden border-0 shadow-md">
-                  <div className="relative h-28">
-                    <img
-                      src={promo.image}
-                      alt={promo.title}
-                      className="h-full w-full object-cover"
-                    />
-                    <Badge className="absolute left-2 top-2 bg-amber-500 text-white hover:bg-amber-600">
-                      {promo.badge}
-                    </Badge>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+              {promotions.map(promo => (
+                <div key={promo.id} style={{ minWidth: 260, flexShrink: 0, ...card }}>
+                  <div style={{ height: 96, position: 'relative', overflow: 'hidden' }}>
+                    <img src={promo.image} alt={promo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <span style={{ position: 'absolute', left: 8, top: 8, padding: '3px 8px', borderRadius: 100, background: 'var(--menu-gold)', color: '#fff', fontSize: 10, fontWeight: 600 }}>{promo.badge}</span>
                   </div>
-                  <CardContent className="p-3">
-                    <h3 className="text-sm font-semibold">{promo.title}</h3>
-                    <p className="text-xs text-muted-foreground">{promo.description}</p>
-                  </CardContent>
-                </Card>
+                  <div style={{ padding: 12 }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)' }}>{promo.title}</h3>
+                    <p style={{ fontSize: 12, color: 'var(--menu-text-light)' }}>{promo.description}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Featured Section */}
         {!searchQuery && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-amber-500" />
-                <h2 className="text-sm font-semibold">Featured Items</h2>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Star style={{ width: 16, height: 16, color: 'var(--menu-gold)' }} />
+                <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)' }}>Featured Items</h2>
               </div>
-              <Link href="/menu?category=all" className="text-xs text-amber-600 hover:underline">
-                View all
-              </Link>
+              <Link href="/menu?category=all" style={{ fontSize: 12, color: 'var(--menu-gold-dark)', textDecoration: 'none' }}>View all</Link>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {featuredItems.map((item) => (
-                <Link key={item.id} href={`/menu/item/${item.id}`}>
-                  <Card className="min-w-[160px] flex-shrink-0 overflow-hidden border-0 shadow-md transition-transform hover:scale-[1.02]">
-                    <div className="relative h-24">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                      {item.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          className={`absolute left-2 top-2 text-[10px] ${getTagStyle(tag)}`}
-                        >
-                          <span className="flex items-center gap-1">
-                            {getTagIcon(tag)}
-                            {formatTagName(tag)}
-                          </span>
-                        </Badge>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+              {featuredItems.map(item => (
+                <Link key={item.id} href={`/menu/item/${item.id}`} style={{ textDecoration: 'none', minWidth: 150, flexShrink: 0 }}>
+                  <div style={card}>
+                    <div style={{ height: 88, position: 'relative', overflow: 'hidden' }}>
+                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      {item.tags.map(tag => (
+                        <span key={tag} style={{ position: 'absolute', left: 6, top: 6, padding: '2px 6px', borderRadius: 100, fontSize: 9, fontWeight: 500, ...tagStyle(tag) }}>{tagName(tag)}</span>
                       ))}
                     </div>
-                    <CardContent className="p-3">
-                      <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>
-                      <p className="mt-1 text-sm font-bold text-amber-600">${item.price.toFixed(2)}</p>
-                    </CardContent>
-                  </Card>
+                    <div style={{ padding: 10 }}>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--menu-charcoal)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</p>
+                      <p style={{ fontSize: 11, color: 'var(--menu-text-light)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</p>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--menu-gold)', marginTop: 4 }}>${item.price.toFixed(2)}</p>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
           </div>
         )}
 
-        {/* Categories & Menu */}
         <div>
-          <h2 className="mb-3 text-sm font-semibold">Our Menu</h2>
-          <Tabs defaultValue="coffee" className="w-full">
-            <TabsList className="mb-4 h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <TabsTrigger
-                    key={category.id}
-                    value={category.id}
-                    className="h-9 rounded-full border border-border/50 bg-card px-4 data-[state=active]:border-amber-500 data-[state=active]:bg-amber-500 data-[state=active]:text-white"
-                  >
-                    <Icon className="mr-1.5 h-3.5 w-3.5" />
-                    {category.name}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)', marginBottom: 12 }}>Our Menu</h2>
 
-            {categories.map((category) => (
-              <TabsContent key={category.id} value={category.id} className="mt-0">
-                <div className="space-y-3">
-                  {filteredItems(category.id).map((item) => (
-                    <Link key={item.id} href={`/menu/item/${item.id}`}>
-                      <Card className="overflow-hidden border-0 shadow-sm transition-shadow hover:shadow-md">
-                        <div className="flex gap-3 p-3">
-                          <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-1 flex-col justify-center">
-                            <div className="flex items-start justify-between gap-2">
-                              <h3 className="text-sm font-medium">{item.name}</h3>
-                              <div className="flex gap-1">
-                                {item.tags.map((tag) => (
-                                  <Badge
-                                    key={tag}
-                                    variant="outline"
-                                    className={`px-1.5 py-0 text-[9px] ${getTagStyle(tag)}`}
-                                  >
-                                    {formatTagName(tag)}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                              {item.description}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="text-sm font-bold text-amber-600">
-                                ${item.price.toFixed(2)}
-                              </span>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-7 w-7 rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white"
-                              >
-                                <ChevronRight className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  ))}
-                  {filteredItems(category.id).length === 0 && (
-                    <div className="py-8 text-center text-sm text-muted-foreground">
-                      No items found
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+            {categories.map(cat => {
+              const Icon = cat.icon;
+              const isActive = activeCat === cat.id;
+              return (
+                <button key={cat.id} onClick={() => setActiveCat(cat.id)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    padding: '8px 16px', borderRadius: 100,
+                    border: `1.5px solid ${isActive ? 'var(--menu-gold)' : 'var(--menu-card-border)'}`,
+                    background: isActive ? 'var(--menu-gold)' : 'var(--menu-card)',
+                    color: isActive ? '#fff' : 'var(--menu-text-muted)',
+                    fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <Icon style={{ width: 14, height: 14 }} />
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filteredItems(activeCat).map(item => (
+              <Link key={item.id} href={`/menu/item/${item.id}`} style={{ textDecoration: 'none' }}>
+                <div className="elegant-item-card" style={{ padding: 12, display: 'flex', gap: 12 }}>
+                  <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 10, overflow: 'hidden' }}>
+                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                      <h3 style={{ fontSize: 14, fontWeight: 500, color: 'var(--menu-charcoal)' }}>{item.name}</h3>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {item.tags?.map(tag => (
+                          <span key={tag} style={{ padding: '1px 6px', borderRadius: 100, fontSize: 9, fontWeight: 500, ...tagStyle(tag) }}>{tagName(tag)}</span>
+                        ))}
+                      </div>
                     </div>
-                  )}
+                    <p style={{ fontSize: 12, color: 'var(--menu-text-light)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.description}</p>
+                    <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span className="elegant-item-price" style={{ fontSize: 14 }}>${item.price.toFixed(2)}</span>
+                      <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--menu-warm)', color: 'var(--menu-gold-dark)' }}>
+                        <ChevronRight style={{ width: 16, height: 16 }} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </TabsContent>
+              </Link>
             ))}
-          </Tabs>
+            {filteredItems(activeCat).length === 0 && (
+              <div style={{ padding: 32, textAlign: 'center', fontSize: 13, color: 'var(--menu-text-light)' }}>No items found</div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Loyalty CTA */}
-      <Link href="/menu/loyalty">
-        <div className="mx-4 mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white shadow-lg">
-          <div className="flex items-center justify-between">
+      <Link href="/menu/loyalty" style={{ textDecoration: 'none' }}>
+        <div style={{ margin: '16px 16px 0', borderRadius: 12, background: 'var(--menu-charcoal)', padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <h3 className="text-sm font-semibold">Join our Loyalty Program</h3>
-              <p className="text-xs text-white/80">Earn points with every order</p>
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>Join our Loyalty Program</h3>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>Earn points with every order</p>
             </div>
-            <Button size="sm" variant="secondary" className="bg-white text-amber-600 hover:bg-white/90">
-              Join Now
-            </Button>
+            <button style={{ padding: '8px 16px', borderRadius: 100, background: '#fff', color: 'var(--menu-charcoal)', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Join Now</button>
           </div>
         </div>
       </Link>

@@ -37,7 +37,7 @@ let QrCodesController = class QrCodesController {
 exports.QrCodesController = QrCodesController;
 __decorate([
     (0, common_1.Post)('generate'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -46,7 +46,7 @@ __decorate([
 ], QrCodesController.prototype, "generateQrCode", null);
 __decorate([
     (0, common_1.Get)('table/:tableId'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
     __param(0, (0, common_1.Param)('tableId', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -63,7 +63,7 @@ __decorate([
 ], QrCodesController.prototype, "scanQrCode", null);
 __decorate([
     (0, common_1.Get)('business/:businessId'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __param(1, (0, common_1.Param)('businessId', common_1.ParseUUIDPipe)),
     __param(2, (0, common_1.Query)('active')),

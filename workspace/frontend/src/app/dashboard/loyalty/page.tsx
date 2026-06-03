@@ -16,27 +16,16 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { formatCurrency } from '@/lib/currency';
 import {
   Award, Gift, Star, Users, TrendingUp, Plus, Settings, Coins, Sparkles, Crown, Loader2,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 
 const REWARD_TYPE_LABELS: Record<string, string> = {
   DISCOUNT: 'Discount', FREE_ITEM: 'Free Item', VOUCHER: 'Voucher', EXCLUSIVE_ACCESS: 'Exclusive Access',
 };
 
-const mockTopCustomers = [
-  { name: 'Sarah Johnson', points: 2450, visits: 48 },
-  { name: 'Mike Chen', points: 1820, visits: 36 },
-  { name: 'Emily Davis', points: 1560, visits: 29 },
-  { name: 'James Wilson', points: 920, visits: 18 },
-  { name: 'Lisa Brown', points: 740, visits: 14 },
-];
-
-const mockTransactions = [
-  { customer: 'Sarah J.', points: 50, type: 'EARNED' as const, desc: 'Order #1042', date: 'Today' },
-  { customer: 'Mike C.', points: 150, type: 'SPENT' as const, desc: 'Free Coffee reward', date: 'Today' },
-  { customer: 'Emily D.', points: 35, type: 'EARNED' as const, desc: 'Order #1040', date: 'Yesterday' },
-  { customer: 'James W.', points: 250, type: 'SPENT' as const, desc: '$5 Discount reward', date: 'Yesterday' },
-  { customer: 'Lisa B.', points: 20, type: 'EARNED' as const, desc: 'Order #1038', date: '2 days ago' },
-];
+// These would be replaced with real API data in production
+const mockTopCustomers = [];
+const mockTransactions = [];
 
 function mockTiers() {
   return [
@@ -89,17 +78,17 @@ export default function LoyaltyPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Loyalty Program</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">Reward your loyal customers and drive repeat visits</p>
         </div>
-        <Button variant="outline" size="sm" onClick={openProgramSettings} className="shrink-0">
-          <Settings className="w-4 h-4 mr-1.5" /> Program Settings
+        <Button variant="outline" size="sm" onClick={openProgramSettings} className="shrink-0" disabled={!program}>
+          <SettingsIcon className="w-4 h-4 mr-1.5" /> Program Settings
         </Button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Active Members', value: '2,450', icon: Award },
-          { label: 'Points Issued', value: '7,490', icon: Coins },
-          { label: 'Rewards Redeemed', value: '156', icon: Gift },
-          { label: 'Retention Rate', value: '68%', icon: TrendingUp },
+          { label: 'Active Members', value: '0', icon: Award },
+          { label: 'Points Issued', value: '0', icon: Coins },
+          { label: 'Rewards Redeemed', value: '0', icon: Gift },
+          { label: 'Retention Rate', value: '0%', icon: TrendingUp },
         ].map((s, i) => (
           <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
             <div className="flex items-center gap-2 mb-1.5">

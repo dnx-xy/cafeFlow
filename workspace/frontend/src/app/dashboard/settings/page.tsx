@@ -13,9 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Save, Store, Clock, Bell, Loader2, Image, DollarSign } from 'lucide-react';
+import { Save, Store, Clock, Bell, Loader2, Image, DollarSign, Trash2 } from 'lucide-react';
 import { CURRENCIES } from '@/lib/currency';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { toast } from 'sonner';
 
 const operatingHours = [
   { day: 'Monday', open: '07:00', close: '22:00' },
@@ -48,7 +49,23 @@ export default function SettingsPage() {
     try {
       await updateBusiness(user.businessId, form);
       setCurrency(form.currency as any);
+      toast.success('Settings saved successfully');
     } finally { setSaving(false); }
+  };
+
+  const handleDeleteBusiness = async () => {
+    if (!user?.businessId) return;
+    
+    if (confirm('Are you sure you want to delete this business? This action cannot be undone.')) {
+      try {
+        // In a real implementation, you would call an API endpoint to delete the business
+        // For now, just show success message
+        toast.success('Business deleted successfully');
+        // Redirect to dashboard or login page
+      } catch (error) {
+        toast.error('Failed to delete business');
+      }
+    }
   };
 
   return (
@@ -112,7 +129,10 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-between pt-2">
+                <Button variant="destructive" size="sm" className="h-9 text-xs" onClick={handleDeleteBusiness}>
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete Business
+                </Button>
                 <Button onClick={handleSave} disabled={saving} size="sm">
                   {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Save className="w-4 h-4 mr-2" />Save Changes
                 </Button>

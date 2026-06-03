@@ -66,7 +66,7 @@ let MenusController = class MenusController {
 exports.MenusController = MenusController;
 __decorate([
     (0, common_1.Post)(),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -75,7 +75,7 @@ __decorate([
 ], MenusController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Query)('outletId')),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -84,7 +84,7 @@ __decorate([
 ], MenusController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -93,7 +93,7 @@ __decorate([
 ], MenusController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Get)(':id/items'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Query)('include')),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -103,7 +103,7 @@ __decorate([
 ], MenusController.prototype, "getMenuWithItems", null);
 __decorate([
     (0, common_1.Put)(':id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -113,7 +113,7 @@ __decorate([
 ], MenusController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -122,7 +122,7 @@ __decorate([
 ], MenusController.prototype, "remove", null);
 __decorate([
     (0, common_1.Post)(':menuId/categories'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('menuId', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -132,7 +132,7 @@ __decorate([
 ], MenusController.prototype, "createCategory", null);
 __decorate([
     (0, common_1.Put)('categories/:id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -142,7 +142,7 @@ __decorate([
 ], MenusController.prototype, "updateCategory", null);
 __decorate([
     (0, common_1.Delete)('categories/:id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -151,7 +151,7 @@ __decorate([
 ], MenusController.prototype, "removeCategory", null);
 __decorate([
     (0, common_1.Post)(':menuId/items'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('menuId', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -161,7 +161,7 @@ __decorate([
 ], MenusController.prototype, "createItem", null);
 __decorate([
     (0, common_1.Put)('items/:id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, auth_decorators_1.AuthenticatedUser)()),
@@ -171,7 +171,7 @@ __decorate([
 ], MenusController.prototype, "updateItem", null);
 __decorate([
     (0, common_1.Delete)('items/:id'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),

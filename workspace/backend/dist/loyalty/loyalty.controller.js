@@ -36,7 +36,7 @@ let LoyaltyController = class LoyaltyController {
 exports.LoyaltyController = LoyaltyController;
 __decorate([
     (0, common_1.Get)('programs'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -44,7 +44,7 @@ __decorate([
 ], LoyaltyController.prototype, "getLoyaltyProgram", null);
 __decorate([
     (0, common_1.Post)('transactions'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -53,7 +53,7 @@ __decorate([
 ], LoyaltyController.prototype, "createPointsTransaction", null);
 __decorate([
     (0, common_1.Get)('points/:customerId'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
     __param(0, (0, common_1.Param)('customerId', common_1.ParseUUIDPipe)),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),

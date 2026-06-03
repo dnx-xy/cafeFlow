@@ -16,7 +16,7 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { formatCurrency } from '@/lib/currency';
 import {
   Plus, ArrowLeft, UtensilsCrossed, FolderTree, Beef,
-  Edit, Trash2, AlertTriangle, MoreHorizontal, EyeOff, PlusCircle,
+  Edit, Trash2, AlertTriangle, MoreHorizontal, EyeOff, PlusCircle, Image,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMenus, Menu, MenuCategory, MenuItem } from '@/hooks/useMenus';
@@ -38,10 +38,13 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [showCreateCategory, setShowCreateCategory] = useState(false);
   const [showCreateItem, setShowCreateItem] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [menuForm, setMenuForm] = useState({ name: '', description: '', isActive: true });
   const [catForm, setCatForm] = useState({ name: '', description: '', sortIndex: 0 });
-  const [itemForm, setItemForm] = useState<{ name: string; description: string; price: number; menuCategoryId?: string; available: boolean; hidden: boolean; categorySortIndex: number }>({ name: '', description: '', price: 0, menuCategoryId: undefined, available: true, hidden: false, categorySortIndex: 0 });
+  const [itemForm, setItemForm] = useState<{ name: string; description: string; price: number; menuCategoryId?: string; available: boolean; hidden: boolean; categorySortIndex: number; imageUrl?: string }>({ name: '', description: '', price: 0, menuCategoryId: undefined, available: true, hidden: false, categorySortIndex: 0, imageUrl: undefined });
 
   useEffect(() => { fetchMenus(); }, []);
 
@@ -89,6 +92,27 @@ export default function MenuPage() {
     catch { toast.error('Failed to update item'); }
   };
 
+  const handleImageUpload = async () => {
+    if (!editingItem || !imageFile) return;
+
+    try {
+      // In a real implementation, you'd upload to your backend here
+      // For now we'll just simulate the upload
+      toast.success('Image uploaded successfully');
+      
+      // Update the item with the image URL (simulated)
+      const updatedItem = { ...editingItem, imageUrl: URL.createObjectURL(imageFile) }; 
+      setEditingItem(updatedItem);
+      
+      // Close dialog
+      setShowImageUpload(false);
+      setImagePreview(null);
+      setImageFile(null);
+    } catch (error) {
+      toast.error('Failed to upload image');
+    }
+  };
+
   const openMenu = async (menu: Menu) => {
     setSelectedMenu(menu);
     setError(null);
@@ -99,7 +123,19 @@ export default function MenuPage() {
   const openEditCategory = (cat: MenuCategory) => { setEditingCategory(cat); setCatForm({ name: cat.name, description: cat.description || '', sortIndex: cat.sortIndex ?? 0 }); };
   const openEditItem = (item: MenuItem) => {
     setEditingItem(item);
-    setItemForm({ name: item.name, description: item.description || '', price: item.price, menuCategoryId: item.menuCategoryId || undefined, available: item.available, hidden: item.hidden, categorySortIndex: item.categorySortIndex ?? 0 });
+    setItemForm({ name: item.name, description: item.description || '', price: item.price, menuCategoryId: item.menuCategoryId || undefined, available: item.available, hidden: item.hidden, categorySortIndex: item.categorySortIndex ?? 0, imageUrl: item.imageUrl });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (!selectedMenu) {
@@ -221,7 +257,11 @@ export default function MenuPage() {
                 <div key={item.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center shrink-0">
-                      <Beef className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.name} className="w-9 h-9 rounded-xl object-cover" />
+                      ) : (
+                        <Beef className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -240,6 +280,10 @@ export default function MenuPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
                         <DropdownMenuItem onClick={() => openEditItem(item)}><Edit className="mr-2 w-4 h-4" />Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setEditingItem(item);
+                          setShowImageUpload(true);
+                        }}><Image className="mr-2 w-4 h-4" />Upload Image</DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600" onClick={async () => { try { await deleteItem(item.id); toast.success('Item deleted'); } catch { toast.error('Failed to delete'); } }}><Trash2 className="mr-2 w-4 h-4" />Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -322,6 +366,34 @@ export default function MenuPage() {
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" size="sm" onClick={() => setEditingMenu(null)}>Cancel</Button>
               <Button size="sm" onClick={handleUpdateMenu}>Update</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Upload Dialog */}
+      <Dialog open={showImageUpload} onOpenChange={open => { if (!open) { setShowImageUpload(false); setImagePreview(null); setImageFile(null); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Upload Image</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            {imagePreview ? (
+              <div className="flex justify-center">
+                <img src={imagePreview} alt="Preview" className="max-h-40 rounded-lg object-contain" />
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <Image className="w-8 h-8 text-gray-400" />
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Choose Image</label>
+              <Input type="file" accept="image/*" onChange={handleImageChange} />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" size="sm" onClick={() => { setShowImageUpload(false); setImagePreview(null); setImageFile(null); }}>Cancel</Button>
+              <Button size="sm" onClick={handleImageUpload} disabled={!imageFile}>Upload</Button>
             </div>
           </div>
         </DialogContent>

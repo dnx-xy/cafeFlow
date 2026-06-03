@@ -11,7 +11,7 @@ export default function MenuLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="elegant-theme" style={{ background: '#faf8f5', minHeight: '100vh' }}>
       {children}
     </div>
   );

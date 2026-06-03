@@ -92,10 +92,12 @@ __decorate([
 ], MenuItem.prototype, "tenantId", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => menu_category_entity_1.MenuCategory, (category) => category.menuItems, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'menuCategoryId' }),
     __metadata("design:type", menu_category_entity_1.MenuCategory)
 ], MenuItem.prototype, "category", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => menu_group_entity_1.MenuGroup, (group) => group.menuItems, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'menuGroupId' }),
     __metadata("design:type", menu_group_entity_1.MenuGroup)
 ], MenuItem.prototype, "group", void 0);
 __decorate([

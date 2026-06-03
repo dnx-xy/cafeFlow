@@ -114,4 +114,12 @@ export class AuthService {
 
     return savedUser;
   }
+
+  async findTenantById(id: string): Promise<Tenant | null> {
+    return await this.tenantsRepository.findOne({ where: { id } });
+  }
+
+  async findBusinessByTenantId(tenantId: string): Promise<Business | null> {
+    return await this.businessesRepository.findOne({ where: { tenantId } });
+  }
 }

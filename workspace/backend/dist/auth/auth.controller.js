@@ -59,6 +59,39 @@ let AuthController = class AuthController {
     async logout(user) {
         return { message: 'Successfully logged out' };
     }
+    async switchTenant(body, currentUser) {
+        const tenant = await this.authService.findTenantById(body.tenantId);
+        if (!tenant) {
+            throw new Error('Tenant not found');
+        }
+        const business = await this.authService.findBusinessByTenantId(body.tenantId);
+        if (!business) {
+            throw new Error('Business not found for this tenant');
+        }
+        const payload = {
+            email: currentUser.email,
+            id: currentUser.id,
+            name: currentUser.name,
+            tenantId: body.tenantId,
+            businessId: business.id,
+            role: currentUser.role,
+        };
+        const access_token = this.authService.signToken(payload);
+        const refresh_token = this.authService.signToken(payload, '7d');
+        return {
+            access_token,
+            refresh_token,
+            expires_in: 3600,
+            user: {
+                id: currentUser.id,
+                name: currentUser.name,
+                email: currentUser.email,
+                role: currentUser.role,
+                tenantId: body.tenantId,
+                businessId: business.id,
+            }
+        };
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -72,7 +105,7 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('me'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -89,7 +122,7 @@ __decorate([
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('refresh'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
@@ -98,12 +131,21 @@ __decorate([
 ], AuthController.prototype, "refreshToken", null);
 __decorate([
     (0, common_1.Post)('logout'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Post)('switch-tenant'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "switchTenant", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

@@ -17,6 +17,36 @@ export interface User {
   businessId: string;
 }
 
+export const USER_ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  TENANT: 'TENANT',
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  STAFF: 'STAFF'
+};
+
+// Mock tenant data to show how data would be isolated
+export const MOCK_TENANT_DATA = {
+  'tenant-A': {
+    name: 'The Daily Grind',
+    customers: 1247,
+    orders: 2450,
+    revenue: 48900
+  },
+  'tenant-B': {
+    name: 'Café Luna',
+    customers: 820,
+    orders: 1820,
+    revenue: 36400
+  },
+  'tenant-C': {
+    name: 'Brew & Beyond',
+    customers: 560,
+    orders: 890,
+    revenue: 17800
+  }
+};
+
 export interface Order {
   id: string;
   orderId: string;
@@ -24,7 +54,7 @@ export interface Order {
   orderType: 'DINING_IN' | 'TAKEAWAY' | 'DELIVERY';
   tableNumber?: string;
   totalAmount: number;
-  items: OrderItem[];
+  items?: OrderItem[];
   paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   createdAt: string;
   updatedAt: string;
@@ -81,7 +111,8 @@ export const useAuth = () => {
       setError('Failed to authenticate user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
-      router.push('/login');
+      // Don't redirect immediately, let the component handle it
+      // The AuthGuard should handle the redirect
     } finally {
       setLoading(false);
     }
@@ -149,15 +180,64 @@ export const useAuth = () => {
     try {
       await authService.logout();
       setUser(null);
-      router.push('/login');
-      toast.success('Logged out successfully');
+      router.push('/');
     } catch (err) {
       console.error('Logout error:', err);
       // Even if logout fails, clear local storage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       setUser(null);
-      router.push('/login');
+      router.push('/');
+    }
+  };
+
+  // Reset auth state manually
+  const resetAuthState = () => {
+    setUser(null);
+    setError(null);
+  };
+
+  const switchTenant = async (tenantId: string) => {
+    try {
+      setLoading(true);
+      const response = await authService.switchTenant(tenantId);
+      
+      // Store new tokens
+      localStorage.setItem('access_token', response.access_token);
+      localStorage.setItem('refresh_token', response.refresh_token);
+      
+      // Update user data
+      setUser(response.user);
+      setError(null);
+      
+      // Return the response for any additional processing if needed
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to switch tenant';
+      setError(errorMessage);
+      toast.error('Tenant switch failed', {
+        description: errorMessage
+      });
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Force refresh auth state (to be called after tenant switch)
+  const refreshAuthState = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      }
+    } catch (err) {
+      console.error('Failed to refresh auth state:', err);
+      // Clear tokens if refresh fails
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setUser(null);
     }
   };
 
@@ -168,7 +248,9 @@ export const useAuth = () => {
     login,
     register,
     logout,
-    fetchUserData
+    fetchUserData,
+    switchTenant,
+    resetAuthState
   };
 };
 
@@ -182,15 +264,17 @@ export const useOrders = () => {
   const fetchOrders = async (filters?: any) => {
     try {
       setLoading(true);
+      console.log('[FE useOrders] Fetching orders with filters:', filters);
       const result = await ordersService.getOrders(filters);
+      console.log('[FE useOrders] Orders fetched:', result.data?.length, 'orders');
       setOrders(result.data);
       setPagination(result.pagination);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch orders';
+      console.error('[FE useOrders] Orders fetch error:', err);
       setError(errorMessage);
       toast.error('Failed to load orders');
-      console.error('Orders fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -252,15 +336,17 @@ export const useCustomers = () => {
   const fetchCustomers = async (filters?: any) => {
     try {
       setLoading(true);
+      console.log('[FE useCustomers] Fetching customers with filters:', filters);
       const result = await customersService.getCustomers(filters);
+      console.log('[FE useCustomers] Customers fetched:', result.data?.length, 'customers');
       setCustomers(result.data);
       setPagination(result.pagination);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch customers';
+      console.error('[FE useCustomers] Customers fetch error:', err);
       setError(errorMessage);
       toast.error('Failed to load customers');
-      console.error('Customers fetch error:', err);
     } finally {
       setLoading(false);
     }

@@ -23,6 +23,9 @@ let PublicController = class PublicController {
     async getMenuByTable(tableId) {
         return await this.publicService.getMenuByTable(tableId);
     }
+    async getMenuItem(id) {
+        return await this.publicService.getMenuItem(id);
+    }
     async createOrder(body) {
         return await this.publicService.createOrder(body);
     }
@@ -42,6 +45,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PublicController.prototype, "getMenuByTable", null);
+__decorate([
+    (0, common_1.Get)('menu-items/:id'),
+    (0, auth_decorators_1.Public)(),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PublicController.prototype, "getMenuItem", null);
 __decorate([
     (0, common_1.Post)('orders'),
     (0, auth_decorators_1.Public)(),

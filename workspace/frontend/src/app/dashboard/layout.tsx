@@ -68,7 +68,7 @@ const bottomItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
   const [tenantsLoading, setTenantsLoading] = useState(false);
@@ -283,7 +283,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 dark:text-red-400">
+                <DropdownMenuItem className="text-red-600 dark:text-red-400" onClick={logout}>
                   <LogOut className="mr-2 w-4 h-4" /> Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>

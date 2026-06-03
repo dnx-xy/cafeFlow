@@ -29,4 +29,6 @@ export declare class AuthService {
     register(userData: Partial<User> & {
         businessName?: string;
     }): Promise<User>;
+    findTenantById(id: string): Promise<Tenant | null>;
+    findBusinessByTenantId(tenantId: string): Promise<Business | null>;
 }

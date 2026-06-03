@@ -8,7 +8,7 @@ export interface Order {
   orderType: 'DINING_IN' | 'TAKEAWAY' | 'DELIVERY';
   tableNumber?: string;
   totalAmount: number;
-  items: OrderItem[];
+  items?: OrderItem[];
   paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   createdAt: string;
   updatedAt: string;
@@ -34,6 +34,7 @@ export interface OrderFilters {
 class OrdersService {
   async getOrders(filters?: OrderFilters): Promise<{ data: Order[]; pagination: any }> {
     try {
+      console.log('[FE OrdersService] Getting orders with filters:', filters);
       const params = new URLSearchParams();
       
       if (filters?.status) params.append('status', filters.status);
@@ -46,9 +47,12 @@ class OrdersService {
       const queryString = params.toString();
       const url = queryString ? `/orders?${queryString}` : '/orders';
       
+      console.log('[FE OrdersService] Calling API:', url);
       const response = await apiClient.get<{ data: Order[]; pagination: any }>(url);
+      console.log('[FE OrdersService] API response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('[FE OrdersService] Error getting orders:', error);
       throw this.handleError(error);
     }
   }

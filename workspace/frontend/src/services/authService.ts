@@ -34,6 +34,13 @@ export interface AuthTokens {
   refresh_token: string;
 }
 
+export interface SwitchTenantResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: User;
+}
+
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
@@ -71,6 +78,18 @@ class AuthService {
       const response = await apiClient.get<User>('/auth/me');
       return response.data;
     } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  async switchTenant(tenantId: string): Promise<SwitchTenantResponse> {
+    try {
+      console.log('[FE AuthService] Switching tenant to:', tenantId);
+      const response = await apiClient.post<SwitchTenantResponse>('/auth/switch-tenant', { tenantId });
+      console.log('[FE AuthService] Tenant switched successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[FE AuthService] Error switching tenant:', error);
       throw this.handleError(error);
     }
   }

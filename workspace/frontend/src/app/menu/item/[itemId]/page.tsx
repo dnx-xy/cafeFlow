@@ -4,12 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  ArrowLeft, Plus, Minus, Heart, Share2, Star,
-  Coffee, Leaf, ShoppingCart, Loader2, Check,
+  ArrowLeft, Plus, Minus, Heart, Star,
+  Coffee, ShoppingCart, Loader2, Check,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useMenuCart } from "@/hooks/useMenuCart";
 import { formatIDR } from "@/lib/format-idr";
@@ -110,122 +107,151 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+      <div className="flex min-h-screen items-center justify-center" style={{ background: 'var(--menu-bg)' }}>
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'var(--menu-gold)' }} />
       </div>
     );
   }
 
   if (error || !item) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <p className="text-sm text-red-500">{error || 'Item tidak ditemukan'}</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4" style={{ background: 'var(--menu-bg)' }}>
+        <Coffee style={{ width: 40, height: 40, color: 'var(--menu-text-light)', opacity: 0.4 }} />
+        <p style={{ fontSize: 14, color: 'var(--menu-text-muted)' }}>{error || 'Item tidak ditemukan'}</p>
         <Link href={menuUrl}>
-          <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" />Kembali ke Menu</Button>
+          <button style={{
+            padding: '10px 24px', borderRadius: 100, background: 'var(--menu-charcoal)',
+            color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+          }}>
+            <ArrowLeft style={{ width: 16, height: 16 }} />
+            Kembali ke Menu
+          </button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-32">
-      <div className="relative">
-        <div className="h-72 w-full overflow-hidden">
+    <div className="min-h-screen pb-32" style={{ background: 'var(--menu-bg)' }}>
+      {/* Hero Image */}
+      <div className="elegant-header" style={{ minHeight: 280 }}>
+        <div className="elegant-header-bg">
           {item.imageUrl ? (
-            <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+            <img src={item.imageUrl} alt={item.name} />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
-              <Coffee className="h-20 w-20 text-amber-300" />
-            </div>
+            <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, var(--menu-warm) 0%, var(--menu-warm-hover) 100%)' }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <div className="elegant-header-overlay" />
         </div>
 
-        <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
+        {/* Top bar */}
+        <div style={{ position: 'absolute', top: 16, left: 16, right: 16, zIndex: 3, display: 'flex', justifyContent: 'space-between' }}>
           <Link href={menuUrl}>
-            <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <button className="elegant-cart-fab" style={{ position: 'static' }}>
+              <ArrowLeft />
+            </button>
           </Link>
-          <div className="flex gap-2">
-            <Link href="/menu/cart" className="relative">
-              <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-              {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/menu/cart">
+              <button className="elegant-cart-fab" style={{ position: 'static' }}>
+                <ShoppingCart />
+                {cartCount > 0 && (
+                  <span className="elegant-cart-badge">{cartCount}</span>
+                )}
+              </button>
             </Link>
-            <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full bg-white/90 shadow-lg backdrop-blur hover:bg-white" onClick={() => setIsFavorite(!isFavorite)}>
-              <Heart className={isFavorite ? "h-5 w-5 fill-red-500 text-red-500" : "h-5 w-5"} />
-            </Button>
+            <button
+              className="elegant-cart-fab" style={{ position: 'static' }}
+              onClick={() => setIsFavorite(!isFavorite)}
+            >
+              <Heart style={isFavorite ? { fill: '#ef4444', color: '#ef4444' } : {}} />
+            </button>
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-4 flex gap-2">
+        {/* Badges */}
+        <div style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 3, display: 'flex', gap: 8 }}>
           {item.isFeatured && (
-            <Badge className="bg-amber-500 text-white border-0"><Star className="mr-1 h-3 w-3 fill-white" />Terlaris</Badge>
+            <span className="elegant-badge featured" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '4px 12px', fontSize: 11 }}>
+              <Star style={{ width: 12, height: 12, marginRight: 4 }} />
+              Terlaris
+            </span>
           )}
           {item.isSpecialOffer && (
-            <Badge className="bg-green-500 text-white border-0"><Leaf className="mr-1 h-3 w-3" />Promo</Badge>
+            <span className="elegant-badge promo" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '4px 12px', fontSize: 11 }}>
+              Promo
+            </span>
           )}
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="mb-4">
-          <h1 className="text-xl font-bold">{item.name}</h1>
+      {/* Content */}
+      <div style={{ padding: '20px' }}>
+        <div style={{ marginBottom: 20 }}>
+          <h1 className="elegant-cafe-name" style={{ fontSize: 22, marginBottom: 8 }}>{item.name}</h1>
           {item.description && (
-            <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+            <p style={{ fontSize: 14, color: 'var(--menu-text-muted)', lineHeight: 1.6 }}>{item.description}</p>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <span className="elegant-item-price" style={{ fontSize: 24 }}>{formatIDR(unitPrice)}</span>
+          {item.popularityScore > 50 && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px',
+              borderRadius: 6, background: 'var(--menu-warm)', fontSize: 11, color: 'var(--menu-gold-dark)',
+            }}>
+              <Star style={{ width: 12, height: 12, fill: 'var(--menu-gold)', color: 'var(--menu-gold)' }} />
+              {item.popularityScore} terjual
+            </span>
           )}
         </div>
 
         {item.soldOut && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-center text-sm font-medium text-red-600">
+          <div style={{
+            padding: '12px 16px', borderRadius: 12, background: 'rgba(45,42,39,0.06)',
+            fontSize: 13, color: 'var(--menu-text-muted)', marginBottom: 20, textAlign: 'center',
+          }}>
             Maaf, item ini sedang habis
-          </div>
-        )}
-
-        {item.popularityScore > 50 && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-700">
-            <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-            Menu favorit pelanggan! {item.popularityScore} orang telah memesan
           </div>
         )}
 
         {/* Menu Options */}
         {item.menuOptions && item.menuOptions.length > 0 && (
-          <div className="mb-6 space-y-4">
+          <div style={{ marginBottom: 24 }}>
             {item.menuOptions.map((option) => (
-              <div key={option.id}>
-                <div className="mb-2 flex items-center gap-1">
-                  <h3 className="text-sm font-semibold">{option.name}</h3>
+              <div key={option.id} style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)' }}>{option.name}</h3>
                   {option.required && (
-                    <span className="text-xs text-red-500">*Wajib</span>
+                    <span style={{ fontSize: 11, color: 'var(--menu-text-muted)' }}>*Wajib</span>
                   )}
                 </div>
                 {option.description && (
-                  <p className="mb-2 text-xs text-muted-foreground">{option.description}</p>
+                  <p style={{ fontSize: 12, color: 'var(--menu-text-light)', marginBottom: 8 }}>{option.description}</p>
                 )}
-                <div className="flex flex-wrap gap-2">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {option.options.filter(v => v.available).map((value) => {
                     const isSelected = selectedOptions[option.id] === value.id;
                     return (
                       <button
                         key={value.id}
                         onClick={() => handleSelectOption(option.id, value.id)}
-                        className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all ${
-                          isSelected
-                            ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
-                            : 'border-border bg-card text-muted-foreground hover:border-amber-200 hover:text-amber-600'
-                        }`}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          padding: '8px 16px', borderRadius: 100,
+                          border: `1.5px solid ${isSelected ? 'var(--menu-gold)' : 'var(--menu-card-border)'}`,
+                          background: isSelected ? 'var(--menu-warm)' : 'var(--menu-card)',
+                          color: isSelected ? 'var(--menu-gold-dark)' : 'var(--menu-text-muted)',
+                          fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
                       >
-                        {isSelected && <Check className="h-3 w-3" />}
+                        {isSelected && <Check style={{ width: 14, height: 14 }} />}
                         {value.name}
                         {value.priceAdjustment ? (
-                          <span className="text-[10px] opacity-70">(+{formatIDR(value.priceAdjustment)})</span>
+                          <span style={{ fontSize: 11, opacity: 0.7 }}>(+{formatIDR(value.priceAdjustment)})</span>
                         ) : null}
                       </button>
                     );
@@ -235,32 +261,61 @@ export default function ProductDetailPage() {
             ))}
           </div>
         )}
-
-        <div className="mb-6 grid grid-cols-3 gap-3">
-          <div className="rounded-xl bg-muted p-3 text-center">
-            <p className="text-lg font-bold text-amber-600">{formatIDR(unitPrice)}</p>
-            <p className="text-xs text-muted-foreground">Harga</p>
-          </div>
-        </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 p-4 backdrop-blur">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-border/50" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={item.soldOut}>
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-8 text-center text-lg font-semibold">{quantity}</span>
-            <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-border/50" onClick={() => setQuantity(quantity + 1)} disabled={item.soldOut}>
-              <Plus className="h-4 w-4" />
-            </Button>
+      {/* Bottom Bar */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 30,
+        background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+        borderTop: '1px solid var(--menu-card-border)',
+        padding: '12px 20px',
+      }}>
+        <div style={{ maxWidth: 400, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={item.soldOut}
+              style={{
+                width: 40, height: 40, borderRadius: '50%',
+                border: '1.5px solid var(--menu-card-border)',
+                background: 'transparent', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--menu-charcoal)',
+              }}
+            >
+              <Minus style={{ width: 16, height: 16 }} />
+            </button>
+            <span style={{ width: 32, textAlign: 'center', fontSize: 18, fontWeight: 600, color: 'var(--menu-charcoal)' }}>{quantity}</span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              disabled={item.soldOut}
+              style={{
+                width: 40, height: 40, borderRadius: '50%',
+                border: '1.5px solid var(--menu-card-border)',
+                background: 'transparent', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--menu-charcoal)',
+              }}
+            >
+              <Plus style={{ width: 16, height: 16 }} />
+            </button>
           </div>
-          <Button className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600" onClick={handleAddToCart} disabled={item.soldOut}>
-            <span className="flex flex-col items-start">
-              <span className="text-xs opacity-80">Tambah ke Keranjang</span>
-              <span className="text-base font-bold">{formatIDR(totalPrice)}</span>
+          <button
+            onClick={handleAddToCart}
+            disabled={item.soldOut}
+            style={{
+              flex: 1, padding: '12px 24px', borderRadius: 100,
+              background: item.soldOut ? 'var(--menu-text-light)' : 'var(--menu-charcoal)',
+              color: '#fff', border: 'none', fontSize: 14, fontWeight: 600,
+              cursor: item.soldOut ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, opacity: 0.7 }}>Tambah ke Keranjang</span>
+              <span style={{ fontSize: 16, fontWeight: 700 }}>{formatIDR(totalPrice)}</span>
             </span>
-          </Button>
+          </button>
         </div>
       </div>
     </div>

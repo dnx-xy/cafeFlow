@@ -52,7 +52,7 @@ __decorate([
 ], TenantsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('current'),
-    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF, user_entity_1.UserRole.CUSTOMER),
     __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

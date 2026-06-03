@@ -19,6 +19,7 @@ const table_entity_1 = require("../entities/table.entity");
 const business_entity_1 = require("../entities/business.entity");
 const order_entity_1 = require("../entities/order.entity");
 const order_item_entity_1 = require("../entities/order-item.entity");
+const order_item_menu_option_entity_1 = require("../entities/order-item-menu-option.entity");
 const customer_entity_1 = require("../entities/customer.entity");
 const customer_feedback_entity_1 = require("../entities/customer-feedback.entity");
 const loyalty_program_entity_1 = require("../entities/loyalty-program.entity");
@@ -31,7 +32,7 @@ exports.PublicModule = PublicModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([
                 menu_entity_1.Menu, menu_category_entity_1.MenuCategory, menu_item_entity_1.MenuItem, outlet_entity_1.Outlet, table_entity_1.Table, business_entity_1.Business,
-                order_entity_1.Order, order_item_entity_1.OrderItem, customer_entity_1.Customer, customer_feedback_entity_1.CustomerFeedback,
+                order_entity_1.Order, order_item_entity_1.OrderItem, order_item_menu_option_entity_1.OrderItemMenuOption, customer_entity_1.Customer, customer_feedback_entity_1.CustomerFeedback,
                 loyalty_program_entity_1.LoyaltyProgram, point_transaction_entity_1.PointTransaction,
             ]),
         ],

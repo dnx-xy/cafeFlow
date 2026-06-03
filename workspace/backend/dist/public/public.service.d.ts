@@ -6,6 +6,7 @@ import { Table } from '../entities/table.entity';
 import { Business } from '../entities/business.entity';
 import { Order } from '../entities/order.entity';
 import { OrderItem as OrderItemEntity } from '../entities/order-item.entity';
+import { OrderItemMenuOption } from '../entities/order-item-menu-option.entity';
 import { Customer } from '../entities/customer.entity';
 import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
@@ -22,7 +23,8 @@ export declare class PublicService {
     private feedbackRepository;
     private loyaltyProgramsRepository;
     private pointTransactionsRepository;
-    constructor(menusRepository: Repository<Menu>, menuItemsRepository: Repository<MenuItem>, outletsRepository: Repository<Outlet>, tablesRepository: Repository<Table>, businessesRepository: Repository<Business>, ordersRepository: Repository<Order>, orderItemsRepository: Repository<OrderItemEntity>, customersRepository: Repository<Customer>, feedbackRepository: Repository<CustomerFeedback>, loyaltyProgramsRepository: Repository<LoyaltyProgram>, pointTransactionsRepository: Repository<PointTransaction>);
+    private orderItemMenuOptionsRepository;
+    constructor(menusRepository: Repository<Menu>, menuItemsRepository: Repository<MenuItem>, outletsRepository: Repository<Outlet>, tablesRepository: Repository<Table>, businessesRepository: Repository<Business>, ordersRepository: Repository<Order>, orderItemsRepository: Repository<OrderItemEntity>, customersRepository: Repository<Customer>, feedbackRepository: Repository<CustomerFeedback>, loyaltyProgramsRepository: Repository<LoyaltyProgram>, pointTransactionsRepository: Repository<PointTransaction>, orderItemMenuOptionsRepository: Repository<OrderItemMenuOption>);
     getMenuByTable(tableId: string): Promise<{
         menu: Menu;
         cafe: {
@@ -36,19 +38,27 @@ export declare class PublicService {
             outletId: string;
             tenantId: string;
             businessId: string;
+            currency: string;
+            phoneNumber: string;
         };
     }>;
+    getMenuItem(itemId: string): Promise<MenuItem>;
     createOrder(data: {
         tableId: string;
         items: {
             menuItemId: string;
             quantity: number;
             notes?: string;
+            options?: {
+                optionValueId: string;
+                priceAdjustment?: number;
+            }[];
         }[];
         notes?: string;
         orderType?: string;
         customerName?: string;
         customerWhatsapp?: string;
+        paymentMethod?: string;
     }): Promise<Order>;
     submitFeedback(data: {
         customerName?: string;

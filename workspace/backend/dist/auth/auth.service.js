@@ -142,6 +142,12 @@ let AuthService = class AuthService {
         await this.businessesRepository.save(savedBusiness);
         return savedUser;
     }
+    async findTenantById(id) {
+        return await this.tenantsRepository.findOne({ where: { id } });
+    }
+    async findBusinessByTenantId(tenantId) {
+        return await this.businessesRepository.findOne({ where: { tenantId } });
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

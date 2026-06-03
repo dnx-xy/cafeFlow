@@ -47,10 +47,13 @@ let OrdersService = class OrdersService {
             where.orderType = orderType;
         }
         if (startDate && endDate) {
-            where.createdAt = {
-                $gte: startDate,
-                $lte: endDate,
-            };
+            where.createdAt = (0, typeorm_2.Between)(startDate, endDate);
+        }
+        else if (startDate) {
+            where.createdAt = (0, typeorm_2.MoreThanOrEqual)(startDate);
+        }
+        else if (endDate) {
+            where.createdAt = (0, typeorm_2.LessThanOrEqual)(endDate);
         }
         return await this.ordersRepository.find({
             where,

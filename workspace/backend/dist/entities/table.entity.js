@@ -31,6 +31,14 @@ __decorate([
     __metadata("design:type", String)
 ], Table.prototype, "outletId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'int', default: 1 }),
+    __metadata("design:type", Number)
+], Table.prototype, "capacity", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Table.prototype, "active", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
 ], Table.prototype, "tenantId", void 0);

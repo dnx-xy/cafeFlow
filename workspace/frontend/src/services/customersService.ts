@@ -23,6 +23,7 @@ export interface CustomerFilters {
 class CustomersService {
   async getCustomers(filters?: CustomerFilters): Promise<{ data: Customer[]; pagination: any }> {
     try {
+      console.log('[FE CustomersService] Getting customers with filters:', filters);
       const params = new URLSearchParams();
       
       if (filters?.page) params.append('page', filters.page.toString());
@@ -31,9 +32,12 @@ class CustomersService {
       const queryString = params.toString();
       const url = queryString ? `/customers?${queryString}` : '/customers';
       
+      console.log('[FE CustomersService] Calling API:', url);
       const response = await apiClient.get<{ data: Customer[]; pagination: any }>(url);
+      console.log('[FE CustomersService] API response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('[FE CustomersService] Error getting customers:', error);
       throw this.handleError(error);
     }
   }

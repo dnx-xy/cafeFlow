@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  CheckCircle2, Clock, MapPin, Coffee, UtensilsCrossed,
+  CheckCircle2, Clock, MapPin, Coffee,
   Share2, Home, Star, QrCode, Banknote, MessageCircle,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { formatIDR } from "@/lib/format-idr";
 
 interface OrderDetails {
@@ -60,9 +58,9 @@ export default function OrderConfirmationPage() {
 
   const paymentIcon = (method?: string) => {
     switch (method) {
-      case 'CASH': return <Banknote className="h-4 w-4" />;
-      case 'WA_TRANSFER': return <MessageCircle className="h-4 w-4" />;
-      default: return <QrCode className="h-4 w-4" />;
+      case 'CASH': return <Banknote style={{ width: 16, height: 16 }} />;
+      case 'WA_TRANSFER': return <MessageCircle style={{ width: 16, height: 16 }} />;
+      default: return <QrCode style={{ width: 16, height: 16 }} />;
     }
   };
 
@@ -76,181 +74,243 @@ export default function OrderConfirmationPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-amber-500" />
+      <div className="flex min-h-screen items-center justify-center" style={{ background: 'var(--menu-bg)' }}>
+        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--menu-card-border)', borderTopColor: 'var(--menu-gold)', animation: 'spin 0.8s linear infinite' }} />
       </div>
     );
   }
 
+  const sectionTitle: React.CSSProperties = {
+    fontSize: 14, fontWeight: 600, color: 'var(--menu-charcoal)', marginBottom: 16,
+  };
+
+  const cardStyle: React.CSSProperties = {
+    background: 'var(--menu-card)', borderRadius: 16,
+    border: '1px solid var(--menu-card-border)', padding: 16,
+    marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  };
+
+  const infoIcon = (bg: string, color: string) => ({
+    width: 36, height: 36, borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: bg, color, flexShrink: 0,
+  });
+
+  const primaryBtn: React.CSSProperties = {
+    padding: '12px 20px', borderRadius: 100,
+    background: 'var(--menu-charcoal)', color: '#fff',
+    border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 8, justifyContent: 'center',
+    transition: 'all 0.2s ease', width: '100%',
+  };
+
+  const outlineBtn: React.CSSProperties = {
+    padding: '12px 20px', borderRadius: 100,
+    border: '1.5px solid var(--menu-card-border)',
+    background: 'transparent', color: 'var(--menu-text-muted)',
+    fontSize: 13, fontWeight: 500, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 8, justifyContent: 'center',
+    transition: 'all 0.2s ease', width: '100%',
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden bg-gradient-to-b from-green-50 to-background px-4 pb-6 pt-12">
-        <div className="flex flex-col items-center">
-          <div className="mb-4 flex h-20 w-20 animate-in items-center justify-center rounded-full bg-green-100 fade-in zoom-in duration-500">
-            <CheckCircle2 className="h-10 w-10 text-green-600" />
-          </div>
-          <h1 className="animate-in text-xl font-bold text-foreground slide-in-from-bottom duration-500 delay-100">
-            Pesanan Dikonfirmasi!
-          </h1>
-          <p className="mt-1 animate-in text-center text-sm text-muted-foreground slide-in-from-bottom duration-500 delay-200">
-            Pesanan Anda telah diterima dan sedang disiapkan
-          </p>
+    <div className="min-h-screen" style={{ background: 'var(--menu-bg)' }}>
+      {/* Success Header */}
+      <div style={{
+        position: 'relative', overflow: 'hidden',
+        padding: '48px 16px 32px',
+        textAlign: 'center',
+      }}>
+        <div style={{
+          margin: '0 auto 16px', width: 72, height: 72, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(45,42,39,0.06)',
+        }}>
+          <CheckCircle2 style={{ width: 36, height: 36, color: 'var(--menu-gold)' }} />
         </div>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--menu-charcoal)' }}>
+          Pesanan Dikonfirmasi!
+        </h1>
+        <p style={{ fontSize: 13, color: 'var(--menu-text-muted)', marginTop: 4 }}>
+          Pesanan Anda telah diterima dan sedang disiapkan
+        </p>
       </div>
 
-      <div className="px-4 pb-24">
-        <Card className="mb-4 animate-in overflow-hidden border-0 shadow-md slide-in-from-bottom duration-500 delay-300">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+      <div style={{ padding: '0 16px 96px' }}>
+        {/* Order Info */}
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <p style={{ fontSize: 11, color: 'var(--menu-text-light)' }}>Nomor Pesanan</p>
+              <p style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1, color: 'var(--menu-charcoal)' }}>{orderDetails?.orderId || '------'}</p>
+            </div>
+            <button onClick={handleShare} style={{
+              width: 36, height: 36, borderRadius: '50%',
+              border: '1.5px solid var(--menu-card-border)',
+              background: 'transparent', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--menu-text-light)',
+            }}>
+              <Share2 style={{ width: 16, height: 16 }} />
+            </button>
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--menu-card-border)', display: 'flex', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={infoIcon('var(--menu-warm)', 'var(--menu-gold-dark)')}>
+                <Clock style={{ width: 16, height: 16 }} />
+              </div>
               <div>
-                <p className="text-xs text-muted-foreground">Nomor Pesanan</p>
-                <p className="text-lg font-bold tracking-wide">{orderDetails?.orderId || '------'}</p>
-              </div>
-              <Button variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={handleShare}>
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="mt-4 flex items-center gap-4 border-t border-border pt-4">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                  <Clock className="h-4 w-4 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Estimasi</p>
-                  <p className="text-sm font-semibold">{orderDetails?.estimatedTime || '15-20 menit'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                  <MapPin className="h-4 w-4 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Meja</p>
-                  <p className="text-sm font-semibold">#{orderDetails?.tableNumber || 'N/A'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                  {paymentIcon(orderDetails?.paymentMethod)}
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Pembayaran</p>
-                  <p className="text-sm font-semibold">{paymentLabel(orderDetails?.paymentMethod)}</p>
-                </div>
+                <p style={{ fontSize: 10, color: 'var(--menu-text-light)' }}>Estimasi</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--menu-charcoal)' }}>{orderDetails?.estimatedTime || '15-20 menit'}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={infoIcon('var(--menu-warm)', 'var(--menu-gold-dark)')}>
+                <MapPin style={{ width: 16, height: 16 }} />
+              </div>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--menu-text-light)' }}>Meja</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--menu-charcoal)' }}>#{orderDetails?.tableNumber || 'N/A'}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={infoIcon('var(--menu-warm)', 'var(--menu-gold-dark)')}>
+                {paymentIcon(orderDetails?.paymentMethod)}
+              </div>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--menu-text-light)' }}>Pembayaran</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--menu-charcoal)' }}>{paymentLabel(orderDetails?.paymentMethod)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card className="mb-4 border-0 shadow-sm">
-          <CardContent className="p-4">
-            <h3 className="mb-4 text-sm font-semibold">Status Pesanan</h3>
-            <div className="relative">
-              <div className="absolute bottom-4 left-3 top-8 w-0.5 bg-amber-500" />
-              <div className="relative flex gap-4 pb-6">
-                <div className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500">
-                  <CheckCircle2 className="h-4 w-4 text-white" />
+        {/* Order Status */}
+        <div style={cardStyle}>
+          <h3 style={sectionTitle}>Status Pesanan</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[
+              { icon: CheckCircle2, label: 'Pesanan Dikonfirmasi', desc: 'Pesanan Anda telah diterima', done: true },
+              { icon: Coffee, label: 'Sedang Disiapkan', desc: 'Koki kami sedang memasak', done: false },
+              { icon: Coffee, label: 'Siap Disajikan', desc: 'Kami akan memberitahu jika siap', done: false },
+            ].map((step, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, position: 'relative' }}>
+                {i < 2 && (
+                  <div style={{
+                    position: 'absolute', top: 32, left: 11, width: 2, height: 28,
+                    background: step.done ? 'var(--menu-gold)' : 'var(--menu-card-border)',
+                  }} />
+                )}
+                <div style={{
+                  width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: step.done ? 'var(--menu-gold)' : 'var(--menu-card-border)',
+                  color: step.done ? '#fff' : 'var(--menu-text-light)',
+                }}>
+                  <CheckCircle2 style={{ width: 14, height: 14 }} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Pesanan Dikonfirmasi</p>
-                  <p className="text-xs text-muted-foreground">Pesanan Anda telah diterima</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: step.done ? 'var(--menu-charcoal)' : 'var(--menu-text-light)' }}>{step.label}</p>
+                  <p style={{ fontSize: 12, color: 'var(--menu-text-light)' }}>{step.desc}</p>
                 </div>
               </div>
-              <div className="relative flex gap-4 pb-6">
-                <div className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
-                  <UtensilsCrossed className="h-3 w-3 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Sedang Disiapkan</p>
-                  <p className="text-xs text-muted-foreground">Koki kami sedang memasak</p>
-                </div>
-              </div>
-              <div className="relative flex gap-4">
-                <div className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                  <Coffee className="h-3 w-3 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Siap Disajikan</p>
-                  <p className="text-xs text-muted-foreground">Kami akan memberitahu jika siap</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </div>
 
+        {/* QRIS / Cash Info */}
         {orderDetails?.paymentMethod === 'QRIS' && (
-          <Card className="mb-4 border-0 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500">
-                  <QrCode className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Bayar dengan QRIS</p>
-                  <p className="text-xs text-muted-foreground">Scan QRIS di kasir untuk menyelesaikan pembayaran</p>
-                </div>
+          <div style={{
+            ...cardStyle,
+            background: 'var(--menu-warm)',
+            border: '1px solid rgba(201,169,110,0.3)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'var(--menu-gold)', color: '#fff',
+              }}>
+                <QrCode style={{ width: 20, height: 20 }} />
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card className="mb-4 border-0 shadow-sm">
-          <CardContent className="p-4">
-            <h3 className="mb-3 text-sm font-semibold">Ringkasan Pesanan</h3>
-            <div className="space-y-2">
-              {(orderDetails?.items || []).map((item, index) => (
-                <div key={index} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">{item.quantity}x</span>
-                    <span>{item.itemName || item.name || 'Menu'}</span>
-                  </div>
-                  <span className="text-muted-foreground">{formatIDR(item.totalPrice || item.price || 0)}</span>
-                </div>
-              ))}
-              <div className="mt-2 border-t border-border pt-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">Total</span>
-                  <span className="text-lg font-bold text-amber-600">{formatIDR(orderDetails?.finalAmount || orderDetails?.totalAmount || 0)}</span>
-                </div>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--menu-gold-dark)' }}>Bayar dengan QRIS</p>
+                <p style={{ fontSize: 12, color: 'var(--menu-text-muted)' }}>Scan QRIS di kasir untuk menyelesaikan pembayaran</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
         {orderDetails?.paymentMethod === 'CASH' && (
-          <Card className="mb-4 border-0 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
-                  <Banknote className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Bayar Tunai</p>
-                  <p className="text-xs text-muted-foreground">Siapkan {formatIDR(orderDetails?.finalAmount || orderDetails?.totalAmount || 0)} untuk dibayarkan di kasir</p>
-                </div>
+          <div style={{
+            ...cardStyle,
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#22c55e', color: '#fff',
+              }}>
+                <Banknote style={{ width: 20, height: 20 }} />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#15803d' }}>Bayar Tunai</p>
+                <p style={{ fontSize: 12, color: '#4ade80' }}>Siapkan {formatIDR(orderDetails?.finalAmount || orderDetails?.totalAmount || 0)} untuk dibayarkan di kasir</p>
+              </div>
+            </div>
+          </div>
         )}
 
-        <div className="rounded-lg bg-muted p-3 text-center">
-          <p className="text-xs text-muted-foreground">Kami akan memberitahu Anda saat pesanan siap</p>
+        {/* Order Summary */}
+        <div style={cardStyle}>
+          <h3 style={sectionTitle}>Ringkasan Pesanan</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(orderDetails?.items || []).map((item, index) => (
+              <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ color: 'var(--menu-text-light)' }}>{item.quantity}x</span>
+                  <span style={{ color: 'var(--menu-charcoal)' }}>{item.itemName || item.name || 'Menu'}</span>
+                </div>
+                <span style={{ color: 'var(--menu-text-light)' }}>{formatIDR(item.totalPrice || item.price || 0)}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 8, paddingTop: 12, borderTop: '1px solid var(--menu-card-border)', display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 600, color: 'var(--menu-charcoal)' }}>Total</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--menu-gold)' }}>{formatIDR(orderDetails?.finalAmount || orderDetails?.totalAmount || 0)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Info */}
+        <div style={{
+          padding: '12px 16px', borderRadius: 12,
+          background: 'var(--menu-warm)', textAlign: 'center',
+        }}>
+          <p style={{ fontSize: 12, color: 'var(--menu-text-muted)' }}>Kami akan memberitahu Anda saat pesanan siap</p>
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 p-4 backdrop-blur">
-        <div className="mx-auto flex max-w-md gap-3">
-          <Link href="/menu" className="flex-1">
-            <Button variant="outline" className="w-full">
-              <Home className="mr-2 h-4 w-4" />
+      {/* Bottom Bar */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 30,
+        background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+        borderTop: '1px solid var(--menu-card-border)',
+        padding: '12px 16px',
+      }}>
+        <div style={{ maxWidth: 400, margin: '0 auto', display: 'flex', gap: 12 }}>
+          <Link href="/menu" style={{ flex: 1 }}>
+            <button style={outlineBtn}>
+              <Home style={{ width: 16, height: 16 }} />
               Kembali ke Menu
-            </Button>
+            </button>
           </Link>
-          <Link href="/menu/review" className="flex-1">
-            <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
-              <Star className="mr-2 h-4 w-4" />
+          <Link href="/menu/review" style={{ flex: 1 }}>
+            <button style={{ ...primaryBtn }}>
+              <Star style={{ width: 16, height: 16 }} />
               Beri Penilaian
-            </Button>
+            </button>
           </Link>
         </div>
       </div>

@@ -23,6 +23,8 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3001);
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();

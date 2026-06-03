@@ -70,4 +70,51 @@ export class AuthController {
     // In a real implementation, you'd invalidate tokens here
     return { message: 'Successfully logged out' };
   }
+
+  @Post('switch-tenant')
+  @Roles(UserRole.SUPER_ADMIN)
+  async switchTenant(
+    @Body() body: { tenantId: string },
+    @AuthenticatedUser() currentUser: any,
+  ) {
+    // Get the tenant details
+    const tenant = await this.authService.findTenantById(body.tenantId);
+    if (!tenant) {
+      throw new Error('Tenant not found');
+    }
+
+    // Get the business for this tenant
+    const business = await this.authService.findBusinessByTenantId(body.tenantId);
+    if (!business) {
+      throw new Error('Business not found for this tenant');
+    }
+
+    // Create new token payload with updated tenant and business
+    const payload = {
+      email: currentUser.email,
+      id: currentUser.id,
+      name: currentUser.name,
+      tenantId: body.tenantId,
+      businessId: business.id,
+      role: currentUser.role,
+    };
+
+    // Generate new tokens
+    const access_token = this.authService.signToken(payload);
+    const refresh_token = this.authService.signToken(payload, '7d');
+
+    return {
+      access_token,
+      refresh_token,
+      expires_in: 3600,
+      user: {
+        id: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        role: currentUser.role,
+        tenantId: body.tenantId,
+        businessId: business.id,
+      }
+    };
+  }
 }

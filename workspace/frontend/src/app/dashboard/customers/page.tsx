@@ -14,6 +14,7 @@ import {
 import {
   Search, MoreHorizontal, Eye, Edit, Trash2, Plus,
   ChevronLeft, ChevronRight, Users, DollarSign, Calendar, Phone, Mail,
+  Upload, Download,
 } from 'lucide-react';
 import { useCustomers } from '@/hooks/useAuth';
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -37,10 +38,10 @@ export default function CustomersPage() {
     <div className="space-y-5">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Customers', value: '1,247', icon: Users },
-          { label: 'New This Week', value: '42', icon: Calendar },
-          { label: 'Total Spent', value: '$24,580', icon: DollarSign },
-          { label: 'Avg. Visit', value: '3.2', icon: Users },
+          { label: 'Total Customers', value: customers.length, icon: Users },
+          { label: 'New This Week', value: '0', icon: Calendar },
+          { label: 'Total Spent', value: '$0', icon: DollarSign },
+          { label: 'Avg. Visit', value: '0', icon: Users },
         ].map((s, i) => (
           <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
             <div className="flex items-center justify-between">
@@ -57,19 +58,19 @@ export default function CustomersPage() {
       </div>
 
       <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
+            </div>
+            <Button size="sm" className="h-9" onClick={() => toast.success('Add Customer modal would open here')}><Plus className="w-4 h-4 mr-1.5" /> Add Customer</Button>
           </div>
-          <Button size="sm" className="h-9"><Plus className="w-4 h-4 mr-1.5" /> Add Customer</Button>
-        </div>
       </div>
 
       <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
         <div className="flex items-center justify-between px-5 pt-5 pb-1">
           <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Customers</CardTitle>
-          <Button variant="outline" size="sm" className="h-8 text-xs"><Plus className="w-3.5 h-3.5 mr-1.5" /> Import</Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => toast.success('Import customers modal would open here')}><Upload className="w-3.5 h-3.5 mr-1.5" /> Import</Button>
         </div>
         <div className="p-5 pt-3">
           {loading ? (
