@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n } from '@/i18n/context';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,27 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 export default function MarketingPage() {
+  const { t } = useI18n();
   const { currency } = useCurrency();
+  const typeLabels: Record<string, string> = {
+    Discount: t.dashboard.marketing.types.discount,
+    'Time-based': t.dashboard.marketing.types.timeBased,
+    Event: t.dashboard.marketing.types.event,
+    Reward: t.dashboard.marketing.types.reward,
+  };
+  const statusLabels: Record<string, string> = {
+    Active: t.dashboard.marketing.statuses.active,
+    Scheduled: t.dashboard.marketing.statuses.scheduled,
+    Draft: t.dashboard.marketing.statuses.draft,
+    Completed: t.dashboard.marketing.statuses.completed,
+  };
+  const targetLabels: Record<string, string> = {
+    'All Customers': t.dashboard.marketing.targets.allCustomers,
+    Regulars: t.dashboard.marketing.targets.regulars,
+    'New Customers': t.dashboard.marketing.targets.newCustomers,
+    'Weekend Visitors': t.dashboard.marketing.targets.weekendVisitors,
+    'Lunch Crowd': t.dashboard.marketing.targets.lunchCrowd,
+  };
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'Discount', description: '', target: 'All Customers', budget: 0 });
   const [submitting, setSubmitting] = useState(false);
@@ -61,43 +82,43 @@ export default function MarketingPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Marketing Campaigns</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Create and manage promotional campaigns</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.marketing.title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.marketing.subtitle}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger render={<Button size="sm"><Plus className="w-4 h-4 mr-1.5" /> New Campaign</Button>} />
+          <DialogTrigger render={<Button size="sm"><Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.marketing.newCampaign}</Button>} />
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Campaign</DialogTitle>
+              <DialogTitle>{t.dashboard.marketing.createCampaign}</DialogTitle>
               <DialogDescription>Set up a new marketing campaign</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="space-y-2"><Label>Campaign Name</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Summer Special" /></div>
+              <div className="space-y-2"><Label>{t.dashboard.marketing.campaignName}</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Summer Special" /></div>
               <div className="space-y-2">
-                <Label>Campaign Type</Label>
+                <Label>{t.dashboard.marketing.campaignType}</Label>
                 <Select value={form.type} onValueChange={v => setForm(p => ({ ...p, type: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {['Discount', 'Time-based', 'Event', 'Reward'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {['Discount', 'Time-based', 'Event', 'Reward'].map(type => <SelectItem key={type} value={type}>{typeLabels[type]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe your campaign" /></div>
+              <div className="space-y-2"><Label>{t.dashboard.marketing.description}</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe your campaign" /></div>
               <div className="space-y-2">
-                <Label>Target Audience</Label>
+                <Label>{t.dashboard.marketing.targetAudience}</Label>
                 <Select value={form.target} onValueChange={v => setForm(p => ({ ...p, target: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {['All Customers', 'Regulars', 'New Customers', 'Weekend Visitors', 'Lunch Crowd'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {['All Customers', 'Regulars', 'New Customers', 'Weekend Visitors', 'Lunch Crowd'].map(target => <SelectItem key={target} value={target}>{targetLabels[target]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>Budget ($)</Label><Input type="number" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: Number(e.target.value) }))} /></div>
+              <div className="space-y-2"><Label>{t.dashboard.marketing.budget} ($)</Label><Input type="number" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: Number(e.target.value) }))} /></div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>{t.dashboard.marketing.cancel}</Button>
               <Button onClick={handleCreate} disabled={submitting}>
-                {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Send className="w-4 h-4 mr-2" />Create Campaign
+                {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Send className="w-4 h-4 mr-2" />{t.dashboard.marketing.createCampaign}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -106,10 +127,10 @@ export default function MarketingPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Active Campaigns', value: activeCampaigns, icon: Megaphone, color: 'text-amber-500' },
-          { label: 'Total Reach', value: totalReach.toLocaleString(), icon: Users, color: 'text-blue-500' },
-          { label: 'Conversions', value: totalConversions, icon: TrendingUp, color: 'text-green-500' },
-          { label: 'Conversion Rate', value: `${totalConversions > 0 ? Math.round((totalConversions / totalReach) * 100) : 0}%`, icon: BarChart3, color: 'text-purple-500' },
+          { label: t.dashboard.marketing.activeCampaigns, value: activeCampaigns, icon: Megaphone, color: 'text-amber-500' },
+          { label: t.dashboard.marketing.totalReach, value: totalReach.toLocaleString(), icon: Users, color: 'text-blue-500' },
+          { label: t.dashboard.marketing.conversions, value: totalConversions, icon: TrendingUp, color: 'text-green-500' },
+          { label: t.dashboard.marketing.conversionRate, value: `${totalConversions > 0 ? Math.round((totalConversions / totalReach) * 100) : 0}%`, icon: BarChart3, color: 'text-purple-500' },
         ].map((s, i) => (
           <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
             <div className="flex items-center gap-2 mb-1.5"><s.icon className={`w-5 h-5 ${s.color}`} /></div>
@@ -133,7 +154,7 @@ export default function MarketingPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{campaign.name}</p>
                       <span className="text-xs text-gray-400">·</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{campaign.type}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{typeLabels[campaign.type]}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-gray-400 dark:text-gray-500">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{campaign.startDate} - {campaign.endDate}</span>
@@ -141,16 +162,16 @@ export default function MarketingPage() {
                     </div>
                     {campaign.reach > 0 && (
                       <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                        <span>Reach: <strong className="text-gray-700 dark:text-gray-300">{campaign.reach}</strong></span>
-                        <span>Conversions: <strong className="text-gray-700 dark:text-gray-300">{campaign.conversions}</strong></span>
-                        <span>Rate: <strong className="text-gray-700 dark:text-gray-300">{Math.round((campaign.conversions / campaign.reach) * 100)}%</strong></span>
+                        <span>{t.dashboard.marketing.reach}: <strong className="text-gray-700 dark:text-gray-300">{campaign.reach}</strong></span>
+                        <span>{t.dashboard.marketing.conversions}: <strong className="text-gray-700 dark:text-gray-300">{campaign.conversions}</strong></span>
+                        <span>{t.dashboard.marketing.rate}: <strong className="text-gray-700 dark:text-gray-300">{Math.round((campaign.conversions / campaign.reach) * 100)}%</strong></span>
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{formatCurrency(campaign.budget, currency)}</span>
-                  <Badge variant="outline" className={`text-[10px] ${statusColors[campaign.status] || ''}`}>{campaign.status}</Badge>
+                  <Badge variant="outline" className={`text-[10px] ${statusColors[campaign.status] || ''}`}>{statusLabels[campaign.status]}</Badge>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useI18n } from '@/i18n/context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,7 @@ interface TenantWithStats extends Tenant {
 }
 
 export default function TenantsPage() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [tenants, setTenants] = useState<TenantWithStats[]>([]);
   const [search, setSearch] = useState('');
@@ -54,7 +56,7 @@ export default function TenantsPage() {
       setTenants(tenantsWithStats);
     } catch (error) {
       console.error('Failed to fetch tenants:', error);
-      toast.error('Failed to load tenants');
+      toast.error(t.dashboard.tenants.failedToLoad);
     } finally {
       setLoading(false);
     }
@@ -76,13 +78,13 @@ export default function TenantsPage() {
       localStorage.setItem('refresh_token', response.refresh_token);
 
       const tenantName = tenants.find(t => t.id === tenantId)?.name || tenantId;
-      toast.success(`Switched to: ${tenantName}`);
+      toast.success(t.dashboard.tenants.switchedTo.replace('{{name}}', tenantName));
 
       // Refresh page to update auth context
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Tenant switch error:', error);
-      toast.error('Failed to switch tenant');
+      toast.error(t.dashboard.tenants.failedToSwitch);
     }
   };
 
@@ -94,11 +96,11 @@ export default function TenantsPage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Tenants Management</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage your cafe franchises and businesses</p>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.tenants.tenantsManagement}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.tenants.tenantsSubtitle}</p>
         </div>
         <Button onClick={handleCreateTenant} className="h-9 text-sm">
-          <Plus className="w-4 h-4 mr-1.5" /> Create Tenant
+          <Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.tenants.createTenant}
         </Button>
       </div>
 
@@ -107,7 +109,7 @@ export default function TenantsPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Search tenants..."
+              placeholder={t.dashboard.tenants.search}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 h-9 text-sm"
@@ -121,7 +123,7 @@ export default function TenantsPage() {
           <Card className="border-0 shadow-sm bg-white dark:bg-[#16181f]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                Active Tenants
+                {t.dashboard.tenants.activeTenants}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -144,8 +146,8 @@ export default function TenantsPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.orders?.toLocaleString() || 0} orders</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Revenue: ${tenant.revenue?.toLocaleString() || 0}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{t.dashboard.tenants.orders.replace('{{count}}', (tenant.orders?.toLocaleString() || '0'))}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{t.dashboard.tenants.revenue.replace('{{amount}}', (tenant.revenue?.toLocaleString() || '0'))}</p>
                         </div>
                         <Button
                           variant="outline"
@@ -153,7 +155,7 @@ export default function TenantsPage() {
                           className="h-8 text-xs"
                           onClick={() => handleSwitchTenant(tenant.id)}
                         >
-                          Switch
+                          {t.dashboard.tenants.switchTenant}
                         </Button>
                       </div>
                     </div>
@@ -161,7 +163,7 @@ export default function TenantsPage() {
 
                   {filteredTenants.length === 0 && !loading && (
                     <div className="text-center py-10">
-                      <p className="text-gray-500 dark:text-gray-400">No tenants found</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t.dashboard.tenants.noTenants}</p>
                     </div>
                   )}
                 </div>
@@ -174,7 +176,7 @@ export default function TenantsPage() {
           <Card className="border-0 shadow-sm bg-white dark:bg-[#16181f]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                Tenant Statistics
+                {t.dashboard.tenants.tenantStatistics}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -184,7 +186,7 @@ export default function TenantsPage() {
                     <div className="w-8 h-8 bg-blue-50 dark:bg-blue-500/10 rounded-lg flex items-center justify-center">
                       <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Total Tenants</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.tenants.totalTenants}</span>
                   </div>
                   <span className="font-semibold text-gray-900 dark:text-white">{tenants.length}</span>
                 </div>
@@ -194,7 +196,7 @@ export default function TenantsPage() {
                     <div className="w-8 h-8 bg-green-50 dark:bg-green-500/10 rounded-lg flex items-center justify-center">
                       <Building className="w-4 h-4 text-green-600 dark:text-green-400" />
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Active Businesses</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.tenants.activeBusinesses}</span>
                   </div>
                   <span className="font-semibold text-gray-900 dark:text-white">{tenants.filter(t => t.status === 'ACTIVE').length}</span>
                 </div>
@@ -204,7 +206,7 @@ export default function TenantsPage() {
                     <div className="w-8 h-8 bg-purple-50 dark:bg-purple-500/10 rounded-lg flex items-center justify-center">
                       <Globe className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.tenants.totalRevenue}</span>
                   </div>
                   <span className="font-semibold text-gray-900 dark:text-white">
                     ${tenants.reduce((sum, t) => sum + (t.revenue || 0), 0).toLocaleString()}
@@ -217,19 +219,19 @@ export default function TenantsPage() {
           <Card className="border-0 shadow-sm bg-white dark:bg-[#16181f]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                Quick Actions
+                {t.dashboard.tenants.quickActions}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-2">
                 <Button variant="outline" className="w-full justify-start h-9 text-sm">
-                  <Shield className="w-4 h-4 mr-2" /> Security Settings
+                  <Shield className="w-4 h-4 mr-2" /> {t.dashboard.tenants.actions.security}
                 </Button>
                 <Button variant="outline" className="w-full justify-start h-9 text-sm">
-                  <Mail className="w-4 h-4 mr-2" /> Send Notification
+                  <Mail className="w-4 h-4 mr-2" /> {t.dashboard.tenants.actions.notification}
                 </Button>
                 <Button variant="outline" className="w-full justify-start h-9 text-sm">
-                  <Clock className="w-4 h-4 mr-2" /> Schedule Maintenance
+                  <Clock className="w-4 h-4 mr-2" /> {t.dashboard.tenants.actions.maintenance}
                 </Button>
               </div>
             </CardContent>

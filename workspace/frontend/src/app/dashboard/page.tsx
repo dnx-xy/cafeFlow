@@ -9,7 +9,8 @@ import {
   TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users,
   Award, Clock, QrCode, BarChart3, ArrowRight, Activity, Percent,
 } from 'lucide-react';
-import { useOrders, useCustomers } from '@/hooks/useAuth';
+import { useOrders, useCustomers, useAuth } from '@/hooks/useAuth';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useI18n } from '@/i18n/context';
 import { formatCurrency } from '@/lib/currency';
@@ -18,42 +19,66 @@ import {
   ResponsiveContainer, AreaChart, Area,
 } from 'recharts';
 
-const revenueData = [
-  { name: 'Mon', revenue: 2400, orders: 24 },
-  { name: 'Tue', revenue: 1398, orders: 18 },
-  { name: 'Wed', revenue: 9800, orders: 42 },
-  { name: 'Thu', revenue: 3908, orders: 32 },
-  { name: 'Fri', revenue: 4800, orders: 38 },
-  { name: 'Sat', revenue: 3800, orders: 35 },
-  { name: 'Sun', revenue: 4300, orders: 40 },
-];
-
-const topProducts = [
-  { name: 'Caramel Macchiato', sales: 142, revenue: 1988, trend: 'up' as const },
-  { name: 'Avocado Toast', sales: 98, revenue: 1372, trend: 'up' as const },
-  { name: 'Cold Brew', sales: 87, revenue: 1087, trend: 'down' as const },
-  { name: 'Eggs Benedict', sales: 76, revenue: 1368, trend: 'up' as const },
-  { name: 'Matcha Latte', sales: 65, revenue: 910, trend: 'up' as const },
-];
+const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function DashboardPage() {
   const { currency } = useCurrency();
   const { t } = useI18n();
+  const { user } = useAuth();
   const { orders, loading: ordersLoading, fetchOrders } = useOrders();
   const { customers, loading: customersLoading, fetchCustomers } = useCustomers();
+  const { data: analytics, loading: analyticsLoading, fetchAnalytics } = useAnalytics();
   const [stats, setStats] = useState({
-    revenue: 24580,
-    orders: 1247,
-    customers: 892,
-    qrScans: 3842,
-    returning: 42,
-    avgOrder: 19.72,
+    revenue: 0,
+    orders: 0,
+    customers: 0,
+    qrScans: 0,
+    returning: 0,
+    avgOrder: 0,
   });
 
   useEffect(() => {
     fetchOrders();
     fetchCustomers();
+    fetchAnalytics('week');
   }, []);
+
+  useEffect(() => {
+    if (analytics) {
+      setStats({
+        revenue: analytics.revenue.total,
+        orders: analytics.orders.total,
+        customers: analytics.customers.total,
+        qrScans: 0,
+        returning: analytics.customerRetention?.rate || 0,
+        avgOrder: analytics.avgOrderValue.value,
+      });
+    }
+  }, [analytics]);
+
+  const todaySummary = {
+    openOrders: orders.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED').length,
+    completed: orders.filter(o => o.status === 'COMPLETED').length,
+    newCustomers: customers.filter(c => {
+      const d = new Date(c.createdAt);
+      const now = new Date();
+      return d.toDateString() === now.toDateString();
+    }).length,
+  };
+
+  const revenueData = analytics?.revenueChart?.length
+    ? analytics.revenueChart.map((item, i) => ({
+        name: weekDays[i] || item.date,
+        revenue: item.revenue,
+        orders: item.orders,
+      }))
+    : weekDays.map((name, i) => ({
+        name,
+        revenue: 0,
+        orders: 0,
+      }));
+
+  const topProducts = analytics?.topItems || [];
 
   const statusColors: Record<string, string> = {
     PENDING: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
@@ -69,8 +94,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.home.greeting.replace('{{name}}', 'John')}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.home.subtitle.replace('{{cafe}}', 'The Daily Grind')}</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.home.greeting.replace('{{name}}', user?.name || 'User')}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.home.subtitle.replace('{{cafe}}', user?.name || 'Your Cafe')}</p>
         </div>
         <Badge variant="outline" className="text-xs font-normal text-gray-500 dark:text-gray-400">
           <Activity className="w-3 h-3 mr-1.5" />
@@ -262,10 +287,10 @@ export default function DashboardPage() {
               <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">{t.dashboard.home.todaysSummary}</h4>
               <div className="space-y-2.5">
                 {[
-                  [t.dashboard.home.openOrders, '12'],
-                  [t.dashboard.home.completed, '89'],
-                  [t.dashboard.home.newCustomers, '24'],
-                  [t.dashboard.home.avgPrepTime, '8 min'],
+                  [t.dashboard.home.openOrders, String(todaySummary.openOrders)],
+                  [t.dashboard.home.completed, String(todaySummary.completed)],
+                  [t.dashboard.home.newCustomers, String(todaySummary.newCustomers)],
+                  [t.dashboard.home.avgPrepTime, '—'],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">{label}</span>

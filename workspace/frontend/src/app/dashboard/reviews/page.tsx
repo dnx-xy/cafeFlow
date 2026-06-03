@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { useI18n } from '@/i18n/context';
 import { useReviews } from '@/hooks/useReviews';
 import { Star, Search, ThumbsUp, ThumbsDown, MessageSquare, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -24,6 +25,7 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg
 }
 
 export default function ReviewsPage() {
+  const { t } = useI18n();
   const { reviews, loading, error, fetchReviews } = useReviews();
   const [search, setSearch] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
@@ -49,7 +51,7 @@ export default function ReviewsPage() {
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-6 text-center">
           <p className="text-4xl font-bold text-gray-900 dark:text-white">{avgRating.toFixed(1)}</p>
           <div className="flex justify-center my-2"><StarRating rating={Math.round(avgRating)} size="lg" /></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{reviews.length} total reviews</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{reviews.length} {t.dashboard.reviews.totalReviews}</p>
         </div>
         <div className="lg:col-span-3 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
           <div className="space-y-2">
@@ -70,15 +72,15 @@ export default function ReviewsPage() {
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input className="pl-9 h-9 text-sm" placeholder="Search reviews..." value={search} onChange={e => setSearch(e.target.value)} />
+          <Input className="pl-9 h-9 text-sm" placeholder={t.dashboard.reviews.searchReviews} value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <Select value={ratingFilter} onValueChange={setRatingFilter}>
           <SelectTrigger className="w-[140px] h-9 text-sm">
-            <SelectValue placeholder="All Ratings" />
+            <SelectValue placeholder={t.dashboard.reviews.allRatings} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Ratings</SelectItem>
-            {[5, 4, 3, 2, 1].map(s => <SelectItem key={s} value={String(s)}>{s} Stars</SelectItem>)}
+            <SelectItem value="">{t.dashboard.reviews.allRatings}</SelectItem>
+            {[5, 4, 3, 2, 1].map(s => <SelectItem key={s} value={String(s)}>{s} {t.dashboard.reviews.stars}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -88,13 +90,13 @@ export default function ReviewsPage() {
       ) : error ? (
         <div className="flex flex-col items-center justify-center h-48 gap-3">
           <p className="text-red-500 text-sm">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchReviews}>Retry</Button>
+          <Button variant="outline" size="sm" onClick={fetchReviews}>{t.dashboard.reviews.retry}</Button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-48 text-gray-400 dark:text-gray-500">
           <MessageSquare className="w-10 h-10 mb-2 opacity-50" />
-          <p className="font-medium text-sm">No reviews yet</p>
-          <p className="text-xs">Customer reviews will appear here</p>
+          <p className="font-medium text-sm">{t.dashboard.reviews.noReviews}</p>
+          <p className="text-xs">{t.dashboard.reviews.reviewsWillAppear}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -108,7 +110,7 @@ export default function ReviewsPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{review.customer?.name || 'Anonymous'}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{review.customer?.name || t.dashboard.reviews.anonymous}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <StarRating rating={review.rating} />
                       <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center">
@@ -119,7 +121,7 @@ export default function ReviewsPage() {
                 </div>
                 <Badge variant="outline" className={`text-[10px] ${review.rating >= 4 ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20' : review.rating <= 2 ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20' : 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20'}`}>
                   {review.rating >= 4 ? <ThumbsUp className="w-3 h-3 mr-1 inline" /> : <ThumbsDown className="w-3 h-3 mr-1 inline" />}
-                  {review.rating >= 4 ? 'Positive' : review.rating <= 2 ? 'Negative' : 'Neutral'}
+                  {review.rating >= 4 ? t.dashboard.reviews.positive : review.rating <= 2 ? t.dashboard.reviews.negative : t.dashboard.reviews.neutral}
                 </Badge>
               </div>
               {review.comment && (
@@ -130,7 +132,7 @@ export default function ReviewsPage() {
                   {review.comment.length > 120 && (
                     <button className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center" onClick={() => setExpanded(expanded === review.id ? null : review.id)}>
                       {expanded === review.id ? <ChevronUp className="w-3 h-3 mr-1" /> : <ChevronDown className="w-3 h-3 mr-1" />}
-                      {expanded === review.id ? 'Show less' : 'Read more'}
+                      {expanded === review.id ? t.dashboard.reviews.showLess : t.dashboard.reviews.readMore}
                     </button>
                   )}
                 </div>

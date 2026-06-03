@@ -12,19 +12,29 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import {
   Search, MoreHorizontal, Eye, Edit, Trash2, Plus,
   ChevronLeft, ChevronRight, Users, DollarSign, Calendar, Phone, Mail,
-  Upload, Download,
+  Upload, Download, Loader2,
 } from 'lucide-react';
+import { useI18n } from '@/i18n/context';
 import { useCustomers } from '@/hooks/useAuth';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { formatCurrency } from '@/lib/currency';
+import { customersService } from '@/services/customersService';
 import { toast } from 'sonner';
 
 export default function CustomersPage() {
+  const { t } = useI18n();
   const { currency } = useCurrency();
   const { customers, loading, error, fetchCustomers } = useCustomers();
   const [search, setSearch] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', email: '', phoneNumber: '' });
 
   useEffect(() => { fetchCustomers(); }, []);
 
@@ -38,10 +48,10 @@ export default function CustomersPage() {
     <div className="space-y-5">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Customers', value: customers.length, icon: Users },
-          { label: 'New This Week', value: '0', icon: Calendar },
-          { label: 'Total Spent', value: '$0', icon: DollarSign },
-          { label: 'Avg. Visit', value: '0', icon: Users },
+          { label: t.dashboard.customers.totalCustomers, value: customers.length, icon: Users },
+          { label: t.dashboard.customers.newThisWeek, value: '0', icon: Calendar },
+          { label: t.dashboard.customers.totalSpent, value: '$0', icon: DollarSign },
+          { label: t.dashboard.customers.avgVisit, value: '0', icon: Users },
         ].map((s, i) => (
           <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
             <div className="flex items-center justify-between">
@@ -61,16 +71,16 @@ export default function CustomersPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
+              <Input placeholder={t.dashboard.customers.searchCustomers} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
             </div>
-            <Button size="sm" className="h-9" onClick={() => toast.success('Add Customer modal would open here')}><Plus className="w-4 h-4 mr-1.5" /> Add Customer</Button>
+            <Button size="sm" className="h-9" onClick={() => setAddOpen(true)}><Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.customers.addCustomer}</Button>
           </div>
       </div>
 
       <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
         <div className="flex items-center justify-between px-5 pt-5 pb-1">
-          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Customers</CardTitle>
-          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => toast.success('Import customers modal would open here')}><Upload className="w-3.5 h-3.5 mr-1.5" /> Import</Button>
+          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.customers.title}</CardTitle>
+          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => toast.success('Import customers modal would open here')}><Upload className="w-3.5 h-3.5 mr-1.5" /> {t.dashboard.customers.import}</Button>
         </div>
         <div className="p-5 pt-3">
           {loading ? (
@@ -83,12 +93,12 @@ export default function CustomersPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800/50">
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Customer</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Contact</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Visits</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Spent</th>
-                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Loyalty</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Actions</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.customer}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.contact}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.visits}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.spent}</th>
+                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.loyalty}</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.customers.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -122,9 +132,9 @@ export default function CustomersPage() {
                               <Button variant="ghost" size="icon" className="w-7 h-7"><MoreHorizontal className="w-4 h-4" /></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem><Eye className="mr-2 w-4 h-4" />View Profile</DropdownMenuItem>
-                              <DropdownMenuItem><Edit className="mr-2 w-4 h-4" />Edit</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 w-4 h-4" />Delete</DropdownMenuItem>
+                              <DropdownMenuItem><Eye className="mr-2 w-4 h-4" />{t.dashboard.customers.viewProfile}</DropdownMenuItem>
+                              <DropdownMenuItem><Edit className="mr-2 w-4 h-4" />{t.dashboard.customers.edit}</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 w-4 h-4" />{t.dashboard.customers.delete}</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </td>
@@ -134,10 +144,49 @@ export default function CustomersPage() {
                 </table>
               </div>
               {filtered.length === 0 && !loading && (
-                <div className="text-center py-12 text-sm text-gray-400 dark:text-gray-500">No customers found</div>
+                <div className="text-center py-12 text-sm text-gray-400 dark:text-gray-500">{t.dashboard.customers.noCustomers}</div>
               )}
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t.dashboard.customers.addCustomer}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="text-xs">{t.dashboard.customers.name}</Label>
+              <Input value={addForm.name} onChange={e => setAddForm(p => ({ ...p, name: e.target.value }))} placeholder={t.dashboard.customers.namePlaceholder} className="h-9 text-sm" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">{t.dashboard.customers.email}</Label>
+              <Input value={addForm.email} onChange={e => setAddForm(p => ({ ...p, email: e.target.value }))} type="email" placeholder={t.dashboard.customers.emailPlaceholder} className="h-9 text-sm" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">{t.dashboard.customers.phone}</Label>
+              <Input value={addForm.phoneNumber} onChange={e => setAddForm(p => ({ ...p, phoneNumber: e.target.value }))} placeholder={t.dashboard.customers.phonePlaceholder} className="h-9 text-sm" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setAddOpen(false)} disabled={adding}>{t.dashboard.customers.cancel}</Button>
+            <Button size="sm" onClick={async () => {
+              if (!addForm.name) { toast.error(t.dashboard.customers.nameRequired); return; }
+              setAdding(true);
+              try {
+                await customersService.createCustomer(addForm);
+                toast.success(t.dashboard.customers.customerCreated);
+                setAddOpen(false);
+                setAddForm({ name: '', email: '', phoneNumber: '' });
+                fetchCustomers();
+              } catch { toast.error(t.dashboard.customers.failedToCreate); }
+              finally { setAdding(false); }
+            }} disabled={adding}>
+              {adding && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}{t.dashboard.customers.save}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/50">
-                <p className="text-xs text-gray-400 dark:text-gray-500">Showing 1-{filtered.length} of {filtered.length}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t.dashboard.customers.showing.replace('{count}', String(filtered.length)).replace('{total}', String(filtered.length))}</p>
                 <div className="flex gap-1">
                   <Button variant="outline" size="icon" className="w-7 h-7" disabled><ChevronLeft className="w-3.5 h-3.5" /></Button>
                   <Button variant="outline" size="icon" className="w-7 h-7 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400">1</Button>

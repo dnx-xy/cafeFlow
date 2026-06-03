@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useAuth';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { useI18n } from '@/i18n/context';
 import { formatCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
 import { printOrderReceipt, exportOrder } from '@/lib/orderExportUtils';
@@ -21,6 +22,7 @@ export default function OrderDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { currency } = useCurrency();
+  const { t } = useI18n();
   const { fetchOrderById, updateOrderStatus } = useOrders();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ export default function OrderDetailsPage() {
         setOrder(data);
         setError(null);
       } catch (err) {
-        setError('Failed to load order details');
+        setError(t.dashboard.orders.detail.failedToLoad);
         console.error('Error loading order:', err);
       } finally {
         setLoading(false);
@@ -50,9 +52,9 @@ export default function OrderDetailsPage() {
     try {
       const updatedOrder = await updateOrderStatus(params.id as string, status);
       setOrder(updatedOrder);
-      toast.success('Order status updated');
+      toast.success(t.dashboard.orders.detail.statusUpdated);
     } catch (err) {
-      toast.error('Failed to update order status');
+      toast.error(t.dashboard.orders.detail.failedToUpdate);
     }
   };
 
@@ -75,49 +77,49 @@ export default function OrderDetailsPage() {
         bg: 'bg-amber-50 dark:bg-amber-500/10',
         border: 'border-amber-200 dark:border-amber-500/20',
         icon: <Clock className="w-3.5 h-3.5" />,
-        label: 'Pending'
+        label: t.dashboard.orders.detail.statuses.pending
       },
       CONFIRMED: { 
         color: 'text-blue-700 dark:text-blue-400', 
         bg: 'bg-blue-50 dark:bg-blue-500/10',
         border: 'border-blue-200 dark:border-blue-500/20',
         icon: <CheckCircle className="w-3.5 h-3.5" />,
-        label: 'Confirmed'
+        label: t.dashboard.orders.detail.statuses.confirmed
       },
       PREPARING: { 
         color: 'text-indigo-700 dark:text-indigo-400', 
         bg: 'bg-indigo-50 dark:bg-indigo-500/10',
         border: 'border-indigo-200 dark:border-indigo-500/20',
         icon: <Package className="w-3.5 h-3.5" />,
-        label: 'Preparing'
+        label: t.dashboard.orders.detail.statuses.preparing
       },
       READY: { 
         color: 'text-green-700 dark:text-green-400', 
         bg: 'bg-green-50 dark:bg-green-500/10',
         border: 'border-green-200 dark:border-green-500/20',
         icon: <CheckCircle className="w-3.5 h-3.5" />,
-        label: 'Ready'
+        label: t.dashboard.orders.detail.statuses.ready
       },
       DELIVERED: { 
         color: 'text-gray-700 dark:text-gray-400', 
         bg: 'bg-gray-50 dark:bg-gray-500/10',
         border: 'border-gray-200 dark:border-gray-500/20',
         icon: <Package className="w-3.5 h-3.5" />,
-        label: 'Delivered'
+        label: t.dashboard.orders.detail.statuses.delivered
       },
       COMPLETED: { 
         color: 'text-emerald-700 dark:text-emerald-400', 
         bg: 'bg-emerald-50 dark:bg-emerald-500/10',
         border: 'border-emerald-200 dark:border-emerald-500/20',
         icon: <CheckCircle className="w-3.5 h-3.5" />,
-        label: 'Completed'
+        label: t.dashboard.orders.detail.statuses.completed
       },
       CANCELLED: { 
         color: 'text-red-700 dark:text-red-400', 
         bg: 'bg-red-50 dark:bg-red-500/10',
         border: 'border-red-200 dark:border-red-500/20',
         icon: <XCircle className="w-3.5 h-3.5" />,
-        label: 'Cancelled'
+        label: t.dashboard.orders.detail.statuses.cancelled
       },
     };
     return configs[status] || { 
@@ -142,10 +144,10 @@ export default function OrderDetailsPage() {
       <div className="max-w-5xl mx-auto p-4 sm:p-6">
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Order Not Found</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">{error || 'The order you are looking for does not exist.'}</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t.dashboard.orders.detail.orderNotFound}</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{error || t.dashboard.orders.detail.orderNotFoundDesc}</p>
           <Button onClick={() => router.push('/dashboard/orders')} variant="outline" className="border-rose-200 hover:bg-rose-50">
-            Back to Orders
+            {t.dashboard.orders.detail.backToOrders}
           </Button>
         </div>
       </div>
@@ -186,11 +188,11 @@ export default function OrderDetailsPage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="h-8 text-xs border-gray-200 hover:bg-gray-50" onClick={handlePrintReceipt}>
             <Printer className="w-3.5 h-3.5 mr-1.5" />
-            Print
+            {t.dashboard.orders.detail.print}
           </Button>
           <Button size="sm" className="h-8 text-xs bg-rose-500 hover:bg-rose-600 text-white" onClick={() => handleExportOrder('pdf')}>
             <Download className="w-3.5 h-3.5 mr-1.5" />
-            Export
+            {t.dashboard.orders.detail.export}
           </Button>
         </div>
       </div>
@@ -203,13 +205,13 @@ export default function OrderDetailsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Store className="w-4 h-4 text-rose-500" />
-                Order Information
+                {t.dashboard.orders.detail.orderInformation}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Order Type</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t.dashboard.orders.detail.orderType}</p>
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-gray-400" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
@@ -218,7 +220,7 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Table</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t.dashboard.orders.detail.table}</p>
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -227,7 +229,7 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Payment</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t.dashboard.orders.detail.payment}</p>
                   <div className="flex items-center gap-1.5">
                     <CreditCard className="w-3.5 h-3.5 text-gray-400" />
                     <span className={`text-sm font-medium ${
@@ -249,10 +251,10 @@ export default function OrderDetailsPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <UtensilsCrossed className="w-4 h-4 text-rose-500" />
-                  Order Items
+                  {t.dashboard.orders.detail.orderItems}
                 </CardTitle>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {order.items?.length || 0} items
+                  {t.dashboard.orders.detail.items.replace('{{count}}', String(order.items?.length || 0))}
                 </span>
               </div>
             </CardHeader>
@@ -289,7 +291,7 @@ export default function OrderDetailsPage() {
                   ))
                 ) : (
                   <div className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
-                    No items found for this order
+                    {t.dashboard.orders.detail.noItems}
                   </div>
                 )}
               </div>
@@ -298,16 +300,16 @@ export default function OrderDetailsPage() {
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t.dashboard.orders.detail.subtotal}</span>
                   <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(order.totalAmount, currency)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">Tax</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t.dashboard.orders.detail.tax}</span>
                   <span className="font-medium text-gray-900 dark:text-white">-</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between">
-                  <span className="font-semibold text-gray-900 dark:text-white">Total</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{t.dashboard.orders.detail.total}</span>
                   <span className="font-bold text-rose-600 dark:text-rose-400">{formatCurrency(order.totalAmount, currency)}</span>
                 </div>
               </div>
@@ -319,7 +321,7 @@ export default function OrderDetailsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <User className="w-4 h-4 text-indigo-500" />
-                Customer Information
+                {t.dashboard.orders.detail.customerInformation}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -328,7 +330,7 @@ export default function OrderDetailsPage() {
                   <User className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 dark:text-white">{order.customer || 'Guest Customer'}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{order.customer || t.dashboard.orders.detail.guestCustomer}</p>
                   <div className="mt-1.5 space-y-1">
                     {order.email && (
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -343,7 +345,7 @@ export default function OrderDetailsPage() {
                       </div>
                     )}
                     {!order.email && !order.phoneNumber && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500">No contact information provided</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{t.dashboard.orders.detail.noContact}</p>
                     )}
                   </div>
                   {(order.phoneNumber || order.customer?.whatsappNumber) && (
@@ -360,7 +362,7 @@ export default function OrderDetailsPage() {
                           window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
                         }}
                       >
-                        <Phone className="w-3.5 h-3.5 mr-1.5" /> Reply via WhatsApp
+                        <Phone className="w-3.5 h-3.5 mr-1.5" /> {t.dashboard.orders.detail.replyViaWhatsapp}
                       </Button>
                     </div>
                   )}
@@ -376,7 +378,7 @@ export default function OrderDetailsPage() {
           <Card className="border-0 shadow-sm bg-white dark:bg-[#16181f]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
-                Update Status
+                {t.dashboard.orders.detail.updateStatus}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -389,7 +391,7 @@ export default function OrderDetailsPage() {
                   >
                     <span className="flex items-center gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-blue-500" />
-                      Confirm Order
+                      {t.dashboard.orders.detail.confirmOrder}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
                   </Button>
@@ -402,7 +404,7 @@ export default function OrderDetailsPage() {
                   >
                     <span className="flex items-center gap-2">
                       <Package className="w-3.5 h-3.5 text-indigo-500" />
-                      Mark Preparing
+                      {t.dashboard.orders.detail.markPreparing}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
                   </Button>
@@ -415,7 +417,7 @@ export default function OrderDetailsPage() {
                   >
                     <span className="flex items-center gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                      Mark Ready
+                      {t.dashboard.orders.detail.markReady}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
                   </Button>
@@ -428,14 +430,14 @@ export default function OrderDetailsPage() {
                   >
                     <span className="flex items-center gap-2">
                       <XCircle className="w-3.5 h-3.5" />
-                      Cancel Order
+                      {t.dashboard.orders.detail.cancelOrder}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
                 )}
                 {(order.status === 'CANCELLED' || order.status === 'COMPLETED') && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-2">
-                    Order is {order.status.toLowerCase()}
+                    {t.dashboard.orders.detail.orderIs.replace('{{status}}', order.status.toLowerCase())}
                   </p>
                 )}
               </div>
@@ -447,7 +449,7 @@ export default function OrderDetailsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <FileText className="w-4 h-4 text-rose-500" />
-                Export Options
+                {t.dashboard.orders.detail.exportOptions}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -458,7 +460,7 @@ export default function OrderDetailsPage() {
                   className="h-8 text-xs"
                   onClick={async () => await handleExportOrder('csv')}
                 >
-                  CSV
+                  {t.dashboard.orders.detail.exportFormats.csv}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -466,7 +468,7 @@ export default function OrderDetailsPage() {
                   className="h-8 text-xs"
                   onClick={async () => await handleExportOrder('xlsx')}
                 >
-                  Excel
+                  {t.dashboard.orders.detail.exportFormats.excel}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -474,7 +476,7 @@ export default function OrderDetailsPage() {
                   className="h-8 text-xs"
                   onClick={async () => await handleExportOrder('pdf')}
                 >
-                  PDF
+                  {t.dashboard.orders.detail.exportFormats.pdf}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -482,7 +484,7 @@ export default function OrderDetailsPage() {
                   className="h-8 text-xs"
                   onClick={async () => await handleExportOrder('jpg')}
                 >
-                  Image
+                  {t.dashboard.orders.detail.exportFormats.image}
                 </Button>
               </div>
             </CardContent>

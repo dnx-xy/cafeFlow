@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useI18n } from '@/i18n/context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ import { toast } from 'sonner';
 import { useTables } from '@/hooks/useTables';
 
 export default function QrCodesPage() {
+  const { t } = useI18n();
   const { tables, loading, error, fetchTables, createTable, deleteTable, generateQrCode } = useTables();
   const [search, setSearch] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -40,16 +42,16 @@ export default function QrCodesPage() {
       await createTable(newTable);
       setIsCreating(false);
       setNewTable({ tableNumber: '', name: '', capacity: 1, isActive: true });
-      toast.success('Table created');
-    } catch { toast.error('Failed to create table'); }
+      toast.success(t.dashboard.qrCodes.tableCreated);
+    } catch { toast.error(t.dashboard.qrCodes.failedToCreate); }
   };
 
   const handleGenerate = async (id: string, number: string) => {
     try {
       const qr = await generateQrCode(id);
       setViewingQr({ id, tableNumber: number, code: qr.code });
-      toast.success('QR code generated');
-    } catch { toast.error('Failed to generate QR'); }
+      toast.success(t.dashboard.qrCodes.qrGenerated);
+    } catch { toast.error(t.dashboard.qrCodes.failedToGenerateQr); }
   };
 
   const getQrBaseUrl = () => process.env.NEXT_PUBLIC_QR_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
@@ -57,7 +59,7 @@ export default function QrCodesPage() {
   const handlePrintAll = () => {
     const origin = getQrBaseUrl();
     const printWindow = window.open('', '_blank');
-    if (!printWindow) { toast.error('Popup blocked. Please allow popups.'); return; }
+    if (!printWindow) { toast.error(t.dashboard.qrCodes.popupBlocked); return; }
     const tableCards = filtered.filter(t => t.qrCodes?.length).map(t => {
       const last = t.qrCodes![t.qrCodes!.length - 1];
       const qrUrl = `${origin}/scan/${last.code}`;
@@ -97,78 +99,78 @@ export default function QrCodesPage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">QR Codes</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage tables and generate QR codes for customer scanning</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.qrCodes.title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.qrCodes.subtitle}</p>
         </div>
         <div className="flex gap-2">
           {filtered.length > 0 && (
             <Button variant="outline" size="sm" onClick={handlePrintAll}>
-              <Printer className="w-4 h-4 mr-1.5" /> Print All
+              <Printer className="w-4 h-4 mr-1.5" /> {t.dashboard.qrCodes.printAll}
             </Button>
           )}
-          <Button size="sm" onClick={() => setIsCreating(true)}><Plus className="w-4 h-4 mr-1.5" /> Add Table</Button>
+          <Button size="sm" onClick={() => setIsCreating(true)}><Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.qrCodes.addTable}</Button>
         </div>
       </div>
 
       {isCreating && (
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Create New Table</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t.dashboard.qrCodes.createNewTable}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Table Number *</label>
-              <Input value={newTable.tableNumber} onChange={e => setNewTable({ ...newTable, tableNumber: e.target.value })} placeholder="e.g. A01" className="h-9 text-sm" />
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.qrCodes.form.tableNumber}</label>
+              <Input value={newTable.tableNumber} onChange={e => setNewTable({ ...newTable, tableNumber: e.target.value })} placeholder={t.dashboard.qrCodes.form.tableNumberPlaceholder} className="h-9 text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Table Name</label>
-              <Input value={newTable.name} onChange={e => setNewTable({ ...newTable, name: e.target.value })} placeholder="e.g. Window Table 1" className="h-9 text-sm" />
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.qrCodes.form.tableName}</label>
+              <Input value={newTable.name} onChange={e => setNewTable({ ...newTable, name: e.target.value })} placeholder={t.dashboard.qrCodes.form.tableNamePlaceholder} className="h-9 text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Capacity</label>
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.qrCodes.form.capacity}</label>
               <Input type="number" min="1" value={newTable.capacity} onChange={e => setNewTable({ ...newTable, capacity: parseInt(e.target.value) || 1 })} className="h-9 text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Status</label>
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.qrCodes.form.status}</label>
               <Select value={newTable.isActive ? 'true' : 'false'} onValueChange={v => setNewTable({ ...newTable, isActive: v === 'true' })}>
                 <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="true">Active</SelectItem>
-                  <SelectItem value="false">Inactive</SelectItem>
+                  <SelectItem value="true">{t.dashboard.qrCodes.form.active}</SelectItem>
+                  <SelectItem value="false">{t.dashboard.qrCodes.form.inactive}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsCreating(false)}>Cancel</Button>
-            <Button size="sm" onClick={handleCreate}>Create Table</Button>
+            <Button variant="outline" size="sm" onClick={() => setIsCreating(false)}>{t.dashboard.qrCodes.cancel}</Button>
+            <Button size="sm" onClick={handleCreate}>{t.dashboard.qrCodes.createTable}</Button>
           </div>
         </div>
       )}
 
       <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
         <div className="flex items-center justify-between px-5 pt-5 pb-1">
-          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Tables & QR Codes</CardTitle>
+          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.qrCodes.tablesAndQr}</CardTitle>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input placeholder="Search tables..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm w-56" />
+            <Input placeholder={t.dashboard.qrCodes.search} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm w-56" />
           </div>
         </div>
         <div className="p-5 pt-3">
           {loading ? (
             <div className="flex justify-center items-center h-48"><div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
           ) : error ? (
-            <div className="text-center py-10"><AlertTriangle className="w-10 h-10 mx-auto text-red-500 mb-3" /><p className="text-red-500 text-sm mb-3">{error}</p><Button variant="outline" size="sm" onClick={() => fetchTables()}>Retry</Button></div>
+            <div className="text-center py-10"><AlertTriangle className="w-10 h-10 mx-auto text-red-500 mb-3" /><p className="text-red-500 text-sm mb-3">{error}</p><Button variant="outline" size="sm" onClick={() => fetchTables()}>{t.dashboard.qrCodes.retry}</Button></div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800/50">
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Table</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Name</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Capacity</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Status</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">QR Code</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">Actions</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.table}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.name}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.capacity}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.status}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.qrCode}</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.qrCodes.table.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -181,19 +183,19 @@ export default function QrCodesPage() {
                           </div>
                         </td>
                         <td className="py-3.5 text-sm text-gray-500 dark:text-gray-400">{table.name || '-'}</td>
-                        <td className="py-3.5"><Badge variant="outline" className="text-[10px]">{table.capacity} {table.capacity === 1 ? 'person' : 'people'}</Badge></td>
+                        <td className="py-3.5"><Badge variant="outline" className="text-[10px]">{table.capacity} {table.capacity === 1 ? t.dashboard.qrCodes.capacity.person.replace('{{count}}', String(table.capacity)) : t.dashboard.qrCodes.capacity.people.replace('{{count}}', String(table.capacity))}</Badge></td>
                         <td className="py-3.5">
                           <Badge variant="outline" className={`text-[10px] ${table.isActive ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'}`}>
-                            {table.isActive ? 'Active' : 'Inactive'}
+                            {table.isActive ? t.dashboard.qrCodes.form.active : t.dashboard.qrCodes.form.inactive}
                           </Badge>
                         </td>
                         <td className="py-3.5">
                           {table.qrCodes && table.qrCodes.length > 0 ? (
                             <button onClick={() => { const last = table.qrCodes![table.qrCodes!.length - 1]; setViewingQr({ id: table.id, tableNumber: table.tableNumber, code: last.code }); }}>
-                              <Badge variant="secondary" className="text-[10px] cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"><QrCode className="w-3 h-3 mr-1" />Generated</Badge>
+                              <Badge variant="secondary" className="text-[10px] cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"><QrCode className="w-3 h-3 mr-1" />{t.dashboard.qrCodes.qr.generated}</Badge>
                             </button>
                           ) : (
-                            <Badge variant="destructive" className="text-[10px]">No QR</Badge>
+                            <Badge variant="destructive" className="text-[10px]">{t.dashboard.qrCodes.qr.noQr}</Badge>
                           )}
                         </td>
                         <td className="py-3.5 text-right">
@@ -202,10 +204,10 @@ export default function QrCodesPage() {
                               <Button variant="ghost" size="icon" className="w-7 h-7"><MoreHorizontal className="w-4 h-4" /></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-44">
-                              <DropdownMenuItem onClick={() => toast.info(`Table #${table.tableNumber} - ${table.name || 'No name'}`)}><Eye className="mr-2 w-4 h-4" />View Details</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toast.info('Edit coming soon')}><Edit className="mr-2 w-4 h-4" />Edit Table</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleGenerate(table.id, table.tableNumber)}><QrCode className="mr-2 w-4 h-4" />Generate QR</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600" onClick={() => deleteTable(table.id)}><Trash2 className="mr-2 w-4 h-4" />Delete</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast.info(`Table #${table.tableNumber} - ${table.name || 'No name'}`)}><Eye className="mr-2 w-4 h-4" />{t.dashboard.qrCodes.actions.viewDetails}</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast.info('Edit coming soon')}><Edit className="mr-2 w-4 h-4" />{t.dashboard.qrCodes.actions.editTable}</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleGenerate(table.id, table.tableNumber)}><QrCode className="mr-2 w-4 h-4" />{t.dashboard.qrCodes.actions.generateQr}</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-600" onClick={() => deleteTable(table.id)}><Trash2 className="mr-2 w-4 h-4" />{t.dashboard.qrCodes.actions.delete}</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </td>
@@ -217,8 +219,8 @@ export default function QrCodesPage() {
               {filtered.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <Table className="w-10 h-10 mx-auto text-gray-400 mb-3" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">No tables found</p>
-                  {!isCreating && <Button size="sm" onClick={() => setIsCreating(true)}><Plus className="w-4 h-4 mr-1.5" />Create First Table</Button>}
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t.dashboard.qrCodes.noTables}</p>
+                  {!isCreating && <Button size="sm" onClick={() => setIsCreating(true)}><Plus className="w-4 h-4 mr-1.5" />{t.dashboard.qrCodes.createFirstTable}</Button>}
                 </div>
               )}
             </>
@@ -229,7 +231,7 @@ export default function QrCodesPage() {
       <Dialog open={viewingQr !== null} onOpenChange={open => { if (!open) setViewingQr(null); }}>
         <DialogContent className="sm:max-w-sm qr-code-dialog">
           <div className="flex flex-col items-center gap-4 py-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Table #{viewingQr?.tableNumber}</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t.dashboard.qrCodes.qr.title.replace('{{number}}', viewingQr?.tableNumber || '')}</h3>
             <div className="bg-white p-4 rounded-xl">
               {viewingQr && (
                 <QRCodeSVG
@@ -239,13 +241,13 @@ export default function QrCodesPage() {
                 />
               )}
             </div>
-            <p className="text-xs text-gray-400 text-center">Scan to open menu for Table #{viewingQr?.tableNumber}</p>
+            <p className="text-xs text-gray-400 text-center">{t.dashboard.qrCodes.qr.scanHint.replace('{{number}}', viewingQr?.tableNumber || '')}</p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => downloadQrPng(`table-${viewingQr?.tableNumber}-qr.png`)}>
-                <Download className="w-4 h-4 mr-2" />Download PNG
+              <Button variant="outline" size="sm" onClick={() => downloadQrPng(t.dashboard.qrCodes.qr.filename.replace('{{number}}', viewingQr?.tableNumber || ''))}>
+                <Download className="w-4 h-4 mr-2" />{t.dashboard.qrCodes.qr.downloadPng}
               </Button>
               <Button variant="outline" size="sm" onClick={() => { window.open(`/scan/${viewingQr?.code}`, '_blank'); }}>
-                <Eye className="w-4 h-4 mr-2" />Preview
+                <Eye className="w-4 h-4 mr-2" />{t.dashboard.qrCodes.qr.preview}
               </Button>
             </div>
           </div>
