@@ -346,6 +346,24 @@ export default function OrderDetailsPage() {
                       <p className="text-xs text-gray-400 dark:text-gray-500">No contact information provided</p>
                     )}
                   </div>
+                  {(order.phoneNumber || order.customer?.whatsappNumber) && (
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/50">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs w-full"
+                        onClick={() => {
+                          const phone = order.customer?.whatsappNumber || order.phoneNumber;
+                          if (!phone) return;
+                          const cleanPhone = phone.replace(/[^0-9]/g, '');
+                          const msg = encodeURIComponent(`Hi ${order.customer || 'there'}, regarding your order ${order.orderId || ''} at CafeFlow. How can we help you?`);
+                          window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+                        }}
+                      >
+                        <Phone className="w-3.5 h-3.5 mr-1.5" /> Reply via WhatsApp
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

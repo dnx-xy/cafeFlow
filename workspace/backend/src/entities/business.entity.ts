@@ -9,6 +9,14 @@ import { Customer } from './customer.entity';
 import { LoyaltyProgram } from './loyalty-program.entity';
 import { QrCode } from './qr-code.entity';
 
+export enum SubscriptionStatus {
+  TRIAL = 'trial',
+  ACTIVE = 'active',
+  PAST_DUE = 'past_due',
+  CANCELED = 'canceled',
+  INACTIVE = 'inactive',
+}
+
 @Entity('businesses')
 export class Business extends BaseEntity {
   @Column({ type: 'varchar' })
@@ -40,6 +48,21 @@ export class Business extends BaseEntity {
 
   @Column({ type: 'varchar' })
   tenantId: string;
+
+  @Column({ type: 'enum', enum: SubscriptionStatus, default: SubscriptionStatus.TRIAL })
+  subscriptionStatus: SubscriptionStatus;
+
+  @Column({ type: 'timestamp', nullable: true })
+  trialEndsAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  currentPeriodEnd: Date;
+
+  @Column({ type: 'varchar', nullable: true })
+  stripeCustomerId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  stripeSubscriptionId: string;
 
   @ManyToOne(() => Tenant, (tenant) => tenant.businesses)
   tenant: Tenant;

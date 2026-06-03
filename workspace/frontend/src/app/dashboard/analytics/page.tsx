@@ -9,8 +9,9 @@ import {
   TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Target,
   Clock, ArrowUpRight, ArrowDownRight, BarChart3, Percent, Activity, RefreshCw,
 } from 'lucide-react';
-import { useAnalytics, AnalyticsData } from '@/hooks/useAnalytics';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { useI18n } from '@/i18n/context';
 import { formatCurrency } from '@/lib/currency';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -42,17 +43,20 @@ function KpiCard({ title, value, change, icon: Icon }: {
 
 export default function AnalyticsPage() {
   const { currency } = useCurrency();
+  const { t } = useI18n();
   const { data, loading, error, fetchAnalytics } = useAnalytics();
   const [period, setPeriod] = useState('week');
 
-  useEffect(() => { fetchAnalytics(); }, []);
+  useEffect(() => {
+    fetchAnalytics(period as 'week' | 'month' | 'year');
+  }, [period, fetchAnalytics]);
 
   if (loading && !data) {
     return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   }
 
   if (error) {
-    return <div className="flex flex-col items-center justify-center h-64 gap-3"><p className="text-red-500 text-sm">{error}</p><Button variant="outline" size="sm" onClick={fetchAnalytics}>Retry</Button></div>;
+    return <div className="flex flex-col items-center justify-center h-64 gap-3"><p className="text-red-500 text-sm">{error}</p><Button variant="outline" size="sm" onClick={() => fetchAnalytics(period as any)}>Retry</Button></div>;
   }
 
   if (!data) return null;
@@ -61,37 +65,37 @@ export default function AnalyticsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Analytics</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Track your café&apos;s key metrics and trends</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.analytics.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           <Tabs value={period} onValueChange={setPeriod}>
             <TabsList className="h-8">
-              <TabsTrigger value="week" className="text-xs px-3">Week</TabsTrigger>
-              <TabsTrigger value="month" className="text-xs px-3">Month</TabsTrigger>
-              <TabsTrigger value="year" className="text-xs px-3">Year</TabsTrigger>
+              <TabsTrigger value="week" className="text-xs px-3">{t.dashboard.analytics.week}</TabsTrigger>
+              <TabsTrigger value="month" className="text-xs px-3">{t.dashboard.analytics.month}</TabsTrigger>
+              <TabsTrigger value="year" className="text-xs px-3">{t.dashboard.analytics.year}</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button variant="outline" size="icon" className="w-8 h-8" onClick={fetchAnalytics}>
+          <Button variant="outline" size="icon" className="w-8 h-8" onClick={() => fetchAnalytics(period as any)}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <KpiCard title="Revenue" value={formatCurrency(data.revenue.total, currency)} change={data.revenue.change} icon={DollarSign} />
-        <KpiCard title="Orders" value={data.orders.total.toLocaleString()} change={data.orders.change} icon={ShoppingCart} />
-        <KpiCard title="Customers" value={data.customers.total.toLocaleString()} change={data.customers.change} icon={Users} />
-        <KpiCard title="Avg Order" value={formatCurrency(data.avgOrderValue.value, currency)} change={data.avgOrderValue.change} icon={Target} />
-        <KpiCard title="Conversion" value={`${data.conversionRate.value}%`} change={data.conversionRate.change} icon={Percent} />
+        <KpiCard title={t.dashboard.analytics.revenue} value={formatCurrency(data.revenue.total, currency)} change={data.revenue.change} icon={DollarSign} />
+        <KpiCard title={t.dashboard.analytics.orders} value={data.orders.total.toLocaleString()} change={data.orders.change} icon={ShoppingCart} />
+        <KpiCard title={t.dashboard.analytics.customers} value={data.customers.total.toLocaleString()} change={data.customers.change} icon={Users} />
+        <KpiCard title={t.dashboard.analytics.avgOrder} value={formatCurrency(data.avgOrderValue.value, currency)} change={data.avgOrderValue.change} icon={Target} />
+        <KpiCard title={t.dashboard.analytics.conversion} value={`${data.conversionRate.value}%`} change={data.conversionRate.change} icon={Percent} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="flex items-center justify-between px-5 pt-5 pb-1">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue & Orders Trend</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Daily performance over the selected period</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.revenueTrend}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.analytics.revenueTrendSubtitle}</p>
             </div>
             <Badge variant="outline" className="text-[10px] font-normal">Last 7 days</Badge>
           </div>
@@ -121,8 +125,8 @@ export default function AnalyticsPage() {
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="flex items-center justify-between px-5 pt-5 pb-1">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Peak Hours</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Orders by hour</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.peakHours}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.analytics.peakHoursSubtitle}</p>
             </div>
             <Clock className="w-4 h-4 text-gray-400" />
           </div>
@@ -145,8 +149,8 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="px-5 pt-5 pb-1">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Selling Items</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Best performers this period</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.topItems}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.analytics.topItemsSubtitle}</p>
           </div>
           <div className="p-5 pt-3">
             <div className="space-y-3.5">
@@ -170,8 +174,8 @@ export default function AnalyticsPage() {
 
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="px-5 pt-5 pb-1">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Customer Retention</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">New vs returning customers</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.customerRetention}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.analytics.retentionSubtitle}</p>
           </div>
           <div className="p-5 pt-3">
             <div className="h-[180px] relative">
@@ -192,25 +196,25 @@ export default function AnalyticsPage() {
             </div>
             <div className="text-center mt-1">
               <p className="text-xl font-bold text-gray-900 dark:text-white">{data.customerRetention.rate}%</p>
-              <p className="text-[11px] text-gray-400 dark:text-gray-500">Retention Rate</p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500">{t.dashboard.analytics.retentionRate}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="px-5 pt-5 pb-1">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Summary at a glance</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.analytics.quickStats}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.analytics.quickStatsSubtitle}</p>
           </div>
           <div className="p-5 pt-3">
             <div className="grid grid-cols-2 gap-3">
               {[
-                ['Total Revenue', formatCurrency(data.revenue.total * 1.5, currency), 'This month'],
-                ['Avg Daily Orders', Math.round(data.orders.total / 30).toString(), 'Last 30 days'],
-                ['Peak Hour', '09:00', '32 orders avg'],
-                ['Avg Prep Time', '8 min', 'Across all items'],
-                ['Table Turnover', '45 min', 'Average per table'],
-                ['Top Category', 'Coffee', '42% of sales'],
+                [t.dashboard.analytics.totalRevenue, formatCurrency(data.revenue.total * 1.5, currency), t.dashboard.analytics.month],
+                [t.dashboard.analytics.avgDailyOrders, Math.round(data.orders.total / 30).toString(), 'Last 30 days'],
+                [t.dashboard.analytics.peakHour, '09:00', '32 orders avg'],
+                [t.dashboard.analytics.avgPrepTime, '8 min', 'Across all items'],
+                [t.dashboard.analytics.tableTurnover, '45 min', 'Average per table'],
+                [t.dashboard.analytics.topCategory, 'Coffee', '42% of sales'],
               ].map(([label, value, sub]) => (
                 <div key={label} className="bg-gray-50 dark:bg-gray-800/40 rounded-lg p-3">
                   <p className="text-[11px] text-gray-400 dark:text-gray-500">{label}</p>

@@ -3,36 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ShoppingCart,
-  Users,
-  Award,
-  Clock,
-  QrCode,
-  BarChart3,
-  ArrowRight,
-  Activity,
-  Percent,
+  TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users,
+  Award, Clock, QrCode, BarChart3, ArrowRight, Activity, Percent,
 } from 'lucide-react';
 import { useOrders, useCustomers } from '@/hooks/useAuth';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { useI18n } from '@/i18n/context';
 import { formatCurrency } from '@/lib/currency';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, AreaChart, Area,
 } from 'recharts';
 
 const revenueData = [
@@ -46,15 +29,16 @@ const revenueData = [
 ];
 
 const topProducts = [
-  { name: 'Caramel Macchiato', sales: 142, revenue: 1988, trend: 'up' },
-  { name: 'Avocado Toast', sales: 98, revenue: 1372, trend: 'up' },
-  { name: 'Cold Brew', sales: 87, revenue: 1087, trend: 'down' },
-  { name: 'Eggs Benedict', sales: 76, revenue: 1368, trend: 'up' },
-  { name: 'Matcha Latte', sales: 65, revenue: 910, trend: 'up' },
+  { name: 'Caramel Macchiato', sales: 142, revenue: 1988, trend: 'up' as const },
+  { name: 'Avocado Toast', sales: 98, revenue: 1372, trend: 'up' as const },
+  { name: 'Cold Brew', sales: 87, revenue: 1087, trend: 'down' as const },
+  { name: 'Eggs Benedict', sales: 76, revenue: 1368, trend: 'up' as const },
+  { name: 'Matcha Latte', sales: 65, revenue: 910, trend: 'up' as const },
 ];
 
 export default function DashboardPage() {
   const { currency } = useCurrency();
+  const { t } = useI18n();
   const { orders, loading: ordersLoading, fetchOrders } = useOrders();
   const { customers, loading: customersLoading, fetchCustomers } = useCustomers();
   const [stats, setStats] = useState({
@@ -85,24 +69,24 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Good morning, John 👋</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Here&apos;s what&apos;s happening at The Daily Grind today.</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.home.greeting.replace('{{name}}', 'John')}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.home.subtitle.replace('{{cafe}}', 'The Daily Grind')}</p>
         </div>
         <Badge variant="outline" className="text-xs font-normal text-gray-500 dark:text-gray-400">
           <Activity className="w-3 h-3 mr-1.5" />
-          Live
+          {t.dashboard.home.live}
         </Badge>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        {[
-          { title: 'Revenue', value: formatCurrency(stats.revenue, currency), change: '+12%', icon: DollarSign, trend: 'up' as const },
-          { title: 'Orders', value: stats.orders.toLocaleString(), change: '+8%', icon: ShoppingCart, trend: 'up' as const },
-          { title: 'Customers', value: stats.customers.toLocaleString(), change: '+5%', icon: Users, trend: 'up' as const },
-          { title: 'QR Scans', value: stats.qrScans.toLocaleString(), change: '+24%', icon: QrCode, trend: 'up' as const },
-          { title: 'Returning', value: `${stats.returning}%`, change: '+5%', icon: Award, trend: 'up' as const },
-          { title: 'Avg Order', value: formatCurrency(stats.avgOrder, currency), change: '-2%', icon: Percent, trend: 'down' as const },
-        ].map((kpi, i) => (
+        {([
+          { title: t.dashboard.home.revenue, value: formatCurrency(stats.revenue, currency), change: '+12%', icon: DollarSign, trend: 'up' as const },
+          { title: t.dashboard.home.orders, value: stats.orders.toLocaleString(), change: '+8%', icon: ShoppingCart, trend: 'up' as const },
+          { title: t.dashboard.home.customers, value: stats.customers.toLocaleString(), change: '+5%', icon: Users, trend: 'up' as const },
+          { title: t.dashboard.home.qrScans, value: stats.qrScans.toLocaleString(), change: '+24%', icon: QrCode, trend: 'up' as const },
+          { title: t.dashboard.home.returning, value: `${stats.returning}%`, change: '+5%', icon: Award, trend: 'up' as const },
+          { title: t.dashboard.home.avgOrder, value: formatCurrency(stats.avgOrder, currency), change: '-2%', icon: Percent, trend: 'down' as const },
+        ] as const).map((kpi, i) => (
           <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
             <div className="flex items-center justify-between mb-2">
               <div className="w-9 h-9 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
@@ -123,10 +107,10 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Overview</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Daily revenue and orders this week</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.home.revenueOverview}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.home.revenueSubtitle}</p>
             </div>
-            <Badge variant="outline" className="text-[11px] font-normal text-gray-500 dark:text-gray-400">This Week</Badge>
+            <Badge variant="outline" className="text-[11px] font-normal text-gray-500 dark:text-gray-400">{t.dashboard.home.thisWeek}</Badge>
           </div>
           <div className="p-5 pt-2">
             <div className="h-[260px]">
@@ -154,8 +138,8 @@ export default function DashboardPage() {
 
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="px-5 pt-5 pb-2">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Best selling items today</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.home.topProducts}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.home.topProductsSubtitle}</p>
           </div>
           <div className="p-5 pt-3">
             <div className="space-y-3.5">
@@ -167,7 +151,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.name}</p>
-                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{product.sales} sold</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{product.sales} {t.dashboard.home.sold}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -187,12 +171,12 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Latest orders from your cafe</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.home.recentOrders}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.home.recentOrdersSubtitle}</p>
             </div>
             <Link href="/dashboard/orders">
               <Button variant="ghost" size="sm" className="text-xs">
-                View all <ArrowRight className="ml-1 w-3 h-3" />
+                {t.dashboard.home.viewAll} <ArrowRight className="ml-1 w-3 h-3" />
               </Button>
             </Link>
           </div>
@@ -206,12 +190,12 @@ export default function DashboardPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800/50">
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Order</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Table</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Customer</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Amount</th>
-                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Status</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">Time</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.order}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.table}</th>
+                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.customer}</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.amount}</th>
+                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.status}</th>
+                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3">{t.dashboard.orders.table.time}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -233,7 +217,7 @@ export default function DashboardPage() {
                     ))}
                     {orders.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">No orders yet</td>
+                        <td colSpan={6} className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">{t.dashboard.orders.noOrders}</td>
                       </tr>
                     )}
                   </tbody>
@@ -245,29 +229,29 @@ export default function DashboardPage() {
 
         <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
           <div className="px-5 pt-5 pb-2">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Frequently used actions</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.home.quickActions}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.home.quickActionsSubtitle}</p>
           </div>
           <div className="p-5 pt-3">
             <div className="space-y-2">
               <Link href="/dashboard/menu">
                 <Button variant="outline" className="w-full justify-start text-sm h-9">
-                  <BarChart3 className="mr-2.5 w-4 h-4 text-gray-400" /> Update Menu
+                  <BarChart3 className="mr-2.5 w-4 h-4 text-gray-400" /> {t.dashboard.home.updateMenu}
                 </Button>
               </Link>
               <Link href="/dashboard/qr-codes">
                 <Button variant="outline" className="w-full justify-start text-sm h-9">
-                  <QrCode className="mr-2.5 w-4 h-4 text-gray-400" /> Generate QR Codes
+                  <QrCode className="mr-2.5 w-4 h-4 text-gray-400" /> {t.dashboard.home.generateQr}
                 </Button>
               </Link>
               <Link href="/dashboard/marketing">
                 <Button variant="outline" className="w-full justify-start text-sm h-9">
-                  <Award className="mr-2.5 w-4 h-4 text-gray-400" /> Create Campaign
+                  <Award className="mr-2.5 w-4 h-4 text-gray-400" /> {t.dashboard.home.createCampaign}
                 </Button>
               </Link>
               <Link href="/dashboard/customers">
                 <Button variant="outline" className="w-full justify-start text-sm h-9">
-                  <Users className="mr-2.5 w-4 h-4 text-gray-400" /> View Customers
+                  <Users className="mr-2.5 w-4 h-4 text-gray-400" /> {t.dashboard.home.viewCustomers}
                 </Button>
               </Link>
             </div>
@@ -275,13 +259,13 @@ export default function DashboardPage() {
             <Separator className="my-4 bg-gray-100 dark:bg-gray-800/50" />
 
             <div>
-              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Today&apos;s Summary</h4>
+              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">{t.dashboard.home.todaysSummary}</h4>
               <div className="space-y-2.5">
                 {[
-                  ['Open Orders', '12'],
-                  ['Completed', '89'],
-                  ['New Customers', '24'],
-                  ['Avg Prep Time', '8 min'],
+                  [t.dashboard.home.openOrders, '12'],
+                  [t.dashboard.home.completed, '89'],
+                  [t.dashboard.home.newCustomers, '24'],
+                  [t.dashboard.home.avgPrepTime, '8 min'],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">{label}</span>

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Business = void 0;
+exports.Business = exports.SubscriptionStatus = void 0;
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("./base.entity");
 const tenant_entity_1 = require("./tenant.entity");
@@ -20,6 +20,14 @@ const order_entity_1 = require("./order.entity");
 const customer_entity_1 = require("./customer.entity");
 const loyalty_program_entity_1 = require("./loyalty-program.entity");
 const qr_code_entity_1 = require("./qr-code.entity");
+var SubscriptionStatus;
+(function (SubscriptionStatus) {
+    SubscriptionStatus["TRIAL"] = "trial";
+    SubscriptionStatus["ACTIVE"] = "active";
+    SubscriptionStatus["PAST_DUE"] = "past_due";
+    SubscriptionStatus["CANCELED"] = "canceled";
+    SubscriptionStatus["INACTIVE"] = "inactive";
+})(SubscriptionStatus || (exports.SubscriptionStatus = SubscriptionStatus = {}));
 let Business = class Business extends base_entity_1.BaseEntity {
 };
 exports.Business = Business;
@@ -63,6 +71,26 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
 ], Business.prototype, "tenantId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'enum', enum: SubscriptionStatus, default: SubscriptionStatus.TRIAL }),
+    __metadata("design:type", String)
+], Business.prototype, "subscriptionStatus", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Business.prototype, "trialEndsAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Business.prototype, "currentPeriodEnd", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Business.prototype, "stripeCustomerId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Business.prototype, "stripeSubscriptionId", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => tenant_entity_1.Tenant, (tenant) => tenant.businesses),
     __metadata("design:type", tenant_entity_1.Tenant)

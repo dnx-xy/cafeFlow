@@ -20,7 +20,9 @@ import {
 import { cn } from '@/lib/utils';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { LanguageSwitcherCompact } from '@/components/marketing/LanguageSwitcherCompact';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/i18n/context';
 import { toast } from 'sonner';
 import { authService } from '@/services/authService';
 import { tenantsService, Tenant } from '@/services/tenantsService';
@@ -45,30 +47,33 @@ import {
   Globe,
   Database,
   Grid,
+  MessageSquare,
 } from 'lucide-react';
 
 const sidebarItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/dashboard/menu', label: 'Menu', icon: UtensilsCrossed },
-  { href: '/dashboard/customers', label: 'Customers', icon: Users },
-  { href: '/dashboard/loyalty', label: 'Loyalty', icon: Award },
-  { href: '/dashboard/reviews', label: 'Reviews', icon: Star },
-  { href: '/dashboard/tables', label: 'Tables', icon: QrCode },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/dashboard/marketing', label: 'Marketing', icon: Megaphone },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard', labelKey: 'dashboard' as const, icon: LayoutDashboard },
+  { href: '/dashboard/orders', labelKey: 'orders' as const, icon: ShoppingCart },
+  { href: '/dashboard/menu', labelKey: 'menu' as const, icon: UtensilsCrossed },
+  { href: '/dashboard/customers', labelKey: 'customers' as const, icon: Users },
+  { href: '/dashboard/loyalty', labelKey: 'loyalty' as const, icon: Award },
+  { href: '/dashboard/reviews', labelKey: 'reviews' as const, icon: Star },
+  { href: '/dashboard/tables', labelKey: 'tables' as const, icon: QrCode },
+  { href: '/dashboard/analytics', labelKey: 'analytics' as const, icon: BarChart3 },
+  { href: '/dashboard/marketing', labelKey: 'marketing' as const, icon: Megaphone },
+  { href: '/dashboard/messages', labelKey: 'messages' as const, icon: MessageSquare },
+  { href: '/dashboard/settings', labelKey: 'settings' as const, icon: Settings },
 ];
 
 const bottomItems = [
-  { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
-  { href: '/dashboard/team', label: 'Team', icon: UserCircle },
+  { href: '/dashboard/billing', labelKey: 'billing' as const, icon: CreditCard },
+  { href: '/dashboard/team', labelKey: 'team' as const, icon: UserCircle },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { t, lang, setLang } = useI18n();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
   const [tenantsLoading, setTenantsLoading] = useState(false);
@@ -77,11 +82,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
 
   const getPageTitle = () => {
-    const path = pathname.split('/').pop() || 'Dashboard';
-    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+    const path = pathname.split('/').pop() || 'dashboard';
+    const key = path.replace(/-/g, '') as keyof typeof t.dashboard.nav;
+    return t.dashboard.nav[key] || path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
   };
 
-  // Determine if user is Super Admin
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   // Fetch tenants for Super Admin
@@ -200,7 +205,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     )}
                   >
                     <item.icon className={cn('w-4.5 h-4.5 shrink-0', active && 'text-amber-600 dark:text-amber-400')} />
-                    <span>{item.label}</span>
+                    <span>{t.dashboard.nav[item.labelKey]}</span>
                   </Link>
                 );
               })}
@@ -221,7 +226,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     )}
                   >
                     <Database className="w-4.5 h-4.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                    <span>Tenants</span>
+                    <span>{t.dashboard.nav.tenants}</span>
                   </Link>
                 </nav>
               </>
@@ -245,7 +250,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     )}
                   >
                     <item.icon className={cn('w-4.5 h-4.5 shrink-0', active && 'text-amber-600 dark:text-amber-400')} />
-                    <span>{item.label}</span>
+                    <span>{t.dashboard.nav[item.labelKey]}</span>
                   </Link>
                 );
               })}
@@ -272,19 +277,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem>
-                  <UserCircle className="mr-2 w-4 h-4" /> Profile
+                  <UserCircle className="mr-2 w-4 h-4" /> {t.dashboard.header.profile}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Settings className="mr-2 w-4 h-4" /> Settings
+                  <Settings className="mr-2 w-4 h-4" /> {t.dashboard.header.settings}
                 </DropdownMenuItem>
                 {isSuperAdmin && (
                   <DropdownMenuItem>
-                    <Globe className="mr-2 w-4 h-4" /> Manage Tenants
+                    <Globe className="mr-2 w-4 h-4" /> {t.dashboard.header.manageTenants}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600 dark:text-red-400" onClick={logout}>
-                  <LogOut className="mr-2 w-4 h-4" /> Log out
+                  <LogOut className="mr-2 w-4 h-4" /> {t.dashboard.header.logOut}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -309,8 +314,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       disabled={tenantsLoading}
                     >
                       <SelectTrigger className="h-8 w-48 text-xs border-gray-200 dark:border-gray-700 bg-white dark:bg-[#16181f]">
-                        <SelectValue placeholder={tenantsLoading ? "Loading tenants..." : "Select Tenant"}>
-                          {currentTenant?.name || tenants.find(t => t.id === user?.tenantId)?.name || "Select Tenant"}
+                        <SelectValue placeholder={tenantsLoading ? t.dashboard.header.loadingTenants : t.dashboard.header.selectTenant}>
+                          {currentTenant?.name || tenants.find(t => t.id === user?.tenantId)?.name || t.dashboard.header.selectTenant}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
@@ -331,7 +336,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       }}
                       disabled={tenantsLoading}
                     >
-                      Refresh Data
+                      {t.dashboard.header.refreshData}
                     </Button>
                   </div>
                 )}
@@ -342,6 +347,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Badge variant="outline" className="text-[11px] font-medium text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hidden sm:inline-flex">
                   {isSuperAdmin ? 'Super Admin' : 'Pro Plan'}
                 </Badge>
+                <LanguageSwitcherCompact />
               </div>
             </div>
           </header>

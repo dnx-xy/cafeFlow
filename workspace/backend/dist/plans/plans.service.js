@@ -33,8 +33,19 @@ let PlansService = class PlansService {
     async getPlan(businessId) {
         const business = await this.businessesRepository.findOne({
             where: { id: businessId },
-            select: { plan: true },
+            select: { plan: true, subscriptionStatus: true, trialEndsAt: true },
         });
+        if (!business)
+            return plan_config_1.Plan.FREE;
+        const status = business.subscriptionStatus;
+        const now = new Date();
+        const trialEnd = business.trialEndsAt;
+        if (status === 'inactive' || status === 'canceled')
+            return plan_config_1.Plan.FREE;
+        if (status === 'trial' && trialEnd && trialEnd < now)
+            return plan_config_1.Plan.FREE;
+        if (status === 'past_due')
+            return plan_config_1.Plan.FREE;
         return business?.plan || plan_config_1.Plan.FREE;
     }
     async getLimits(businessId) {

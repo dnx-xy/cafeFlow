@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -12,6 +12,7 @@ import { User } from '../entities/user.entity';
 import { Tenant } from '../entities/tenant.entity';
 import { Business } from '../entities/business.entity';
 import { Outlet } from '../entities/outlet.entity';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Outlet } from '../entities/outlet.entity';
       signOptions: { expiresIn: '1h' },
     }),
     TypeOrmModule.forFeature([User, Tenant, Business, Outlet]),
+    forwardRef(() => PaymentsModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, LocalStrategy, {
