@@ -477,6 +477,7 @@ const id: Translations = {
   dashboard: {
     nav: {
       dashboard: 'Dasbor',
+      kiosk: 'Kios',
       orders: 'Pesanan',
       menu: 'Menu',
       customers: 'Pelanggan',

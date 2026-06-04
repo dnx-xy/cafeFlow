@@ -56,6 +56,7 @@ import {
 
 const sidebarItems = [
   { href: '/dashboard', labelKey: 'dashboard' as const, icon: LayoutDashboard },
+  { href: '/dashboard/kiosk', labelKey: 'kiosk' as const, icon: Grid },
   { href: '/dashboard/orders', labelKey: 'orders' as const, icon: ShoppingCart },
   { href: '/dashboard/menu', labelKey: 'menu' as const, icon: UtensilsCrossed },
   { href: '/dashboard/customers', labelKey: 'customers' as const, icon: Users },

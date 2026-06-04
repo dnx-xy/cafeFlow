@@ -475,6 +475,7 @@ const en = {
   dashboard: {
     nav: {
       dashboard: 'Dashboard',
+      kiosk: 'Kiosk',
       orders: 'Orders',
       menu: 'Menu',
       customers: 'Customers',
