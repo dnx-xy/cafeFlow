@@ -15,6 +15,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { IntegrationModule } from '../integration/integration.module';
 import { QrCodesModule } from '../qr-codes/qr-codes.module';
+import { WhatsAppModule } from '../whatsapp/whatsapp.module';
 import { PublicModule } from '../public/public.module';
 import { PlansModule } from '../plans/plans.module';
 import { Business } from '../entities/business.entity';
@@ -44,6 +45,7 @@ import { PointTransaction } from '../entities/point-transaction.entity';
 import { Promotion } from '../entities/promotion.entity';
 import { PromotionItem } from '../entities/promotion-item.entity';
 import { QrCode } from '../entities/qr-code.entity';
+import { WhatsAppMessage } from '../entities/whatsapp-message.entity';
 import { Staff } from '../entities/staff.entity';
 import { Table } from '../entities/table.entity';
 import { Tenant } from '../entities/tenant.entity';
@@ -69,7 +71,7 @@ import { User } from '../entities/user.entity';
         OrderNote, OrderStatusUpdate,
         Outlet, PointTransaction,
         Promotion, PromotionItem,
-        QrCode, Staff, Table, Tenant, User,
+        QrCode, Staff, Table, Tenant, User, WhatsAppMessage,
       ],
       synchronize: true,
     }),
@@ -87,6 +89,7 @@ import { User } from '../entities/user.entity';
     NotificationsModule,
     PaymentsModule,
     IntegrationModule,
+    WhatsAppModule,
     QrCodesModule,
     PublicModule,
     PlansModule,

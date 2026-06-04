@@ -31,16 +31,16 @@ command -v npm &>/dev/null || { error "npm not found"; exit 1; }
 docker info &>/dev/null || { error "Docker not running"; exit 1; }
 
 # Start Docker services (db + redis only)
-log "Starting database and redis..."
+log "Starting database, redis, and WhatsApp gateway..."
 cd "$WORKSPACE_DIR"
-docker compose up -d db redis
+docker compose up -d db redis wa-gateway
 log "Waiting for services..."
 sleep 5
 
 # Start backend locally
 log "Starting backend (port 3001)..."
 cd "$WORKSPACE_DIR/backend"
-npm run start:dev &
+WHATSAPP_GATEWAY_URL=http://localhost:3002 npm run start:dev &
 BACKEND_PID=$!
 sleep 8
 
@@ -60,6 +60,7 @@ echo "  Backend:  http://localhost:3001"
 echo "  Frontend: http://localhost:3000"
 echo "  DB:       localhost:5432"
 echo "  Redis:    localhost:6379"
+echo "  WhatsApp: http://localhost:3002 (wa-gateway)"
 echo "==========================================="
 echo "  Press Ctrl+C to stop"
 echo ""

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { NotificationGateway } from './notification.gateway';
+import { WhatsAppService } from './whatsapp.service';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
+  providers: [NotificationGateway, WhatsAppService],
+  exports: [NotificationGateway, WhatsAppService],
 })
 export class NotificationsModule {}

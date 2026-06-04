@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Save, Store, Clock, Bell, Loader2, Image, Trash2 } from 'lucide-react';
+import { Save, Store, Clock, Bell, Loader2, Image, Trash2, Phone } from 'lucide-react';
 import { CURRENCIES, getCurrencyInfo } from '@/lib/currency';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { toast } from 'sonner';
@@ -35,13 +35,13 @@ export default function SettingsPage() {
   const { business, loading, fetchBusiness, updateBusiness } = useBusiness();
   const { setCurrency } = useCurrency();
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', address: '', city: '', logoUrl: '', currency: 'USD' });
+  const [form, setForm] = useState({ name: '', description: '', address: '', city: '', logoUrl: '', currency: 'USD', whatsappNumber: '' });
   const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => { if (user?.businessId) fetchBusiness(user.businessId); }, [user?.businessId]);
   useEffect(() => {
     if (business) {
-      setForm({ name: business.name || '', description: business.description || '', address: business.address || '', city: business.city || '', logoUrl: business.logoUrl || '', currency: business.currency || 'USD' });
+      setForm({ name: business.name || '', description: business.description || '', address: business.address || '', city: business.city || '', logoUrl: business.logoUrl || '', currency: business.currency || 'USD', whatsappNumber: business.whatsappNumber || '' });
     }
   }, [business]);
 
@@ -112,6 +112,14 @@ export default function SettingsPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">No. WhatsApp Notifikasi</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input value={form.whatsappNumber} onChange={e => setForm(p => ({ ...p, whatsappNumber: e.target.value }))} placeholder="+6281234567890" className="h-9 text-sm pl-9" />
+                    </div>
+                    <p className="text-[10px] text-gray-400">Pesan masuk pelanggan & notifikasi akan dikirim ke nomor ini</p>
                   </div>
                   <div className="space-y-2 md:col-span-2"><Label className="text-xs">{t.dashboard.settings.general.logoUrl}</Label><Input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder={t.dashboard.settings.general.logoUrlPlaceholder} className="h-9 text-sm" /></div>
                 </div>

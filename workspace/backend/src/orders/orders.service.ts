@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Order } from '../entities/order.entity';
@@ -6,6 +6,9 @@ import { OrderStatus } from '../entities/enums';
 import { OrderItem } from '../entities/order-item.entity';
 import { Customer } from '../entities/customer.entity';
 import { Table } from '../entities/table.entity';
+import { Business } from '../entities/business.entity';
+import { NotificationGateway } from '../notifications/notification.gateway';
+import { WhatsAppService } from '../notifications/whatsapp.service';
 
 @Injectable()
 export class OrdersService {
@@ -18,6 +21,10 @@ export class OrdersService {
     private customersRepository: Repository<Customer>,
     @InjectRepository(Table)
     private tablesRepository: Repository<Table>,
+    @InjectRepository(Business)
+    private businessesRepository: Repository<Business>,
+    private notificationGateway: NotificationGateway,
+    private whatsAppService: WhatsAppService,
   ) {}
 
   async create(orderData: Partial<Order>, tenantId: string): Promise<Order> {
@@ -26,7 +33,36 @@ export class OrdersService {
       tenantId,
       orderId: `ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
     });
-    return await this.ordersRepository.save(order);
+    const saved = await this.ordersRepository.save(order);
+
+    const businessId = orderData.businessId || '';
+    if (businessId) {
+      const business = await this.businessesRepository.findOne({ where: { id: businessId } });
+
+      this.notificationGateway.emitNewOrder(businessId, {
+        id: saved.id,
+        orderId: saved.orderId,
+        tableNumber: saved.tableId,
+        status: saved.status,
+        totalAmount: saved.totalAmount,
+        customer: saved.customerId,
+        createdAt: saved.createdAt.toISOString(),
+      });
+
+      if (business?.whatsappNumber) {
+        const session = `business-${businessId}`;
+        this.whatsAppService.sendOrderNotification(
+          business.whatsappNumber,
+          saved.orderId,
+          saved.tableId,
+          [],
+          saved.totalAmount,
+          session,
+        );
+      }
+    }
+
+    return saved;
   }
 
   async findAll(
@@ -77,7 +113,19 @@ export class OrdersService {
       { id, tenantId },
       { status },
     );
-    return await this.findOne(id, tenantId);
+    const updated = await this.findOne(id, tenantId);
+    if (updated?.businessId) {
+      this.notificationGateway.emitNewOrder(updated.businessId, {
+        id: updated.id,
+        orderId: updated.orderId,
+        tableNumber: updated.tableId,
+        status: updated.status,
+        totalAmount: updated.totalAmount,
+        customer: updated.customerId,
+        createdAt: updated.createdAt.toISOString(),
+      });
+    }
+    return updated;
   }
 
   async update(id: string, updateOrderDto: Partial<Order>, tenantId: string): Promise<Order> {
@@ -85,7 +133,28 @@ export class OrdersService {
       { id, tenantId },
       updateOrderDto,
     );
-    return await this.findOne(id, tenantId);
+    const updated = await this.findOne(id, tenantId);
+
+    if (updated?.businessId && updateOrderDto.paymentStatus) {
+      const business = await this.businessesRepository.findOne({ where: { id: updated.businessId } });
+      this.notificationGateway.emitPaymentUpdate(updated.businessId, {
+        orderId: updated.orderId,
+        paymentStatus: updateOrderDto.paymentStatus,
+        totalAmount: updated.totalAmount,
+        updatedAt: new Date().toISOString(),
+      });
+      if (business?.whatsappNumber) {
+        const session = `business-${updated.businessId}`;
+        this.whatsAppService.sendPaymentNotification(
+          business.whatsappNumber,
+          updated.orderId,
+          updated.totalAmount,
+          updateOrderDto.paymentStatus,
+          session,
+        );
+      }
+    }
+    return updated;
   }
 
   async remove(id: string, tenantId: string): Promise<void> {

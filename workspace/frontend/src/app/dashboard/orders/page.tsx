@@ -151,51 +151,89 @@ export default function OrdersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map(order => (
-                      <tr key={order.id} className="border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                        <td className="py-3.5">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.orderId}</span>
-                        </td>
-                        <td className="py-3.5">
-                          <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center"><MapPin className="w-3 h-3 mr-1 text-gray-400" />{order.tableNumber || 'N/A'}</span>
-                        </td>
-                        <td className="py-3.5">
-                          <p className="text-sm text-gray-700 dark:text-gray-300">{order.customer || 'N/A'}</p>
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.totalAmount, currency)}</span>
-                        </td>
-                        <td className="py-3.5 text-center">
-                          <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[order.status] || ''}`}>
-                            {order.status.toLowerCase()}
-                          </Badge>
-                        </td>
-                        <td className="py-3.5 text-center">
-                          <span className={`text-[11px] font-medium ${order.paymentStatus === 'PAID' ? 'text-green-600 dark:text-green-400' : order.paymentStatus === 'PENDING' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {order.paymentStatus}
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="w-7 h-7">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44">
-                              <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order.id}`)}><Eye className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.viewDetails}</DropdownMenuItem>
-                              {order.status === 'PENDING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'CONFIRMED')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.confirm}</DropdownMenuItem>}
-                              {order.status === 'CONFIRMED' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'PREPARING')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markPreparing}</DropdownMenuItem>}
-                              {order.status === 'PREPARING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'READY')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markReady}</DropdownMenuItem>}
-                              {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
-                                <DropdownMenuItem className="text-red-600" onClick={() => handleStatus(order.id, 'CANCELLED')}><X className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.cancel}</DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onClick={() => window.print()}><Printer className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.printReceipt}</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
-                      </tr>
-                    ))}
+                    {(() => {
+                      const grouped: Record<string, typeof filtered> = {};
+                      const standalone: typeof filtered = [];
+                      for (const o of filtered) {
+                        if (o.tableNumber) {
+                          if (!grouped[o.tableNumber]) grouped[o.tableNumber] = [];
+                          grouped[o.tableNumber].push(o);
+                        } else {
+                          standalone.push(o);
+                        }
+                      }
+                      const groupKeys = Object.keys(grouped).sort();
+                      const rows: JSX.Element[] = [];
+                      for (const tableNum of groupKeys) {
+                        const group = grouped[tableNum];
+                        rows.push(
+                          <tr key={`group-${tableNum}`} className="bg-gray-50/50 dark:bg-gray-800/20">
+                            <td colSpan={7} className="py-2 px-3">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Meja {tableNum}</span>
+                                <span className="text-[10px] text-gray-400">({group.length} pesanan)</span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                        for (const order of group) {
+                          rows.push(orderRow(order));
+                        }
+                      }
+                      for (const order of standalone) {
+                        rows.push(orderRow(order));
+                      }
+                      return rows;
+
+                      function orderRow(order: typeof filtered[number]) {
+                        return (
+                          <tr key={order.id} className="border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                            <td className="py-3.5">
+                              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.orderId}</span>
+                            </td>
+                            <td className="py-3.5">
+                              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center"><MapPin className="w-3 h-3 mr-1 text-gray-400" />{order.tableNumber || 'N/A'}</span>
+                            </td>
+                            <td className="py-3.5">
+                              <p className="text-sm text-gray-700 dark:text-gray-300">{order.customer || 'N/A'}</p>
+                            </td>
+                            <td className="py-3.5 text-right">
+                              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.totalAmount, currency)}</span>
+                            </td>
+                            <td className="py-3.5 text-center">
+                              <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[order.status] || ''}`}>
+                                {order.status.toLowerCase()}
+                              </Badge>
+                            </td>
+                            <td className="py-3.5 text-center">
+                              <span className={`text-[11px] font-medium ${order.paymentStatus === 'PAID' ? 'text-green-600 dark:text-green-400' : order.paymentStatus === 'PENDING' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+                                {order.paymentStatus}
+                              </span>
+                            </td>
+                            <td className="py-3.5 text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="w-7 h-7">
+                                    <MoreHorizontal className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44">
+                                  <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order.id}`)}><Eye className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.viewDetails}</DropdownMenuItem>
+                                  {order.status === 'PENDING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'CONFIRMED')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.confirm}</DropdownMenuItem>}
+                                  {order.status === 'CONFIRMED' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'PREPARING')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markPreparing}</DropdownMenuItem>}
+                                  {order.status === 'PREPARING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'READY')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markReady}</DropdownMenuItem>}
+                                  {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
+                                    <DropdownMenuItem className="text-red-600" onClick={() => handleStatus(order.id, 'CANCELLED')}><X className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.cancel}</DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem onClick={() => window.print()}><Printer className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.printReceipt}</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        );
+                      }
+                    })()}
                   </tbody>
                 </table>
               </div>

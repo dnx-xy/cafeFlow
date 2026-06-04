@@ -64,6 +64,9 @@ export class Business extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   stripeSubscriptionId: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  whatsappNumber: string;
+
   @ManyToOne(() => Tenant, (tenant) => tenant.businesses)
   tenant: Tenant;
 

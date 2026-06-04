@@ -20,10 +20,12 @@ services:
     depends_on:
       - db
       - redis
+      - wa-gateway
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/cafe_flow_dev
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=super_secret_jwt_key_for_dev
+      - WHATSAPP_GATEWAY_URL=http://wa-gateway:3002
     ports:
       - "3001:3001"
     volumes:
@@ -42,5 +44,20 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
+  wa-gateway:
+    build: ./wa-gateway
+    container_name: cafe-flow-wa-gateway
+    restart: unless-stopped
+    environment:
+      - PORT=3002
+      - SESSIONS_DIR=/app/sessions
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - wa_sessions:/app/sessions
+    ports:
+      - "3002:3002"
+
 volumes:
   postgres_data:
+  wa_sessions:

@@ -12,6 +12,7 @@ export interface Business {
   city?: string;
   countryCode?: string;
   currency?: string;
+  whatsappNumber?: string;
   ownerId: string;
   tenantId: string;
 }

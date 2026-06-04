@@ -19,9 +19,13 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from '@/components/ui/popover';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { LanguageSwitcherCompact } from '@/components/marketing/LanguageSwitcherCompact';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useI18n } from '@/i18n/context';
 import { toast } from 'sonner';
 import { authService } from '@/services/authService';
@@ -88,6 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const { notifications, unreadCount, markAllRead, clearAll } = useNotifications(user?.businessId);
 
   // Fetch tenants for Super Admin
   useEffect(() => {
@@ -340,10 +345,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </Button>
                   </div>
                 )}
-                <button className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
-                  <Bell className="w-4.5 h-4.5 text-gray-500 dark:text-gray-400" />
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#0f1117]" />
-                </button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
+                      <Bell className="w-4.5 h-4.5 text-gray-500 dark:text-gray-400" />
+                      {unreadCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white dark:ring-[#0f1117] px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-80 p-0" sideOffset={8}>
+                    <div className="p-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">Notifikasi</p>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button onClick={markAllRead} className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium">
+                            Tandai dibaca
+                          </button>
+                        )}
+                        {notifications.length > 0 && (
+                          <button onClick={clearAll} className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            Hapus semua
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="max-h-[60vh] overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="py-8 text-center text-xs text-gray-400 dark:text-gray-500">Belum ada notifikasi</div>
+                      ) : (
+                        notifications.map(n => (
+                          <Link
+                            key={n.id}
+                            href={n.link || '#'}
+                            className={`flex items-start gap-3 p-3 border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors ${n.read ? '' : 'bg-amber-50/30 dark:bg-amber-500/5'}`}
+                          >
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${n.type === 'order' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : n.type === 'payment' ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400'}`}>
+                              {n.type === 'order' ? <ShoppingCart className="w-3.5 h-3.5" /> : n.type === 'payment' ? <CreditCard className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{n.title}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{n.message}</p>
+                              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                                {new Date(n.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <Badge variant="outline" className="text-[11px] font-medium text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hidden sm:inline-flex">
                   {isSuperAdmin ? 'Super Admin' : 'Pro Plan'}
                 </Badge>
