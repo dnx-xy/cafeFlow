@@ -1,326 +1,305 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  QrCode, Users, Star, TrendingUp, Coffee, Smartphone, Award,
-  BarChart3, ArrowRight, Check, ShoppingCart, MessageCircle, Target,
-  Zap, Palette, Globe, Sparkles,
+  QrCode, Users, Star, TrendingUp, Coffee, Smartphone,
+  ArrowRight, Check, Zap, Globe, Sparkles, LayoutDashboard, Search
 } from 'lucide-react';
 import Navbar from '@/components/marketing/Navbar';
 import Footer from '@/components/marketing/Footer';
 import { FaqAccordion } from '@/components/landing/FaqAccordion';
-import en from '@/i18n/en';
-
-const d = en.home;
-
-const problemIcons = [Users, Smartphone, Star, Coffee, BarChart3, Target];
-const problemColors = ['text-rose-500', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-violet-500', 'text-teal-500'];
-const problemBg = ['bg-rose-50', 'bg-orange-50', 'bg-amber-50', 'bg-blue-50', 'bg-violet-50', 'bg-teal-50'];
-
-const flowIcons = [QrCode, Smartphone, ShoppingCart, Star, Award];
-const flowColors = ['from-blue-500 to-blue-600', 'from-amber-500 to-amber-600', 'from-emerald-500 to-emerald-600', 'from-violet-500 to-violet-600', 'from-rose-500 to-rose-600'];
-
-const featureIcons = [Smartphone, QrCode, Users, Star, Award, TrendingUp, Zap, Palette, Globe];
-const featureColors = [
-  'bg-blue-100 text-blue-600', 'bg-amber-100 text-amber-600', 'bg-emerald-100 text-emerald-600',
-  'bg-violet-100 text-violet-600', 'bg-rose-100 text-rose-600', 'bg-indigo-100 text-indigo-600',
-  'bg-green-100 text-green-600', 'bg-pink-100 text-pink-600', 'bg-cyan-100 text-cyan-600',
-];
-
-const statsIcons = [QrCode, ShoppingCart, TrendingUp, Users];
-const statsColors = ['bg-emerald-100 text-emerald-600', 'bg-blue-100 text-blue-600', 'bg-amber-100 text-amber-600', 'bg-violet-100 text-violet-600'];
+import { useI18n } from '@/i18n/context';
 
 export default function LandingPage() {
+  const d = useI18n().t.home;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-amber-500/30">
       <Navbar />
 
       {/* ───── HERO ───── */}
-      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(var(--accent)/0.06),_transparent_50%)]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Modern ambient glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-30 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 blur-[100px] rounded-full mix-blend-multiply dark:mix-blend-soft-light" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <div>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-medium rounded-full">
-                <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+              <Badge variant="outline" className="mb-8 px-4 py-2 text-sm font-medium rounded-full bg-background/50 backdrop-blur-md border-amber-500/20 text-amber-700 dark:text-amber-400">
+                <Sparkles className="w-4 h-4 mr-2 inline-block text-amber-500" />
                 {d.hero.badge}
               </Badge>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-foreground mb-6 leading-[1.05]">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-foreground mb-8 leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 ease-out">
               {d.hero.title}{' '}
-              <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 bg-clip-text text-transparent">
+              <span className="block mt-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent pb-2">
                 {d.hero.titleHighlight}
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 ease-out">
               {d.hero.subtitle}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 ease-out">
               <Link href="/register">
-                <Button size="lg" className="text-base px-8 h-12 shadow-lg shadow-amber-500/20">
+                <Button size="lg" className="text-base px-8 h-14 rounded-full shadow-xl shadow-amber-500/20 hover:scale-105 transition-transform bg-foreground text-background hover:bg-foreground/90">
                   {d.hero.startFree}
-                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
               <Link href="/demo">
-                <Button size="lg" variant="outline" className="text-base px-8 h-12">
+                <Button size="lg" variant="outline" className="text-base px-8 h-14 rounded-full bg-background/50 backdrop-blur-md hover:bg-muted">
                   {d.hero.watchDemo}
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
             </div>
-
-            <p className="mt-4 text-xs text-muted-foreground">
+            
+            <p className="mt-6 text-sm text-muted-foreground font-medium animate-in fade-in duration-700 delay-500">
               {d.hero.noCard}
             </p>
+          </div>
+        </div>
 
-            <div className="mt-16 relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/5 to-transparent z-10 pointer-events-none" />
-                <div className="p-6 sm:p-8 bg-gradient-to-br from-muted/30 to-muted/10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                      { label: d.hero.stats.scans, value: '247', change: '+23%' },
-                      { label: d.hero.stats.orders, value: '89', change: '+18%' },
-                      { label: d.hero.stats.revenue, value: '$2,847', change: '+18%' },
-                      { label: d.hero.stats.returning, value: '42%', change: '+8%' },
-                    ].map((stat, i) => (
-                      <Card key={i} className="bg-background/80 backdrop-blur-sm border-0 shadow-sm">
-                        <CardContent className="p-4 sm:p-5">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-medium text-muted-foreground">{stat.label}</span>
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${statsColors[i]}`}>
-                              {(() => { const Icon = statsIcons[i]; return <Icon className="w-4.5 h-4.5" />; })()}
-                            </div>
-                          </div>
-                          <div className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
-                          <div className="mt-1.5 flex items-center gap-1 text-xs font-medium text-emerald-600">
-                            <TrendingUp className="w-3 h-3" />
-                            {stat.change}
-                            <span className="text-muted-foreground font-normal ml-0.5">{d.hero.stats.vsYesterday}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                  <div className="mt-4 h-8 flex items-end gap-1 px-1">
-                    {[35, 55, 40, 70, 60, 80, 45, 65, 90, 75, 50, 85].map((h, i) => (
-                      <div key={i} className="flex-1 bg-gradient-to-t from-amber-500/40 to-amber-400/20 rounded-t-sm" style={{ height: `${h}%` }} />
-                    ))}
-                  </div>
-                </div>
+        {/* Dashboard Preview Mockup */}
+        <div className="mt-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative animate-in fade-in slide-in-from-bottom-24 duration-1000 delay-500">
+           <div className="rounded-2xl border border-border/50 bg-background/40 backdrop-blur-xl shadow-2xl p-2 sm:p-4 relative">
+             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80 rounded-2xl pointer-events-none" />
+             <div className="rounded-xl overflow-hidden border border-border bg-card shadow-inner">
+               {/* Mockup Header */}
+               <div className="h-12 border-b border-border bg-muted/30 flex items-center px-4 gap-2">
+                 <div className="flex gap-1.5">
+                   <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                   <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                   <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                 </div>
+                 <div className="ml-4 w-64 h-6 rounded-md bg-background border border-border/50 flex items-center px-2">
+                    <Search className="w-3 h-3 text-muted-foreground" />
+                 </div>
+               </div>
+               {/* Mockup Body */}
+               <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                 <div className="md:col-span-3 space-y-6">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { l: d.hero.stats.orders, v: '124', c: '+12%' },
+                        { l: d.hero.stats.revenue, v: '$3,240', c: '+24%' },
+                        { l: d.hero.stats.returning, v: '48%', c: '+5%' }
+                      ].map((s, i) => (
+                        <div key={i} className="p-4 rounded-lg border border-border bg-background">
+                          <div className="text-sm text-muted-foreground mb-2">{s.l}</div>
+                          <div className="text-2xl font-bold">{s.v}</div>
+                          <div className="text-xs text-emerald-500 font-medium mt-1">{s.c} {d.hero.stats.vsYesterday}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="h-48 rounded-lg border border-border bg-background flex items-end p-4 gap-2">
+                      {[40, 60, 45, 80, 55, 90, 75, 100, 85, 65].map((h, i) => (
+                        <div key={i} className="flex-1 bg-amber-500/20 hover:bg-amber-500/40 transition-colors rounded-t-sm relative group" style={{ height: `${h}%` }}>
+                           <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                             ${h * 10}
+                           </div>
+                        </div>
+                      ))}
+                    </div>
+                 </div>
+                 <div className="space-y-4">
+                   <div className="p-4 rounded-lg border border-border bg-background h-full">
+                     <div className="text-sm font-semibold mb-4">Live Activity</div>
+                     <div className="space-y-4">
+                       {[1, 2, 3, 4].map((_, i) => (
+                         <div key={i} className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                             <Coffee className="w-4 h-4 text-muted-foreground" />
+                           </div>
+                           <div className="flex-1">
+                             <div className="w-3/4 h-3 rounded bg-muted mb-1.5" />
+                             <div className="w-1/2 h-2 rounded bg-muted/60" />
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+        </div>
+      </section>
+
+      {/* ───── LOGOS / SOCIAL PROOF ───── */}
+      <section className="py-12 border-y border-border/50 bg-muted/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm font-semibold text-muted-foreground tracking-wider uppercase mb-8">{d.social.subtitle}</p>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+             {/* Simulated Logos */}
+             <div className="flex items-center gap-2 text-xl font-bold"><Coffee className="w-6 h-6"/> Bean & Bloom</div>
+             <div className="flex items-center gap-2 text-xl font-bold font-serif italic">The Daily Grind</div>
+             <div className="flex items-center gap-2 text-xl font-black tracking-tighter">ROAST<span className="text-amber-500">CO</span></div>
+             <div className="flex items-center gap-2 text-xl font-medium tracking-widest uppercase">Artisan</div>
+             <div className="flex items-center gap-2 text-xl font-bold"><Zap className="w-6 h-6"/> QuickBite</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───── BENTO FEATURES ───── */}
+      <section className="py-32 bg-background relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">{d.features.title}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{d.features.subtitle}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Bento Item 1: Large */}
+            <div className="md:col-span-2 group rounded-3xl p-8 bg-gradient-to-br from-muted/50 to-muted border border-border/50 relative overflow-hidden transition-all hover:border-amber-500/30">
+              <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity">
+                <QrCode className="w-32 h-32" />
               </div>
+              <div className="relative z-10 h-full flex flex-col justify-end min-h-[300px]">
+                <div className="w-12 h-12 bg-foreground text-background rounded-xl flex items-center justify-center mb-6">
+                  <Smartphone className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">{d.features.items[0].title}</h3>
+                <p className="text-muted-foreground text-lg max-w-md">{d.features.items[0].desc}</p>
+              </div>
+            </div>
+
+            {/* Bento Item 2 */}
+            <div className="group rounded-3xl p-8 bg-card border border-border/50 transition-all hover:border-amber-500/30">
+               <div className="w-12 h-12 bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 rounded-xl flex items-center justify-center mb-6">
+                  <LayoutDashboard className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">{d.features.items[1].title}</h3>
+                <p className="text-muted-foreground">{d.features.items[1].desc}</p>
+            </div>
+
+            {/* Bento Item 3 */}
+            <div className="group rounded-3xl p-8 bg-card border border-border/50 transition-all hover:border-amber-500/30">
+               <div className="w-12 h-12 bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-6">
+                  <Users className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">{d.features.items[2].title}</h3>
+                <p className="text-muted-foreground">{d.features.items[2].desc}</p>
+            </div>
+
+            {/* Bento Item 4: Large */}
+            <div className="md:col-span-2 group rounded-3xl p-8 bg-gradient-to-br from-amber-500/5 to-orange-500/10 border border-border/50 transition-all hover:border-amber-500/50">
+               <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl flex items-center justify-center mb-6">
+                  <Star className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">{d.features.items[3].title}</h3>
+                <p className="text-muted-foreground text-lg max-w-md">{d.features.items[3].desc}</p>
+            </div>
+            
+            {/* Bento Item 5 & 6 */}
+            <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+               <div className="rounded-3xl p-8 bg-card border border-border/50 flex items-start gap-6">
+                 <div className="w-12 h-12 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-6 h-6" />
+                 </div>
+                 <div>
+                    <h3 className="text-xl font-bold mb-2">{d.features.items[5].title}</h3>
+                    <p className="text-muted-foreground">{d.features.items[5].desc}</p>
+                 </div>
+               </div>
+               <div className="rounded-3xl p-8 bg-card border border-border/50 flex items-start gap-6">
+                 <div className="w-12 h-12 bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 rounded-xl flex items-center justify-center shrink-0">
+                    <Globe className="w-6 h-6" />
+                 </div>
+                 <div>
+                    <h3 className="text-xl font-bold mb-2">{d.features.items[8].title}</h3>
+                    <p className="text-muted-foreground">{d.features.items[8].desc}</p>
+                 </div>
+               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ───── PROBLEM ───── */}
-      <section className="py-24 bg-muted/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">{d.problem.title}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{d.problem.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {d.problem.points.map((point, i) => {
-              const Icon = problemIcons[i];
-              return (
-                <Card key={i} className="border-0 shadow-sm hover:shadow-md transition-shadow h-full bg-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`w-11 h-11 ${problemBg[i]} rounded-xl flex items-center justify-center shrink-0`}>
-                        <Icon className={`w-5.5 h-5.5 ${problemColors[i]}`} />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-1">{point.title}</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{point.desc}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ───── SOLUTION FLOW ───── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">{d.howItWorks.title}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{d.howItWorks.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-            {d.howItWorks.steps.map((step, i) => {
-              const Icon = flowIcons[i];
-              return (
-                <div key={i} className="relative">
-                  <Card className="text-center h-full border-0 shadow-sm hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6 sm:p-8">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${flowColors[i]} rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg`}>
-                        <Icon className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
-                      <p className="text-sm text-muted-foreground">{step.desc}</p>
-                    </CardContent>
-                  </Card>
-                  {i < 4 && (
-                    <div className="hidden lg:flex absolute top-1/2 -right-4 transform -translate-y-1/2 text-muted-foreground/40 z-10">
-                      <ArrowRight className="w-5 h-5" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ───── FEATURES ───── */}
-      <section className="py-24 bg-muted/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">{d.features.title}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{d.features.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {d.features.items.map((feature, i) => {
-              const Icon = featureIcons[i];
-              return (
-                <Card key={i} className="group border-0 shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-card">
-                  <CardContent className="p-6 sm:p-8">
-                    <div className={`w-12 h-12 ${featureColors[i]} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ───── SOCIAL PROOF ───── */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">{d.social.title}</h2>
-            <p className="text-lg text-muted-foreground">{d.social.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
-            {[
-              { value: '50K+', label: d.social.stats.scans },
-              { value: '12K+', label: d.social.stats.orders },
-              { value: '$2.4M', label: d.social.stats.revenue },
-              { value: '98%', label: d.social.stats.satisfaction },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent mb-2 tracking-tight">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {d.social.testimonials.map((t, i) => (
-              <Card key={i} className="border-0 shadow-sm hover:shadow-md transition-shadow h-full">
-                <CardContent className="p-6 sm:p-8">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, si) => (
-                      <Star key={si} className="w-4.5 h-4.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-foreground mb-6 leading-relaxed text-sm">&ldquo;{t.content}&rdquo;</p>
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">{t.name.split(' ').map((n: string) => n[0]).join('')}</div>
-                    <div className="ml-3">
-                      <div className="font-semibold text-foreground text-sm">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.role}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {/* ───── HOW IT WORKS (Timeline/Flow) ───── */}
+      <section className="py-32 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-16 tracking-tight">{d.howItWorks.title}</h2>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center relative max-w-5xl mx-auto">
+             {/* Connection Line */}
+             <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-border -translate-y-1/2 z-0" />
+             
+             {d.howItWorks.steps.map((step, i) => (
+               <div key={i} className="relative z-10 flex flex-col items-center group mb-12 md:mb-0">
+                 <div className="w-16 h-16 rounded-2xl bg-background border-2 border-border shadow-sm flex items-center justify-center mb-4 group-hover:border-amber-500 transition-colors group-hover:scale-110 duration-300">
+                    <span className="text-xl font-bold text-muted-foreground group-hover:text-amber-500 transition-colors">{i + 1}</span>
+                 </div>
+                 <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
+                 <p className="text-sm text-muted-foreground text-center max-w-[150px]">{step.desc}</p>
+               </div>
+             ))}
           </div>
         </div>
       </section>
 
       {/* ───── PRICING ───── */}
-      <section id="pricing" className="py-24 bg-muted/40">
+      <section id="pricing" className="py-32 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">{d.pricing.title}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{d.pricing.subtitle}</p>
+          <div className="text-center mb-20">
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">{d.pricing.title}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{d.pricing.subtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {d.pricing.plans.map((plan, i) => {
               const popular = plan.name === 'Growth';
-              const isEnterprise = plan.name === 'Enterprise';
               return (
-                <Card key={i} className={`border-0 shadow-sm h-full flex flex-col ${popular ? 'ring-2 ring-amber-500 relative' : ''}`}>
+                <div key={i} className={`relative flex flex-col rounded-3xl p-8 ${popular ? 'bg-foreground text-background shadow-2xl scale-105 z-10' : 'bg-card border border-border/50'}`}>
                   {popular && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1 text-xs font-medium">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
                         {d.pricing.mostPopular}
-                      </Badge>
+                      </div>
                     </div>
                   )}
-                  <CardHeader className={`pb-4 ${popular ? 'pt-8' : 'pt-6'}`}>
-                    <CardTitle className="text-lg font-semibold">{plan.name}</CardTitle>
-                    <div className="mt-3 flex items-baseline gap-1">
-                      <span className="text-4xl font-bold text-foreground tracking-tight">{plan.price}</span>
-                      {plan.period && <span className="text-sm text-muted-foreground">{plan.period}</span>}
-                    </div>
-                    <CardDescription className="mt-2 text-sm">{plan.desc}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <ul className="space-y-3 flex-1">
-                      {plan.features.map((f, j) => (
-                        <li key={j} className="flex items-start gap-3 text-sm">
-                          <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          <span className="text-foreground">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {'suitableFor' in plan && (plan as any).suitableFor && (
-                      <div className="mt-6 pt-4 border-t border-border/50">
-                        <p className="text-xs text-muted-foreground mb-2 font-medium">{d.pricing.suitableForLabel || 'Best for'}</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {((plan as any).suitableFor as string[]).map((s: string, k: number) => (
-                            <span key={k} className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{s}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {'highlight' in plan && (plan as any).highlight && (
-                      <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                        <p className="text-xs text-amber-800 dark:text-amber-200 italic">{(plan as any).highlight}</p>
-                      </div>
-                    )}
-                    <Link href={isEnterprise ? '/contact' : '/register'} className="mt-8 block">
-                      <Button className={`w-full ${popular ? '' : 'variant-outline'}`} variant={popular ? 'default' : 'outline'}>
-                        {plan.cta}
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                  
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                    <p className={`text-sm ${popular ? 'text-muted' : 'text-muted-foreground'}`}>{plan.desc}</p>
+                  </div>
+                  
+                  <div className="mb-8 flex items-baseline gap-1">
+                    <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
+                    {plan.period && <span className={`text-sm font-medium ${popular ? 'text-muted' : 'text-muted-foreground'}`}>{plan.period}</span>}
+                  </div>
+                  
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-3">
+                        <Check className={`w-5 h-5 shrink-0 ${popular ? 'text-amber-400' : 'text-emerald-500'}`} />
+                        <span className={`text-sm ${popular ? 'text-background/90' : 'text-foreground/80'}`}>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link href="/register" className="mt-auto">
+                    <Button 
+                      className={`w-full h-12 rounded-xl text-base font-semibold transition-all ${
+                        popular 
+                          ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20' 
+                          : 'bg-muted hover:bg-muted/80 text-foreground'
+                      }`}
+                    >
+                      {plan.cta}
+                    </Button>
+                  </Link>
+                </div>
               );
             })}
           </div>
-
-          <p className="text-center mt-8 text-sm text-muted-foreground">{d.pricing.trial}</p>
         </div>
       </section>
 
@@ -328,25 +307,22 @@ export default function LandingPage() {
       <FaqAccordion items={d.faq.items} title={d.faq.title} subtitle={d.faq.subtitle} />
 
       {/* ───── CTA ───── */}
-      <section className="py-24 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_white/0.1,_transparent_50%)]" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">{d.cta.title}</h2>
-          <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">{d.cta.subtitle}</p>
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-foreground" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-transparent to-rose-500/20" />
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent" />
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-4xl sm:text-6xl font-extrabold text-background mb-8 tracking-tight">{d.cta.title}</h2>
+          <p className="text-xl text-background/80 mb-12 max-w-2xl mx-auto leading-relaxed">{d.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register">
-              <Button size="lg" variant="secondary" className="text-base px-8 h-12 bg-white text-amber-700 hover:bg-white/90 shadow-xl">
+              <Button size="lg" className="text-base px-10 h-14 rounded-full bg-background text-foreground hover:bg-background/90 shadow-2xl hover:scale-105 transition-all">
                 {d.cta.startFree}
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-            <Link href="/demo">
-              <Button size="lg" variant="outline" className="text-base px-8 h-12 border-white/30 text-white hover:bg-white/10">
-                {d.cta.watchDemo}
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-white/60 text-sm">{d.cta.noCard}</p>
+          <p className="mt-8 text-background/50 text-sm font-medium tracking-wide">{d.cta.noCard}</p>
         </div>
       </section>
 

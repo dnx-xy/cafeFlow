@@ -61,7 +61,7 @@ let TablesService = class TablesService {
         if (outletId) {
             where.outletId = outletId;
         }
-        return await this.tablesRepository.find({ where });
+        return await this.tablesRepository.find({ where, relations: { qrCodes: true } });
     }
     async findOne(id, tenantId) {
         return await this.tablesRepository.findOne({

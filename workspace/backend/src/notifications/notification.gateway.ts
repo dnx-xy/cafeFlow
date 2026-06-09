@@ -51,6 +51,19 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
     this.server.to(`business:${businessId}`).emit('order:new', data);
   }
 
+  emitOrderStatusUpdate(businessId: string, data: {
+    id: string;
+    orderId: string;
+    tableNumber?: string;
+    customer?: string;
+    totalAmount: number;
+    oldStatus: string;
+    newStatus: string;
+    updatedAt: string;
+  }) {
+    this.server.to(`business:${businessId}`).emit('order:status', data);
+  }
+
   emitPaymentUpdate(businessId: string, data: {
     orderId: string;
     paymentStatus: string;

@@ -16,13 +16,23 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
+const ID_TIMEZONES = new Set(['Asia/Jakarta', 'Asia/Makassar', 'Asia/Jayapura']);
+
+function detectRegion(): Lang {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (ID_TIMEZONES.has(tz)) return 'id';
+  } catch {}
+  const navLang = navigator.language?.toLowerCase() || '';
+  if (navLang.startsWith('id')) return 'id';
+  return 'en';
+}
+
 function detectLang(): Lang {
   if (typeof window === 'undefined') return 'en';
   const stored = localStorage.getItem('cafe_lang') as Lang | null;
   if (stored && (stored === 'en' || stored === 'id')) return stored;
-  const navLang = navigator.language?.toLowerCase() || '';
-  if (navLang.startsWith('id')) return 'id';
-  return 'en';
+  return detectRegion();
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

@@ -5,9 +5,6 @@ import { OrderItem } from './order-item.entity';
 
 @Entity('order_item_menu_options')
 export class OrderItemMenuOption extends BaseEntity {
-  @Column({ type: 'varchar' })
-  optionId: string;
-
   @Column({ nullable: true })
   optionValueId: string;
 
@@ -16,9 +13,6 @@ export class OrderItemMenuOption extends BaseEntity {
 
   @Column({ type: 'float', nullable: true })
   priceAdjustment: number;
-
-  @Column({ type: 'varchar' })
-  orderItemId: string;
 
   @Column({ type: 'varchar' })
   tenantId: string;

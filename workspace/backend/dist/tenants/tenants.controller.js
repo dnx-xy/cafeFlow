@@ -24,6 +24,12 @@ let TenantsController = class TenantsController {
     async create(body) {
         return await this.tenantsService.create(body.name, body.slug);
     }
+    async createRealTenant(body) {
+        return await this.tenantsService.createRealTenant(body);
+    }
+    async createQuickTenant(body) {
+        return await this.tenantsService.createQuickTenant(body);
+    }
     async findAll() {
         return await this.tenantsService.findAll();
     }
@@ -43,6 +49,22 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], TenantsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('real'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TenantsController.prototype, "createRealTenant", null);
+__decorate([
+    (0, common_1.Post)('quick'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TenantsController.prototype, "createQuickTenant", null);
 __decorate([
     (0, common_1.Get)(),
     (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),

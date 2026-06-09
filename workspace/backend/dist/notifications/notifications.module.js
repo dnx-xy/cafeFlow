@@ -8,14 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsModule = void 0;
 const common_1 = require("@nestjs/common");
+const notification_gateway_1 = require("./notification.gateway");
+const whatsapp_service_1 = require("./whatsapp.service");
 let NotificationsModule = class NotificationsModule {
 };
 exports.NotificationsModule = NotificationsModule;
 exports.NotificationsModule = NotificationsModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
-        controllers: [],
-        providers: [],
+        providers: [notification_gateway_1.NotificationGateway, whatsapp_service_1.WhatsAppService],
+        exports: [notification_gateway_1.NotificationGateway, whatsapp_service_1.WhatsAppService],
     })
 ], NotificationsModule);
 //# sourceMappingURL=notifications.module.js.map

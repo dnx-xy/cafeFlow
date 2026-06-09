@@ -16,23 +16,40 @@ import {
 import {
   Search, MoreHorizontal, Eye, Check, X, Printer, Download,
   ChevronLeft, ChevronRight, ShoppingCart, Clock, MapPin,
+  Timer, User, CreditCard, ChevronRight as ArrowRight,
 } from 'lucide-react';
-import { useOrders } from '@/hooks/useAuth';
+import { useOrders, useAuth } from '@/hooks/useAuth';
+import { useBusiness } from '@/hooks/useBusiness';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useI18n } from '@/i18n/context';
-import { formatCurrency } from '@/lib/currency';
+import { formatCurrency, getCurrencyInfo } from '@/lib/currency';
 import { toast } from 'sonner';
-import { exportOrder, exportOrdersCollection } from '@/lib/orderExportUtils';
+import { exportOrder, exportOrdersCollection, BusinessHeaderInfo } from '@/lib/orderExportUtils';
 
 export default function OrdersPage() {
   const router = useRouter();
   const { currency } = useCurrency();
   const { t } = useI18n();
   const { orders, loading, error, pagination, fetchOrders, updateOrderStatus } = useOrders();
+  const { user } = useAuth();
+  const { business, fetchBusiness } = useBusiness();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    if (user?.businessId) fetchBusiness(user.businessId);
+  }, [user?.businessId]);
+
+  const exportHeader: BusinessHeaderInfo | undefined = business ? {
+    name: business.name,
+    description: business.description,
+    logoUrl: business.logoUrl,
+    address: business.address,
+    city: business.city,
+    phone: business.whatsappNumber,
+    currencySymbol: getCurrencyInfo(currency).symbol,
+  } : undefined;
 
   const filtered = orders.filter(o => {
     const q = search.toLowerCase();
@@ -40,218 +57,315 @@ export default function OrdersPage() {
       && (statusFilter === 'all' || o.status === statusFilter);
   });
 
+  const ordersByStatus = {
+    PENDING: filtered.filter(o => o.status === 'PENDING'),
+    CONFIRMED: filtered.filter(o => o.status === 'CONFIRMED'),
+    PREPARING: filtered.filter(o => o.status === 'PREPARING'),
+    READY: filtered.filter(o => o.status === 'READY'),
+    COMPLETED: filtered.filter(o => o.status === 'DELIVERED' || o.status === 'COMPLETED'),
+  };
+
   const handleStatus = async (id: string, status: string) => {
     try { await updateOrderStatus(id, status); toast.success(t.dashboard.orders.statusUpdated); }
     catch { toast.error(t.dashboard.orders.statusFailed); }
   };
 
-  const statusColors: Record<string, string> = {
-    PENDING: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-    CONFIRMED: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-    PREPARING: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-    READY: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20',
-    DELIVERED: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
-    COMPLETED: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
-    CANCELLED: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+  const timeAgo = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  };
+
+  const renderOrderCard = (order: typeof filtered[number], columnStatus: string) => {
+    const nextStatus = {
+      PENDING: 'CONFIRMED',
+      CONFIRMED: 'PREPARING',
+      PREPARING: 'READY',
+      READY: 'DELIVERED',
+      COMPLETED: null,
+    }[columnStatus];
+
+    const nextLabel = {
+      PENDING: 'Confirm',
+      CONFIRMED: 'Start Prep',
+      PREPARING: 'Mark Ready',
+      READY: 'Complete',
+      COMPLETED: null,
+    }[columnStatus];
+
+    return (
+      <div key={order.id} className="bg-card border border-border/50 rounded-xl p-3 hover:shadow-md transition-all group cursor-pointer" onClick={() => router.push(`/dashboard/orders/${order.id}`)}>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-extrabold text-foreground truncate">{order.orderId}</p>
+            <div className="flex items-center gap-1 mt-1">
+              {order.tableNumber ? (
+                <>
+                  <MapPin className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">Table {order.tableNumber}</span>
+                </>
+              ) : (
+                <span className="text-[10px] text-muted-foreground italic">No table</span>
+              )}
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-sm font-extrabold text-foreground">{formatCurrency(order.totalAmount, currency)}</p>
+          </div>
+        </div>
+
+        {order.customer && (
+          <div className="flex items-center gap-1 mb-2">
+            <User className="w-3 h-3 text-muted-foreground shrink-0" />
+            <span className="text-[10px] text-muted-foreground truncate">{order.customer}</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-1.5 mb-3">
+          {order.paymentStatus === 'PAID' ? (
+            <Check className="w-3 h-3 text-emerald-500" />
+          ) : order.paymentStatus === 'PENDING' ? (
+            <Clock className="w-3 h-3 text-amber-500" />
+          ) : (
+            <X className="w-3 h-3 text-rose-500" />
+          )}
+          <span className={`text-[9px] font-bold uppercase tracking-wider ${order.paymentStatus === 'PAID' ? 'text-emerald-600 dark:text-emerald-400' : order.paymentStatus === 'PENDING' ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
+            {order.paymentStatus}
+          </span>
+          <span className="text-muted-foreground/30 mx-0.5">•</span>
+          <Timer className="w-3 h-3 text-muted-foreground" />
+          <span className="text-[9px] font-medium text-muted-foreground">{timeAgo(order.createdAt)}</span>
+        </div>
+
+        {order.orderItems && order.orderItems.length > 0 && (
+          <div className="border-t border-border/30 pt-2 mb-2">
+            <p className="text-[9px] text-muted-foreground truncate">
+              {order.orderItems.slice(0, 2).map(i => i.menuItem?.name).filter(Boolean).join(', ')}
+              {order.orderItems.length > 2 && ` +${order.orderItems.length - 2}`}
+            </p>
+          </div>
+        )}
+
+        <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+          {nextStatus && (
+            <Button 
+              size="sm" 
+              className="h-7 text-[10px] font-bold flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+              onClick={() => handleStatus(order.id, nextStatus)}
+            >
+              {nextLabel} <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-7 w-7 p-0">
+                <MoreHorizontal className="w-3.5 h-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order.id}`)} className="text-xs">
+                <Eye className="mr-2 w-3.5 h-3.5" />View Details
+              </DropdownMenuItem>
+              {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && order.status !== 'DELIVERED' && (
+                <DropdownMenuItem className="text-xs text-rose-600" onClick={() => handleStatus(order.id, 'CANCELLED')}>
+                  <X className="mr-2 w-3.5 h-3.5" />Cancel Order
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => window.print()} className="text-xs">
+                <Printer className="mr-2 w-3.5 h-3.5" />Print
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.orders.title}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t.dashboard.orders.subtitle}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: t.dashboard.orders.totalOrders, value: orders.length, icon: ShoppingCart },
-          { label: t.dashboard.orders.todaysRevenue, value: '$0', icon: ShoppingCart },
-          { label: t.dashboard.orders.pendingOrders, value: orders.filter(o => o.status === 'PENDING').length, icon: Clock },
-          { label: t.dashboard.orders.avgOrderValue, value: '$0', icon: ShoppingCart },
+          { label: t.dashboard.orders.totalOrders, value: orders.length, icon: ShoppingCart, bg: 'bg-blue-100 dark:bg-blue-900/30', color: 'text-blue-600 dark:text-blue-400' },
+          { label: t.dashboard.orders.todaysRevenue, value: '$0', icon: ShoppingCart, bg: 'bg-emerald-100 dark:bg-emerald-900/30', color: 'text-emerald-600 dark:text-emerald-400' },
+          { label: t.dashboard.orders.pendingOrders, value: orders.filter(o => o.status === 'PENDING').length, icon: Clock, bg: 'bg-amber-100 dark:bg-amber-900/30', color: 'text-amber-600 dark:text-amber-400' },
+          { label: t.dashboard.orders.avgOrderValue, value: '$0', icon: ShoppingCart, bg: 'bg-indigo-100 dark:bg-indigo-900/30', color: 'text-indigo-600 dark:text-indigo-400' },
         ].map((s, i) => (
-          <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">{s.value}</p>
+          <div key={i} className="bg-card rounded-3xl border border-border/50 p-6 flex flex-col justify-between hover:shadow-md hover:border-amber-500/30 transition-all group">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform ${s.bg}`}>
+                <s.icon className={`w-6 h-6 ${s.color}`} />
               </div>
-              <div className="w-9 h-9 bg-blue-50 dark:bg-blue-500/10 rounded-xl flex items-center justify-center">
-                <s.icon className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
-              </div>
+            </div>
+            <div>
+              <p className="text-3xl font-extrabold text-foreground tracking-tight mb-1">{s.value}</p>
+              <p className="text-sm font-medium text-muted-foreground">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input placeholder={t.dashboard.orders.search} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
-          </div>
-          <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[130px] h-9 text-sm">
-                <SelectValue placeholder={t.dashboard.orders.allStatus} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.dashboard.orders.allStatus}</SelectItem>
-                {['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
-                  <SelectItem key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="bg-card rounded-3xl border border-border/50 p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input placeholder={t.dashboard.orders.search} value={search} onChange={e => setSearch(e.target.value)} className="pl-12 h-12 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl font-medium" />
+        </div>
+        <div className="flex w-full sm:w-auto gap-3">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px] h-12 bg-muted/30 border-0 focus:ring-amber-500 rounded-xl font-semibold">
+              <SelectValue placeholder={t.dashboard.orders.allStatus} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="font-medium">{t.dashboard.orders.allStatus}</SelectItem>
+              {['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
+                <SelectItem key={s} value={s} className="font-medium">{s.charAt(0) + s.slice(1).toLowerCase()}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-12 rounded-xl font-semibold">
+                <Download className="w-4 h-4 mr-2" /> Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem onClick={async () => {
+                await exportOrdersCollection({ orders: filtered as any, title: 'All Orders' }, 'xlsx', exportHeader);
+              }}>Excel</DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => {
+                await exportOrdersCollection({ orders: filtered as any, title: 'All Orders' }, 'pdf', exportHeader);
+              }}>PDF</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50">
-        <div className="flex items-center justify-between px-5 pt-5 pb-1">
-          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">{t.dashboard.orders.title}</CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-8 text-xs"><Printer className="w-3.5 h-3.5 mr-1.5" /> {t.dashboard.orders.actions.print}</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 text-xs">
-                  <Download className="w-3.5 h-3.5 mr-1.5" /> {t.dashboard.orders.actions.export}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={async () => {
-                  await exportOrdersCollection({ orders: filtered as any, title: 'All Orders' }, 'csv');
-                }}>CSV</DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => {
-                  await exportOrdersCollection({ orders: filtered as any, title: 'All Orders' }, 'xlsx');
-                }}>Excel</DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => {
-                  await exportOrdersCollection({ orders: filtered as any, title: 'All Orders' }, 'pdf');
-                }}>PDF</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      {loading ? (
+        <div className="flex justify-center items-center h-96">
+          <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
         </div>
-        <div className="p-5 pt-3">
-          {loading ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-10">
-              <p className="text-red-500 text-sm mb-3">{error}</p>
-              <Button variant="outline" size="sm" onClick={() => fetchOrders()}>Retry</Button>
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-100 dark:border-gray-800/50">
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.order}</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.table}</th>
-                      <th className="text-left text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.customer}</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.amount}</th>
-                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.status}</th>
-                      <th className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.payment}</th>
-                      <th className="text-right text-[11px] font-medium text-gray-400 dark:text-gray-500 pb-3 uppercase tracking-wider">{t.dashboard.orders.table.actions}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const grouped: Record<string, typeof filtered> = {};
-                      const standalone: typeof filtered = [];
-                      for (const o of filtered) {
-                        if (o.tableNumber) {
-                          if (!grouped[o.tableNumber]) grouped[o.tableNumber] = [];
-                          grouped[o.tableNumber].push(o);
-                        } else {
-                          standalone.push(o);
-                        }
-                      }
-                      const groupKeys = Object.keys(grouped).sort();
-                      const rows: JSX.Element[] = [];
-                      for (const tableNum of groupKeys) {
-                        const group = grouped[tableNum];
-                        rows.push(
-                          <tr key={`group-${tableNum}`} className="bg-gray-50/50 dark:bg-gray-800/20">
-                            <td colSpan={7} className="py-2 px-3">
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Meja {tableNum}</span>
-                                <span className="text-[10px] text-gray-400">({group.length} pesanan)</span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                        for (const order of group) {
-                          rows.push(orderRow(order));
-                        }
-                      }
-                      for (const order of standalone) {
-                        rows.push(orderRow(order));
-                      }
-                      return rows;
-
-                      function orderRow(order: typeof filtered[number]) {
-                        return (
-                          <tr key={order.id} className="border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                            <td className="py-3.5">
-                              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{order.orderId}</span>
-                            </td>
-                            <td className="py-3.5">
-                              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center"><MapPin className="w-3 h-3 mr-1 text-gray-400" />{order.tableNumber || 'N/A'}</span>
-                            </td>
-                            <td className="py-3.5">
-                              <p className="text-sm text-gray-700 dark:text-gray-300">{order.customer || 'N/A'}</p>
-                            </td>
-                            <td className="py-3.5 text-right">
-                              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.totalAmount, currency)}</span>
-                            </td>
-                            <td className="py-3.5 text-center">
-                              <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[order.status] || ''}`}>
-                                {order.status.toLowerCase()}
-                              </Badge>
-                            </td>
-                            <td className="py-3.5 text-center">
-                              <span className={`text-[11px] font-medium ${order.paymentStatus === 'PAID' ? 'text-green-600 dark:text-green-400' : order.paymentStatus === 'PENDING' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {order.paymentStatus}
-                              </span>
-                            </td>
-                            <td className="py-3.5 text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="w-7 h-7">
-                                    <MoreHorizontal className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-44">
-                                  <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${order.id}`)}><Eye className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.viewDetails}</DropdownMenuItem>
-                                  {order.status === 'PENDING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'CONFIRMED')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.confirm}</DropdownMenuItem>}
-                                  {order.status === 'CONFIRMED' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'PREPARING')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markPreparing}</DropdownMenuItem>}
-                                  {order.status === 'PREPARING' && <DropdownMenuItem onClick={() => handleStatus(order.id, 'READY')}><Check className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.markReady}</DropdownMenuItem>}
-                                  {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
-                                    <DropdownMenuItem className="text-red-600" onClick={() => handleStatus(order.id, 'CANCELLED')}><X className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.cancel}</DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem onClick={() => window.print()}><Printer className="mr-2 w-4 h-4" />{t.dashboard.orders.actions.printReceipt}</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
-                          </tr>
-                        );
-                      }
-                    })()}
-                  </tbody>
-                </table>
-              </div>
-              {filtered.length === 0 && !loading && (
-                <div className="text-center py-12 text-sm text-gray-400 dark:text-gray-500">{t.dashboard.orders.noOrders}</div>
-              )}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/50">
-                <p className="text-xs text-gray-400 dark:text-gray-500">{t.dashboard.orders.pagination.replace('{{count}}', String(filtered.length)).replace('{{total}}', String(filtered.length))}</p>
-                <div className="flex gap-1">
-                  <Button variant="outline" size="icon" className="w-7 h-7" disabled><ChevronLeft className="w-3.5 h-3.5" /></Button>
-                  <Button variant="outline" size="icon" className="w-7 h-7 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400">1</Button>
-                  <Button variant="outline" size="icon" className="w-7 h-7" disabled><ChevronRight className="w-3.5 h-3.5" /></Button>
+      ) : error ? (
+        <div className="text-center py-16 bg-card rounded-3xl border border-border/50">
+          <p className="text-rose-500 text-sm font-medium mb-4">{error}</p>
+          <Button variant="outline" onClick={() => fetchOrders()}>Retry</Button>
+        </div>
+      ) : (
+        <>
+          {/* Kanban Board */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* PENDING Column */}
+            <div className="bg-muted/10 rounded-2xl p-4 border-2 border-amber-200 dark:border-amber-900/50">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse" />
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wide">Pending</h3>
                 </div>
+                <span className="text-xs font-extrabold bg-amber-500 text-white px-2.5 py-1 rounded-full">
+                  {ordersByStatus.PENDING.length}
+                </span>
               </div>
-            </>
+              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
+                {ordersByStatus.PENDING.map(order => renderOrderCard(order, 'PENDING'))}
+                {ordersByStatus.PENDING.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-12 italic">No pending orders</p>
+                )}
+              </div>
+            </div>
+
+            {/* CONFIRMED Column */}
+            <div className="bg-muted/10 rounded-2xl p-4 border-2 border-blue-200 dark:border-blue-900/50">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wide">Confirmed</h3>
+                </div>
+                <span className="text-xs font-extrabold bg-blue-500 text-white px-2.5 py-1 rounded-full">
+                  {ordersByStatus.CONFIRMED.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
+                {ordersByStatus.CONFIRMED.map(order => renderOrderCard(order, 'CONFIRMED'))}
+                {ordersByStatus.CONFIRMED.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-12 italic">No confirmed orders</p>
+                )}
+              </div>
+            </div>
+
+            {/* PREPARING Column */}
+            <div className="bg-muted/10 rounded-2xl p-4 border-2 border-indigo-200 dark:border-indigo-900/50">
+              <div className="flex items-center justify-between mb-4 pb-3 border-border/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-indigo-500 animate-pulse" />
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wide">Preparing</h3>
+                </div>
+                <span className="text-xs font-extrabold bg-indigo-500 text-white px-2.5 py-1 rounded-full">
+                  {ordersByStatus.PREPARING.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
+                {ordersByStatus.PREPARING.map(order => renderOrderCard(order, 'PREPARING'))}
+                {ordersByStatus.PREPARING.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-12 italic">No orders in prep</p>
+                )}
+              </div>
+            </div>
+
+            {/* READY Column */}
+            <div className="bg-muted/10 rounded-2xl p-4 border-2 border-emerald-200 dark:border-emerald-900/50">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wide">Ready</h3>
+                </div>
+                <span className="text-xs font-extrabold bg-emerald-500 text-white px-2.5 py-1 rounded-full">
+                  {ordersByStatus.READY.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
+                {ordersByStatus.READY.map(order => renderOrderCard(order, 'READY'))}
+                {ordersByStatus.READY.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-12 italic">No orders ready</p>
+                )}
+              </div>
+            </div>
+
+            {/* COMPLETED Column */}
+            <div className="bg-muted/10 rounded-2xl p-4 border-2 border-gray-200 dark:border-gray-900/50">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-gray-400" />
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wide">Completed</h3>
+                </div>
+                <span className="text-xs font-extrabold bg-gray-400 text-white px-2.5 py-1 rounded-full">
+                  {ordersByStatus.COMPLETED.length}
+                </span>
+              </div>
+              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-1">
+                {ordersByStatus.COMPLETED.map(order => renderOrderCard(order, 'COMPLETED'))}
+                {ordersByStatus.COMPLETED.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-12 italic">No completed orders</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center py-20 bg-card rounded-3xl border border-border/50">
+              <ShoppingCart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-lg font-bold text-muted-foreground">{t.dashboard.orders.noOrders}</p>
+            </div>
           )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

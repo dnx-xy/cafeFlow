@@ -39,6 +39,20 @@ export class QrCodesService {
     return await this.qrCodesRepository.save(qrCode);
   }
 
+  async generateBusinessQrCode(businessId: string, tenantId: string): Promise<QrCode> {
+    const code = crypto.randomBytes(16).toString('hex');
+
+    const qrCode = this.qrCodesRepository.create({
+      code,
+      tableId: null,
+      businessId,
+      tenantId,
+      isActive: true,
+    });
+
+    return await this.qrCodesRepository.save(qrCode);
+  }
+
   async getQrCodeByTable(tableId: string, businessId: string): Promise<QrCode | null> {
     return await this.qrCodesRepository.findOne({
       where: { tableId, businessId },
@@ -46,13 +60,27 @@ export class QrCodesService {
     });
   }
 
-  async scanQrCode(code: string): Promise<{ tableId: string; code: string; outletId: string; tenantId: string; businessId: string }> {
+  async scanQrCode(code: string): Promise<{ tableId: string | null; code: string; outletId?: string; tenantId: string; businessId: string }> {
     const qrCode = await this.qrCodesRepository.findOne({
       where: { code, isActive: true },
     });
 
     if (!qrCode) {
       throw new Error('Invalid or inactive QR code');
+    }
+
+    qrCode.scannedAt = new Date();
+    await this.qrCodesRepository.save(qrCode);
+
+    // Business-level QR code (no table)
+    if (!qrCode.tableId) {
+      return {
+        tableId: null,
+        code: qrCode.code,
+        outletId: undefined,
+        tenantId: qrCode.tenantId || '',
+        businessId: qrCode.businessId,
+      };
     }
 
     const table = await this.tablesRepository.findOne({
@@ -63,9 +91,6 @@ export class QrCodesService {
     if (!table) {
       throw new Error('Table not found');
     }
-
-    qrCode.scannedAt = new Date();
-    await this.qrCodesRepository.save(qrCode);
 
     return {
       tableId: qrCode.tableId,

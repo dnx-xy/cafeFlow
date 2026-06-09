@@ -20,14 +20,6 @@ let OrderItem = class OrderItem extends base_entity_1.BaseEntity {
 };
 exports.OrderItem = OrderItem;
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
-    __metadata("design:type", String)
-], OrderItem.prototype, "menuItemId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
-    __metadata("design:type", String)
-], OrderItem.prototype, "orderId", void 0);
-__decorate([
     (0, typeorm_1.Column)({ type: 'int' }),
     __metadata("design:type", Number)
 ], OrderItem.prototype, "quantity", void 0);
@@ -56,11 +48,11 @@ __decorate([
     __metadata("design:type", order_entity_1.Order)
 ], OrderItem.prototype, "order", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => custom_attribute_value_entity_1.CustomAttributeValue, (value) => value.orderItem),
+    (0, typeorm_1.OneToMany)(() => custom_attribute_value_entity_1.CustomAttributeValue, (value) => value.orderItem, { cascade: true }),
     __metadata("design:type", Array)
 ], OrderItem.prototype, "customAttributes", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => order_item_menu_option_entity_1.OrderItemMenuOption, (option) => option.orderItem),
+    (0, typeorm_1.OneToMany)(() => order_item_menu_option_entity_1.OrderItemMenuOption, (option) => option.orderItem, { cascade: true }),
     __metadata("design:type", Array)
 ], OrderItem.prototype, "menuOptions", void 0);
 exports.OrderItem = OrderItem = __decorate([

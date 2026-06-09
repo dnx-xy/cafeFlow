@@ -8,11 +8,14 @@ export class QrCode extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   code: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   tableId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   businessId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  tenantId: string;
 
   @Column({ type: 'timestamp', nullable: true })
   scannedAt: Date;
@@ -20,7 +23,7 @@ export class QrCode extends BaseEntity {
   @Column({ default: false })
   isActive: boolean;
 
-  @ManyToOne(() => Table, (table) => table.qrCodes)
+  @ManyToOne(() => Table, (table) => table.qrCodes, { nullable: true })
   table: Table;
 
   @ManyToOne(() => Business, (business) => business.qrCodes)

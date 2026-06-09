@@ -135,7 +135,7 @@ __decorate([
     __metadata("design:type", user_entity_1.User)
 ], Order.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => order_item_entity_1.OrderItem, (item) => item.order),
+    (0, typeorm_1.OneToMany)(() => order_item_entity_1.OrderItem, (item) => item.order, { cascade: true }),
     __metadata("design:type", Array)
 ], Order.prototype, "orderItems", void 0);
 __decorate([

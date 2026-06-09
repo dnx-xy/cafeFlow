@@ -22,13 +22,17 @@ __decorate([
     __metadata("design:type", String)
 ], QrCode.prototype, "code", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", String)
 ], QrCode.prototype, "tableId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", String)
 ], QrCode.prototype, "businessId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], QrCode.prototype, "tenantId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
     __metadata("design:type", Date)
@@ -38,7 +42,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], QrCode.prototype, "isActive", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => table_entity_1.Table, (table) => table.qrCodes),
+    (0, typeorm_1.ManyToOne)(() => table_entity_1.Table, (table) => table.qrCodes, { nullable: true }),
     __metadata("design:type", table_entity_1.Table)
 ], QrCode.prototype, "table", void 0);
 __decorate([

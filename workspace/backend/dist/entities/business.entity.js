@@ -92,6 +92,10 @@ __decorate([
     __metadata("design:type", String)
 ], Business.prototype, "stripeSubscriptionId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Business.prototype, "whatsappNumber", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => tenant_entity_1.Tenant, (tenant) => tenant.businesses),
     __metadata("design:type", tenant_entity_1.Tenant)
 ], Business.prototype, "tenant", void 0);

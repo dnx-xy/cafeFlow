@@ -7,12 +7,6 @@ import { OrderItemMenuOption } from './order-item-menu-option.entity';
 
 @Entity('order_items')
 export class OrderItem extends BaseEntity {
-  @Column({ type: 'varchar' })
-  menuItemId: string;
-
-  @Column({ type: 'varchar' })
-  orderId: string;
-
   @Column({ type: 'int' })
   quantity: number;
 
@@ -34,9 +28,9 @@ export class OrderItem extends BaseEntity {
   @ManyToOne(() => Order, (order) => order.orderItems)
   order: Order;
 
-  @OneToMany(() => CustomAttributeValue, (value) => value.orderItem)
+  @OneToMany(() => CustomAttributeValue, (value) => value.orderItem, { cascade: true })
   customAttributes: CustomAttributeValue[];
 
-  @OneToMany(() => OrderItemMenuOption, (option) => option.orderItem)
+  @OneToMany(() => OrderItemMenuOption, (option) => option.orderItem, { cascade: true })
   menuOptions: OrderItemMenuOption[];
 }

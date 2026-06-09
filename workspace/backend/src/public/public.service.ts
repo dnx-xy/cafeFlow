@@ -14,6 +14,8 @@ import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
 import { PointTransaction } from '../entities/point-transaction.entity';
 import { OrderStatus, OrderType, PaymentStatus } from '../entities/enums';
+import { NotificationGateway } from '../notifications/notification.gateway';
+import { WhatsAppService } from '../notifications/whatsapp.service';
 
 @Injectable()
 export class PublicService {
@@ -42,6 +44,8 @@ export class PublicService {
     private pointTransactionsRepository: Repository<PointTransaction>,
     @InjectRepository(OrderItemMenuOption)
     private orderItemMenuOptionsRepository: Repository<OrderItemMenuOption>,
+    private notificationGateway: NotificationGateway,
+    private whatsAppService: WhatsAppService,
   ) {}
 
   async getMenuByTable(tableId: string) {
@@ -140,11 +144,10 @@ export class PublicService {
               const adj = sel.priceAdjustment ?? val.priceAdjustment ?? 0;
               optionAdjustment += adj;
               const optRec = this.orderItemMenuOptionsRepository.create({
-                optionId: opt.id,
+                option: { id: opt.id },
                 optionValueId: val.id,
                 quantity: item.quantity,
                 priceAdjustment: adj,
-                orderItemId: '',
                 tenantId,
               });
               selectedOptionValues.push(optRec);
@@ -157,8 +160,7 @@ export class PublicService {
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
       const orderItem = this.orderItemsRepository.create({
-        menuItemId: item.menuItemId,
-        orderId: '',
+        menuItem: { id: item.menuItemId },
         quantity: item.quantity,
         unitPrice,
         totalPrice: itemTotal,
@@ -189,7 +191,44 @@ export class PublicService {
       orderItems,
     });
 
-    return await this.ordersRepository.save(order);
+    const saved = await this.ordersRepository.save(order);
+
+    const savedWithItems = await this.ordersRepository.findOne({
+      where: { id: saved.id },
+      relations: { orderItems: { menuItem: true } },
+    });
+
+    const bId = business?.id || '';
+    if (bId) {
+      this.notificationGateway.emitNewOrder(bId, {
+        id: saved.id,
+        orderId: saved.orderId,
+        tableNumber: table.number,
+        status: saved.status,
+        totalAmount: saved.totalAmount,
+        customer: customer?.id || null,
+        createdAt: saved.createdAt.toISOString(),
+      });
+
+      if (business?.whatsappNumber) {
+        const session = `business-${bId}`;
+        const items = (savedWithItems?.orderItems || []).map(oi => ({
+          name: oi.menuItem?.name || 'Item',
+          qty: oi.quantity,
+          price: oi.unitPrice,
+        }));
+        this.whatsAppService.sendOrderNotification(
+          business.whatsappNumber,
+          saved.orderId,
+          table.number,
+          items,
+          saved.totalAmount,
+          session,
+        );
+      }
+    }
+
+    return { ...saved, tableNumber: table.number };
   }
 
   async submitFeedback(data: {

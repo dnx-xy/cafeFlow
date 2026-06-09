@@ -12,12 +12,20 @@ const tenants_service_1 = require("./tenants.service");
 const tenants_controller_1 = require("./tenants.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const tenant_entity_1 = require("../entities/tenant.entity");
+const business_entity_1 = require("../entities/business.entity");
+const outlet_entity_1 = require("../entities/outlet.entity");
+const user_entity_1 = require("../entities/user.entity");
+const qr_code_entity_1 = require("../entities/qr-code.entity");
+const qr_codes_module_1 = require("../qr-codes/qr-codes.module");
 let TenantsModule = class TenantsModule {
 };
 exports.TenantsModule = TenantsModule;
 exports.TenantsModule = TenantsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant, business_entity_1.Business, outlet_entity_1.Outlet, user_entity_1.User, qr_code_entity_1.QrCode]),
+            qr_codes_module_1.QrCodesModule,
+        ],
         controllers: [tenants_controller_1.TenantsController],
         providers: [tenants_service_1.TenantsService],
         exports: [tenants_service_1.TenantsService],

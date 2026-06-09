@@ -162,13 +162,15 @@ export default function KioskPage() {
 
   if (!selectedTableId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="w-16 h-16 bg-amber-50 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center">
-          <LayoutGrid className="w-8 h-8 text-amber-600" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 max-w-4xl mx-auto px-4">
+        <div className="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center border border-amber-500/20 shadow-sm">
+          <LayoutGrid className="w-10 h-10 text-amber-500" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select a Table</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Choose a table to start taking orders</p>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 mt-4 max-w-2xl">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-foreground mb-2">Select a Table</h2>
+          <p className="text-base font-medium text-muted-foreground">Choose a table to start taking orders</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6 w-full">
           {tables.map((t: any) => (
             <button
               key={t.id}
@@ -176,10 +178,12 @@ export default function KioskPage() {
                 setSelectedTableId(t.id);
                 setSelectedTableNumber(t.tableNumber || t.number || t.name || '?');
               }}
-              className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-amber-500 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all group"
+              className="flex flex-col items-center gap-3 p-6 rounded-3xl border border-border/50 bg-card hover:border-amber-500/30 hover:bg-amber-500/5 transition-all group shadow-sm hover:shadow-md"
             >
-              <Coffee className="w-6 h-6 text-gray-400 group-hover:text-amber-600" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-amber-700 dark:group-hover:text-amber-400">
+              <div className="w-12 h-12 rounded-2xl bg-muted/50 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center transition-colors text-muted-foreground">
+                <Coffee className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-foreground group-hover:text-amber-600 transition-colors">
                 {t.tableNumber || t.number || t.name || '?'}
               </span>
             </button>
@@ -191,33 +195,37 @@ export default function KioskPage() {
 
   if (showConfirm && lastOrder) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 max-w-md mx-auto text-center">
-        <div className="w-16 h-16 bg-green-50 dark:bg-green-500/10 rounded-2xl flex items-center justify-center">
-          <Check className="w-8 h-8 text-green-600" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 max-w-md mx-auto text-center px-4">
+        <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-500/20 border border-emerald-200 dark:border-emerald-800">
+          <Check className="w-12 h-12 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Order Submitted!</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Order <span className="font-mono font-medium text-gray-700 dark:text-gray-300">{lastOrder.orderId}</span> for Table <strong>{selectedTableNumber}</strong>
-        </p>
-        <div className="w-full bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mt-2">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-left">Order Summary</p>
-          {lastOrder.items.map((item: CartItem) => (
-            <div key={item.id} className="flex justify-between text-sm py-1">
-              <span className="text-gray-700 dark:text-gray-300">{item.name} x{item.quantity}</span>
-              <span className="text-gray-500 dark:text-gray-400">{formatIDR(item.price * item.quantity)}</span>
-            </div>
-          ))}
-          <Separator className="my-2" />
-          <div className="flex justify-between text-sm font-medium">
-            <span className="text-gray-900 dark:text-white">Total</span>
-            <span className="text-gray-900 dark:text-white">{formatIDR(lastOrder.totalAmount || cartSubtotal)}</span>
+        <div>
+          <h2 className="text-3xl font-extrabold text-foreground mb-2">Order Submitted!</h2>
+          <p className="text-base font-medium text-muted-foreground">
+            Order <span className="font-mono font-bold text-foreground px-2 py-0.5 bg-muted rounded-md mx-1">{lastOrder.orderId}</span> for Table <strong className="text-foreground">{selectedTableNumber}</strong>
+          </p>
+        </div>
+        <div className="w-full bg-card rounded-3xl border border-border/50 p-6 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 text-left border-b border-border/50 pb-2">Order Summary</p>
+          <div className="space-y-3 mb-4">
+            {lastOrder.items.map((item: CartItem) => (
+              <div key={item.id} className="flex justify-between text-base font-medium">
+                <span className="text-foreground"><span className="text-muted-foreground mr-2">{item.quantity}x</span> {item.name}</span>
+                <span className="text-muted-foreground font-semibold">{formatIDR(item.price * item.quantity)}</span>
+              </div>
+            ))}
+          </div>
+          <Separator className="my-4 border-border/50" />
+          <div className="flex justify-between text-xl font-extrabold">
+            <span className="text-foreground">Total</span>
+            <span className="text-amber-600 dark:text-amber-400">{formatIDR(lastOrder.totalAmount || cartSubtotal)}</span>
           </div>
         </div>
-        <div className="flex gap-3 mt-4">
-          <Button variant="outline" onClick={() => { setShowConfirm(false); setLastOrder(null); }}>
+        <div className="flex w-full gap-3 mt-2">
+          <Button variant="outline" className="flex-1 h-12 rounded-xl font-bold border-border/50 text-base" onClick={() => { setShowConfirm(false); setLastOrder(null); }}>
             New Order
           </Button>
-          <Button onClick={() => { setShowConfirm(false); setLastOrder(null); setSelectedTableId(''); setSelectedTableNumber(''); }}>
+          <Button className="flex-1 h-12 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 text-base" onClick={() => { setShowConfirm(false); setLastOrder(null); setSelectedTableId(''); setSelectedTableNumber(''); }}>
             Change Table
           </Button>
         </div>
@@ -312,9 +320,9 @@ export default function KioskPage() {
       </div>
 
       {/* Cart Panel (desktop sidebar) */}
-      <div className={`fixed lg:static inset-0 lg:inset-auto z-40 lg:z-auto transition-transform duration-300 ${
+      <div className={`fixed lg:static inset-0 lg:inset-auto z-40 lg:z-auto transition-transform duration-300 lg:w-80 ${
         cartOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
-      } ${cartCount === 0 ? 'lg:w-0 lg:overflow-hidden lg:opacity-0 lg:pointer-events-none' : 'lg:w-80'}`}>
+      }`}>
         {/* Overlay for mobile */}
         <div
           className={`lg:hidden absolute inset-0 bg-black/40 ${cartOpen ? '' : 'hidden'}`}

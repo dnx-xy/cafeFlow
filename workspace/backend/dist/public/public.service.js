@@ -29,8 +29,10 @@ const customer_feedback_entity_1 = require("../entities/customer-feedback.entity
 const loyalty_program_entity_1 = require("../entities/loyalty-program.entity");
 const point_transaction_entity_1 = require("../entities/point-transaction.entity");
 const enums_1 = require("../entities/enums");
+const notification_gateway_1 = require("../notifications/notification.gateway");
+const whatsapp_service_1 = require("../notifications/whatsapp.service");
 let PublicService = class PublicService {
-    constructor(menusRepository, menuItemsRepository, outletsRepository, tablesRepository, businessesRepository, ordersRepository, orderItemsRepository, customersRepository, feedbackRepository, loyaltyProgramsRepository, pointTransactionsRepository, orderItemMenuOptionsRepository) {
+    constructor(menusRepository, menuItemsRepository, outletsRepository, tablesRepository, businessesRepository, ordersRepository, orderItemsRepository, customersRepository, feedbackRepository, loyaltyProgramsRepository, pointTransactionsRepository, orderItemMenuOptionsRepository, notificationGateway, whatsAppService) {
         this.menusRepository = menusRepository;
         this.menuItemsRepository = menuItemsRepository;
         this.outletsRepository = outletsRepository;
@@ -43,6 +45,8 @@ let PublicService = class PublicService {
         this.loyaltyProgramsRepository = loyaltyProgramsRepository;
         this.pointTransactionsRepository = pointTransactionsRepository;
         this.orderItemMenuOptionsRepository = orderItemMenuOptionsRepository;
+        this.notificationGateway = notificationGateway;
+        this.whatsAppService = whatsAppService;
     }
     async getMenuByTable(tableId) {
         const table = await this.tablesRepository.findOne({
@@ -126,11 +130,10 @@ let PublicService = class PublicService {
                             const adj = sel.priceAdjustment ?? val.priceAdjustment ?? 0;
                             optionAdjustment += adj;
                             const optRec = this.orderItemMenuOptionsRepository.create({
-                                optionId: opt.id,
+                                option: { id: opt.id },
                                 optionValueId: val.id,
                                 quantity: item.quantity,
                                 priceAdjustment: adj,
-                                orderItemId: '',
                                 tenantId,
                             });
                             selectedOptionValues.push(optRec);
@@ -142,8 +145,7 @@ let PublicService = class PublicService {
             const itemTotal = unitPrice * item.quantity;
             totalAmount += itemTotal;
             const orderItem = this.orderItemsRepository.create({
-                menuItemId: item.menuItemId,
-                orderId: '',
+                menuItem: { id: item.menuItemId },
                 quantity: item.quantity,
                 unitPrice,
                 totalPrice: itemTotal,
@@ -172,7 +174,33 @@ let PublicService = class PublicService {
             paymentStatus: enums_1.PaymentStatus.PENDING,
             orderItems,
         });
-        return await this.ordersRepository.save(order);
+        const saved = await this.ordersRepository.save(order);
+        const savedWithItems = await this.ordersRepository.findOne({
+            where: { id: saved.id },
+            relations: { orderItems: { menuItem: true } },
+        });
+        const bId = business?.id || '';
+        if (bId) {
+            this.notificationGateway.emitNewOrder(bId, {
+                id: saved.id,
+                orderId: saved.orderId,
+                tableNumber: table.number,
+                status: saved.status,
+                totalAmount: saved.totalAmount,
+                customer: customer?.id || null,
+                createdAt: saved.createdAt.toISOString(),
+            });
+            if (business?.whatsappNumber) {
+                const session = `business-${bId}`;
+                const items = (savedWithItems?.orderItems || []).map(oi => ({
+                    name: oi.menuItem?.name || 'Item',
+                    qty: oi.quantity,
+                    price: oi.unitPrice,
+                }));
+                this.whatsAppService.sendOrderNotification(business.whatsappNumber, saved.orderId, table.number, items, saved.totalAmount, session);
+            }
+        }
+        return { ...saved, tableNumber: table.number };
     }
     async submitFeedback(data) {
         let customerId;
@@ -258,6 +286,8 @@ exports.PublicService = PublicService = __decorate([
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        notification_gateway_1.NotificationGateway,
+        whatsapp_service_1.WhatsAppService])
 ], PublicService);
 //# sourceMappingURL=public.service.js.map

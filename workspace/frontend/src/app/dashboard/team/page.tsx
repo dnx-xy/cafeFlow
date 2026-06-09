@@ -79,49 +79,49 @@ export default function TeamPage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.team.teamMembers}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.team.teamSubtitle}</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground">{t.dashboard.team.teamMembers}</h2>
+          <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.team.teamSubtitle}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger render={<Button size="sm"><Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.team.addMember}</Button>} />
-          <DialogContent>
+          <DialogTrigger render={<Button className="h-11 px-6 font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 rounded-xl hover:scale-105 transition-all"><Plus className="w-5 h-5 mr-2" /> {t.dashboard.team.addMember}</Button>} />
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{editing ? t.dashboard.team.dialog.editTitle : t.dashboard.team.dialog.addTitle}</DialogTitle>
-              <DialogDescription>{editing ? t.dashboard.team.dialog.editDesc : t.dashboard.team.dialog.addDesc}</DialogDescription>
+              <DialogTitle className="text-xl font-bold">{editing ? t.dashboard.team.dialog.editTitle : t.dashboard.team.dialog.addTitle}</DialogTitle>
+              <DialogDescription className="text-sm font-medium">{editing ? t.dashboard.team.dialog.editDesc : t.dashboard.team.dialog.addDesc}</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-5 py-4">
               {!editing && (
                 <>
                   <div className="space-y-2">
-                    <Label>{t.dashboard.team.dialog.fullName}</Label>
-                    <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder={t.dashboard.team.dialog.namePlaceholder} />
+                    <Label className="text-sm font-medium">{t.dashboard.team.dialog.fullName}</Label>
+                    <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder={t.dashboard.team.dialog.namePlaceholder} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" />
                   </div>
                   <div className="space-y-2">
-                    <Label>{t.dashboard.team.dialog.email}</Label>
-                    <Input value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder={t.dashboard.team.dialog.emailPlaceholder} type="email" />
+                    <Label className="text-sm font-medium">{t.dashboard.team.dialog.email}</Label>
+                    <Input value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder={t.dashboard.team.dialog.emailPlaceholder} type="email" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" />
                   </div>
                   <div className="space-y-2">
-                    <Label>{t.dashboard.team.dialog.password}</Label>
-                    <Input value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} placeholder={t.dashboard.team.dialog.passwordPlaceholder} type="password" />
+                    <Label className="text-sm font-medium">{t.dashboard.team.dialog.password}</Label>
+                    <Input value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} placeholder={t.dashboard.team.dialog.passwordPlaceholder} type="password" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" />
                   </div>
                 </>
               )}
               <div className="space-y-2">
-                <Label>{t.dashboard.team.dialog.role}</Label>
+                <Label className="text-sm font-medium">{t.dashboard.team.dialog.role}</Label>
                 <Select value={form.roleId} onValueChange={v => setForm(p => ({ ...p, roleId: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 font-medium"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {Object.entries(roleLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                    {Object.entries(roleLabels).map(([k, v]) => <SelectItem key={k} value={k} className="font-medium">{v}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>{t.dashboard.team.dialog.cancel}</Button>
-              <Button onClick={handleSubmit} disabled={submitting}>
+            <DialogFooter className="gap-3 sm:gap-0">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="h-11 px-6 font-semibold rounded-xl border-border/50">{t.dashboard.team.dialog.cancel}</Button>
+              <Button onClick={handleSubmit} disabled={submitting} className="h-11 px-6 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20">
                 {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editing ? t.dashboard.team.dialog.update : t.dashboard.team.dialog.addMember}
               </Button>
@@ -130,64 +130,68 @@ export default function TeamPage() {
         </Dialog>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input className="pl-9 h-9 text-sm" placeholder={t.dashboard.team.search} value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="flex flex-col sm:flex-row items-center gap-4 bg-card rounded-3xl border border-border/50 p-4 shadow-sm">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input className="pl-12 h-12 bg-muted/30 border-0 focus-visible:ring-amber-500 rounded-2xl font-medium w-full" placeholder={t.dashboard.team.search} value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[140px] h-9 text-sm"><SelectValue placeholder={t.dashboard.team.allRoles} /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[180px] h-12 bg-muted/30 border-0 focus:ring-amber-500 rounded-2xl font-semibold"><SelectValue placeholder={t.dashboard.team.allRoles} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">{t.dashboard.team.allRoles}</SelectItem>
-            {Object.entries(roleLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+            {Object.entries(roleLabels).map(([k, v]) => <SelectItem key={k} value={k} className="font-medium">{v}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48"><div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center h-48 gap-3">
-          <p className="text-red-500 text-sm">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchStaff}>{t.dashboard.team.retry}</Button>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-rose-500 text-sm font-bold">{error}</p>
+          <Button variant="outline" onClick={fetchStaff} className="h-11 px-6 rounded-xl border-border/50">{t.dashboard.team.retry}</Button>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 text-gray-400 dark:text-gray-500">
-          <UserCircle className="w-10 h-10 mb-2 opacity-50" />
-          <p className="font-medium text-sm">{t.dashboard.team.noMembers}</p>
-          <p className="text-xs">{t.dashboard.team.noMembersDesc}</p>
+        <div className="flex flex-col items-center justify-center h-64 text-muted-foreground border-2 border-dashed border-border/50 rounded-3xl">
+          <UserCircle className="w-16 h-16 mb-4 opacity-50" />
+          <p className="font-bold text-lg text-foreground mb-1">{t.dashboard.team.noMembers}</p>
+          <p className="text-sm font-medium">{t.dashboard.team.noMembersDesc}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map(member => (
-            <div key={member.id} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div key={member.id} className="bg-card rounded-3xl border border-border/50 p-6 shadow-sm hover:shadow-md hover:border-amber-500/30 transition-all group flex flex-col">
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-white font-extrabold text-xl shadow-sm group-hover:scale-110 transition-transform shrink-0">
                     {(member.user?.name || '?').charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{member.user?.name || t.dashboard.team.unknown}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{member.user?.email || t.dashboard.team.noEmail}</p>
+                    <p className="text-lg font-bold text-foreground truncate group-hover:text-amber-600 transition-colors">{member.user?.name || t.dashboard.team.unknown}</p>
+                    <p className="text-sm font-medium text-muted-foreground truncate">{member.user?.email || t.dashboard.team.noEmail}</p>
                   </div>
                 </div>
-                <Badge variant="outline" className={`text-[10px] shrink-0 ${ROLE_COLORS[member.roleId] || ''}`}>
-                  <Shield className="w-3 h-3 mr-1 inline" />{roleLabels[member.roleId] || member.roleId}
+              </div>
+              
+              <div className="mb-6">
+                 <Badge variant="outline" className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider border-0 shadow-sm ${ROLE_COLORS[member.roleId] || 'bg-muted text-muted-foreground'}`}>
+                  <Shield className="w-3.5 h-3.5 mr-1.5 inline" />{roleLabels[member.roleId] || member.roleId}
                 </Badge>
               </div>
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/50">
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 text-sm font-bold">
                   {member.isActive ? (
-                    <span className="flex items-center text-green-600 dark:text-green-400"><Check className="w-3 h-3 mr-1" />{t.dashboard.team.status.active}</span>
+                    <span className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-md"><Check className="w-4 h-4 mr-1.5" />{t.dashboard.team.status.active}</span>
                   ) : (
-                    <span className="flex items-center text-red-600 dark:text-red-400"><X className="w-3 h-3 mr-1" />{t.dashboard.team.status.inactive}</span>
+                    <span className="flex items-center text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-3 py-1 rounded-md"><X className="w-4 h-4 mr-1.5" />{t.dashboard.team.status.inactive}</span>
                   )}
                 </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => handleOpen(member)}>
-                    <MoreHorizontal className="w-4 h-4" />
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" className="w-10 h-10 hover:bg-muted" onClick={() => handleOpen(member)}>
+                    <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-xs text-red-600 dark:text-red-400 h-7" onClick={() => handleDelete(member.id)}>
+                  <Button variant="ghost" size="sm" className="font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 px-4 h-10 rounded-xl" onClick={() => handleDelete(member.id)}>
                     {t.dashboard.team.actions.remove}
                   </Button>
                 </div>

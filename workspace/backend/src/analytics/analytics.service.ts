@@ -46,7 +46,7 @@ export class AnalyticsService {
 
     const ids = orders.map(o => o.id);
     const orderItems = ids.length > 0 ? await this.orderItemsRepository.find({
-      where: { orderId: In(ids) },
+      where: { order: { id: In(ids) } } as any,
       relations: { menuItem: true },
     }) : [];
 

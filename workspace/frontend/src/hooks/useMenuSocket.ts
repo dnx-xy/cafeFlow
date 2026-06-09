@@ -10,8 +10,8 @@ export function useMenuSocket(businessId?: string | null) {
   useEffect(() => {
     if (!businessId) return;
 
-    const socket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', {
-      path: '/menu-updates',
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+    const socket = io(`${apiUrl}/menu-updates`, {
       transports: ['websocket', 'polling'],
       query: { businessId },
     });

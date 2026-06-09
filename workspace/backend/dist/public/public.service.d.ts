@@ -11,6 +11,9 @@ import { Customer } from '../entities/customer.entity';
 import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
 import { PointTransaction } from '../entities/point-transaction.entity';
+import { OrderStatus, OrderType, PaymentStatus } from '../entities/enums';
+import { NotificationGateway } from '../notifications/notification.gateway';
+import { WhatsAppService } from '../notifications/whatsapp.service';
 export declare class PublicService {
     private menusRepository;
     private menuItemsRepository;
@@ -24,7 +27,9 @@ export declare class PublicService {
     private loyaltyProgramsRepository;
     private pointTransactionsRepository;
     private orderItemMenuOptionsRepository;
-    constructor(menusRepository: Repository<Menu>, menuItemsRepository: Repository<MenuItem>, outletsRepository: Repository<Outlet>, tablesRepository: Repository<Table>, businessesRepository: Repository<Business>, ordersRepository: Repository<Order>, orderItemsRepository: Repository<OrderItemEntity>, customersRepository: Repository<Customer>, feedbackRepository: Repository<CustomerFeedback>, loyaltyProgramsRepository: Repository<LoyaltyProgram>, pointTransactionsRepository: Repository<PointTransaction>, orderItemMenuOptionsRepository: Repository<OrderItemMenuOption>);
+    private notificationGateway;
+    private whatsAppService;
+    constructor(menusRepository: Repository<Menu>, menuItemsRepository: Repository<MenuItem>, outletsRepository: Repository<Outlet>, tablesRepository: Repository<Table>, businessesRepository: Repository<Business>, ordersRepository: Repository<Order>, orderItemsRepository: Repository<OrderItemEntity>, customersRepository: Repository<Customer>, feedbackRepository: Repository<CustomerFeedback>, loyaltyProgramsRepository: Repository<LoyaltyProgram>, pointTransactionsRepository: Repository<PointTransaction>, orderItemMenuOptionsRepository: Repository<OrderItemMenuOption>, notificationGateway: NotificationGateway, whatsAppService: WhatsAppService);
     getMenuByTable(tableId: string): Promise<{
         menu: Menu;
         cafe: {
@@ -59,7 +64,44 @@ export declare class PublicService {
         customerName?: string;
         customerWhatsapp?: string;
         paymentMethod?: string;
-    }): Promise<Order>;
+    }): Promise<{
+        tableNumber: string;
+        orderId: string;
+        orderIdPrefix: string;
+        tableId: string;
+        outletId: string;
+        customerId: string;
+        userId: string;
+        status: OrderStatus;
+        orderType: OrderType;
+        notes: string;
+        totalAmount: number;
+        discountAmount: number;
+        taxAmount: number;
+        finalAmount: number;
+        currency: string;
+        paymentMethod: import("../entities/enums").PaymentMethod;
+        paymentStatus: PaymentStatus;
+        paymentId: string;
+        deliveredAt: Date;
+        completedAt: Date;
+        cancelledAt: Date;
+        tenantId: string;
+        businessId: string;
+        business: Business;
+        table: Table;
+        outlet: Outlet;
+        customer: Customer;
+        user: import("../entities/user.entity").User;
+        orderItems: OrderItemEntity[];
+        orderStatusUpdates: import("../entities/order-status-update.entity").OrderStatusUpdate[];
+        orderNotes: import("../entities/order-note.entity").OrderNote[];
+        customerFeedback: CustomerFeedback[];
+        pointTransactions: PointTransaction[];
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
     submitFeedback(data: {
         customerName?: string;
         customerWhatsapp?: string;

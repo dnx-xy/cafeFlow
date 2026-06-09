@@ -30,26 +30,60 @@ command -v docker &>/dev/null || { error "Docker not found"; exit 1; }
 command -v npm &>/dev/null || { error "npm not found"; exit 1; }
 docker info &>/dev/null || { error "Docker not running"; exit 1; }
 
-# Start Docker services (db + redis only)
+wait_for_pg() {
+  log "Waiting for PostgreSQL..."
+  for i in $(seq 1 30); do
+    if docker compose exec -T db pg_isready -U postgres &>/dev/null; then
+      success "PostgreSQL is ready"
+      return 0
+    fi
+    echo -n "."
+    sleep 1
+  done
+  echo ""
+  error "PostgreSQL did not become ready within 30s"
+  return 1
+}
+
+wait_for_url() {
+  local name="$1" url="$2" timeout="${3:-30}"
+  log "Waiting for $name..."
+  for i in $(seq 1 "$timeout"); do
+    if curl -so /dev/null "$url" &>/dev/null; then
+      success "$name is ready"
+      return 0
+    fi
+    echo -n "."
+    sleep 1
+  done
+  echo ""
+  error "$name did not start within ${timeout}s"
+  return 1
+}
+
+# Start Docker services
 log "Starting database, redis, and WhatsApp gateway..."
 cd "$WORKSPACE_DIR"
 docker compose up -d db redis wa-gateway
-log "Waiting for services..."
-sleep 5
+
+# Wait for PostgreSQL to actually accept connections
+wait_for_pg
 
 # Start backend locally
 log "Starting backend (port 3001)..."
 cd "$WORKSPACE_DIR/backend"
 WHATSAPP_GATEWAY_URL=http://localhost:3002 npm run start:dev &
 BACKEND_PID=$!
-sleep 8
+
+wait_for_url "Backend" "http://localhost:3001" 45
 
 # Start frontend locally
 log "Starting frontend (port 3000)..."
 cd "$WORKSPACE_DIR/frontend"
 npm run dev &
 FRONTEND_PID=$!
-sleep 5
+
+wait_for_url "Frontend" "http://localhost:3000" 60
 
 # Show status
 echo ""

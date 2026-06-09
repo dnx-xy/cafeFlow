@@ -73,6 +73,17 @@ let QrCodesService = class QrCodesService {
         });
         return await this.qrCodesRepository.save(qrCode);
     }
+    async generateBusinessQrCode(businessId, tenantId) {
+        const code = crypto.randomBytes(16).toString('hex');
+        const qrCode = this.qrCodesRepository.create({
+            code,
+            tableId: null,
+            businessId,
+            tenantId,
+            isActive: true,
+        });
+        return await this.qrCodesRepository.save(qrCode);
+    }
     async getQrCodeByTable(tableId, businessId) {
         return await this.qrCodesRepository.findOne({
             where: { tableId, businessId },
@@ -86,6 +97,17 @@ let QrCodesService = class QrCodesService {
         if (!qrCode) {
             throw new Error('Invalid or inactive QR code');
         }
+        qrCode.scannedAt = new Date();
+        await this.qrCodesRepository.save(qrCode);
+        if (!qrCode.tableId) {
+            return {
+                tableId: null,
+                code: qrCode.code,
+                outletId: undefined,
+                tenantId: qrCode.tenantId || '',
+                businessId: qrCode.businessId,
+            };
+        }
         const table = await this.tablesRepository.findOne({
             where: { id: qrCode.tableId },
             relations: { outlet: { business: true } },
@@ -93,8 +115,6 @@ let QrCodesService = class QrCodesService {
         if (!table) {
             throw new Error('Table not found');
         }
-        qrCode.scannedAt = new Date();
-        await this.qrCodesRepository.save(qrCode);
         return {
             tableId: qrCode.tableId,
             code: qrCode.code,

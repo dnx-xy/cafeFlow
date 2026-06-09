@@ -39,10 +39,16 @@ export class OrdersService {
     if (businessId) {
       const business = await this.businessesRepository.findOne({ where: { id: businessId } });
 
+      let tableNumber: string | undefined;
+      if (saved.tableId) {
+        const table = await this.tablesRepository.findOne({ where: { id: saved.tableId } });
+        tableNumber = table?.number;
+      }
+
       this.notificationGateway.emitNewOrder(businessId, {
         id: saved.id,
         orderId: saved.orderId,
-        tableNumber: saved.tableId,
+        tableNumber,
         status: saved.status,
         totalAmount: saved.totalAmount,
         customer: saved.customerId,
@@ -51,11 +57,20 @@ export class OrdersService {
 
       if (business?.whatsappNumber) {
         const session = `business-${businessId}`;
+        const orderWithItems = await this.ordersRepository.findOne({
+          where: { id: saved.id },
+          relations: { orderItems: { menuItem: true } },
+        });
+        const items = (orderWithItems?.orderItems || []).map(oi => ({
+          name: oi.menuItem?.name || 'Item',
+          qty: oi.quantity,
+          price: oi.unitPrice,
+        }));
         this.whatsAppService.sendOrderNotification(
           business.whatsappNumber,
           saved.orderId,
-          saved.tableId,
-          [],
+          tableNumber,
+          items,
           saved.totalAmount,
           session,
         );
@@ -72,7 +87,7 @@ export class OrdersService {
     orderType?: string,
     startDate?: Date,
     endDate?: Date,
-  ): Promise<Order[]> {
+  ): Promise<any[]> {
     const where: any = { tenantId };
     
     if (outletId) {
@@ -95,34 +110,54 @@ export class OrdersService {
       where.createdAt = LessThanOrEqual(endDate);
     }
     
-    return await this.ordersRepository.find({
+    const orders = await this.ordersRepository.find({
       where,
+      relations: { orderItems: { menuItem: true }, table: true },
       order: { createdAt: 'DESC' },
     });
+
+    return orders.map(o => ({
+      ...o,
+      tableNumber: o.table?.number || null,
+      table: undefined,
+    }));
   }
 
-  async findOne(id: string, tenantId: string): Promise<Order> {
-    return await this.ordersRepository.findOne({
+  async findOne(id: string, tenantId: string): Promise<any> {
+    const order = await this.ordersRepository.findOne({
       where: { id, tenantId },
       relations: { customer: true, table: true, orderItems: { menuItem: true } },
     });
+    if (order) {
+      (order as any).tableNumber = order.table?.number || null;
+      (order as any).table = undefined;
+    }
+    return order;
   }
 
   async updateStatus(id: string, status: OrderStatus, tenantId: string): Promise<Order> {
+    const order = await this.ordersRepository.findOne({ where: { id, tenantId } });
+    const oldStatus = order?.status;
     await this.ordersRepository.update(
       { id, tenantId },
       { status },
     );
     const updated = await this.findOne(id, tenantId);
     if (updated?.businessId) {
-      this.notificationGateway.emitNewOrder(updated.businessId, {
+      let tableNumber: string | undefined;
+      if (updated.tableId) {
+        const table = await this.tablesRepository.findOne({ where: { id: updated.tableId } });
+        tableNumber = table?.number;
+      }
+      this.notificationGateway.emitOrderStatusUpdate(updated.businessId, {
         id: updated.id,
         orderId: updated.orderId,
-        tableNumber: updated.tableId,
-        status: updated.status,
+        tableNumber,
         totalAmount: updated.totalAmount,
         customer: updated.customerId,
-        createdAt: updated.createdAt.toISOString(),
+        oldStatus: oldStatus || '',
+        newStatus: updated.status,
+        updatedAt: new Date().toISOString(),
       });
     }
     return updated;

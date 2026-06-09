@@ -129,24 +129,24 @@ export default function MessagesPage() {
   const isConnected = sessionStatus === 'authenticated';
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.whatsapp.title}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.whatsapp.subtitle}</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground">{t.dashboard.whatsapp.title}</h2>
+          <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.whatsapp.subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           {isConnected ? (
-            <Badge className="text-[10px] bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/20 gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Terhubung
+            <Badge className="px-3 py-1.5 text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 shadow-sm gap-1.5">
+              <CheckCircle2 className="w-4 h-4" /> Terhubung
             </Badge>
           ) : sessionStatus === 'gateway_unreachable' ? (
-            <Badge className="text-[10px] bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20 gap-1">
-              <XCircle className="w-3 h-3" /> Gateway offline
+            <Badge className="px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-0 shadow-sm gap-1.5">
+              <XCircle className="w-4 h-4" /> Gateway offline
             </Badge>
           ) : null}
           {unreadCount > 0 && (
-            <Badge variant="outline" className="text-[10px] bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20">
+            <Badge className="px-3 py-1.5 text-xs font-bold bg-rose-500 text-white border-0 shadow-sm">
               {unreadCount} unread
             </Badge>
           )}
@@ -154,32 +154,35 @@ export default function MessagesPage() {
       </div>
 
       {!isConnected && (
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/5 dark:to-orange-500/5 rounded-xl border border-amber-100 dark:border-amber-500/10 p-5">
-          <div className="flex flex-col items-center text-center">
-            <Smartphone className="w-10 h-10 text-amber-600 dark:text-amber-400 mb-3" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Hubungkan WhatsApp</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-md">
+        <div className="bg-card rounded-3xl border border-amber-500/20 p-8 shadow-lg shadow-amber-500/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[60px] pointer-events-none" />
+          <div className="flex flex-col items-center text-center relative z-10">
+            <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+              <Smartphone className="w-10 h-10 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-foreground mb-2">Hubungkan WhatsApp</h3>
+            <p className="text-sm font-medium text-muted-foreground mb-8 max-w-md leading-relaxed">
               Scan QR code dengan WhatsApp Anda untuk menerima dan membalas pesan pelanggan langsung dari dashboard.
             </p>
             {qrCode ? (
-              <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm mb-3">
+              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-black/5 mb-4 border border-gray-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48" />
+                <img src={qrCode} alt="WhatsApp QR Code" className="w-56 h-56" />
               </div>
             ) : (
-              <Button onClick={handleConnect} disabled={connecting} size="sm" className="h-9">
-                {connecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+              <Button onClick={handleConnect} disabled={connecting} className="h-12 px-8 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20 hover:scale-105 transition-all">
+                {connecting ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <RefreshCw className="w-5 h-5 mr-2" />}
                 {connecting ? 'Menghubungkan...' : 'Tampilkan QR Code'}
               </Button>
             )}
             {sessionStatus === 'connecting' && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
-                <Loader2 className="w-3 h-3 animate-spin" /> Menunggu scan...
+              <p className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-4 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Menunggu scan...
               </p>
             )}
             {sessionStatus === 'scan_required' && (
-              <p className="text-xs text-gray-500 mt-2">
-                Buka WhatsApp &gt; Titik tiga &gt; Perangkat tertaut &gt; Scan
+              <p className="text-sm font-medium text-muted-foreground mt-4 bg-muted/50 px-4 py-2 rounded-full">
+                Buka WhatsApp <span className="mx-1">&gt;</span> Titik tiga <span className="mx-1">&gt;</span> Perangkat tertaut <span className="mx-1">&gt;</span> Scan
               </p>
             )}
           </div>

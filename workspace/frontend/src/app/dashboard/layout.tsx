@@ -52,6 +52,7 @@ import {
   Database,
   Grid,
   MessageSquare,
+  RefreshCw,
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -183,13 +184,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
         >
           <div className="p-5 border-b border-gray-100 dark:border-gray-800/50">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-sm">
-                <Coffee className="w-4.5 h-4.5 text-white" />
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Coffee className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-base font-semibold tracking-tight text-gray-900 dark:text-white">CafeFlow</span>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 -mt-0.5">Dashboard</p>
+                <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">CafeFlow</span>
+                <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Workspace</p>
               </div>
             </Link>
           </div>
@@ -204,9 +205,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all',
                       active
-                        ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200'
                     )}
                   >
@@ -225,9 +226,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     href="/dashboard/tenants"
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all',
                       isActive('/dashboard/tenants')
-                        ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200'
                     )}
                   >
@@ -249,9 +250,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all',
                       active
-                        ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200'
                     )}
                   >
@@ -263,70 +264,70 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </nav>
           </ScrollArea>
 
-          <div className="p-3 border-t border-gray-100 dark:border-gray-800/50">
+          <div className="p-4 border-t border-border/50 bg-muted/10">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors text-left group">
-                  <Avatar className="w-8 h-8 ring-2 ring-gray-100 dark:ring-gray-800">
-                    <AvatarFallback className="bg-gradient-to-br from-amber-500 to-orange-600 text-white text-xs font-semibold">
+                <button className="flex items-center gap-4 w-full p-3 rounded-2xl hover:bg-muted/50 transition-colors text-left group border border-transparent hover:border-border/50">
+                  <Avatar className="w-10 h-10 shadow-sm border border-border/50 group-hover:scale-105 transition-transform">
+                    <AvatarFallback className="bg-gradient-to-br from-amber-400 to-orange-500 text-white text-sm font-extrabold">
                       {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name || 'User'}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                    <p className="text-sm font-bold text-foreground truncate group-hover:text-amber-600 transition-colors">{user?.name || 'User'}</p>
+                    <p className="text-xs font-medium text-muted-foreground truncate mt-0.5">
                       {isSuperAdmin ? getCurrentTenantDisplayName() : (currentTenant?.name || user?.businessId || 'Unknown')}
                     </p>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors shrink-0" />
+                  <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-amber-600 transition-colors shrink-0" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>
-                  <UserCircle className="mr-2 w-4 h-4" /> {t.dashboard.header.profile}
+              <DropdownMenuContent align="end" className="w-56 rounded-2xl border-border/50 shadow-xl p-2">
+                <DropdownMenuItem className="p-3 rounded-xl font-medium cursor-pointer hover:bg-muted/50">
+                  <UserCircle className="mr-3 w-4 h-4 text-muted-foreground" /> {t.dashboard.header.profile}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 w-4 h-4" /> {t.dashboard.header.settings}
+                <DropdownMenuItem className="p-3 rounded-xl font-medium cursor-pointer hover:bg-muted/50">
+                  <Settings className="mr-3 w-4 h-4 text-muted-foreground" /> {t.dashboard.header.settings}
                 </DropdownMenuItem>
                 {isSuperAdmin && (
-                  <DropdownMenuItem>
-                    <Globe className="mr-2 w-4 h-4" /> {t.dashboard.header.manageTenants}
+                  <DropdownMenuItem className="p-3 rounded-xl font-medium cursor-pointer hover:bg-muted/50">
+                    <Globe className="mr-3 w-4 h-4 text-muted-foreground" /> {t.dashboard.header.manageTenants}
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 dark:text-red-400" onClick={logout}>
-                  <LogOut className="mr-2 w-4 h-4" /> {t.dashboard.header.logOut}
+                <DropdownMenuSeparator className="my-2 bg-border/50" />
+                <DropdownMenuItem className="p-3 rounded-xl font-bold cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-500/10" onClick={logout}>
+                  <LogOut className="mr-3 w-4 h-4" /> {t.dashboard.header.logOut}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </aside>
 
-        <div className="lg:ml-64">
-          <header className="sticky top-0 z-30 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800/50">
-            <div className="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon" className="lg:hidden -ml-2" onClick={() => setSidebarOpen(true)}>
-                  <Menu className="w-5 h-5" />
+        <div className="lg:ml-64 flex flex-col min-h-screen">
+          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+            <div className="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" className="lg:hidden w-10 h-10 -ml-2" onClick={() => setSidebarOpen(true)}>
+                  <Menu className="w-6 h-6" />
                 </Button>
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{getPageTitle()}</h1>
+                <h1 className="text-2xl font-extrabold text-foreground capitalize tracking-tight">{getPageTitle()}</h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {isSuperAdmin && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 hidden sm:flex">
                     <Select 
                       value={user?.tenantId} 
                       onValueChange={handleSwitchTenant}
                       disabled={tenantsLoading}
                     >
-                      <SelectTrigger className="h-8 w-48 text-xs border-gray-200 dark:border-gray-700 bg-white dark:bg-[#16181f]">
+                      <SelectTrigger className="h-10 w-48 text-sm font-medium bg-muted/50 border-0 focus:ring-amber-500 rounded-xl">
                         <SelectValue placeholder={tenantsLoading ? t.dashboard.header.loadingTenants : t.dashboard.header.selectTenant}>
                           {currentTenant?.name || tenants.find(t => t.id === user?.tenantId)?.name || t.dashboard.header.selectTenant}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-2xl border-border/50 shadow-xl">
                         {tenants.map((tenant) => (
-                          <SelectItem key={tenant.id} value={tenant.id}>
+                          <SelectItem key={tenant.id} value={tenant.id} className="font-medium rounded-lg">
                             {tenant.name}
                           </SelectItem>
                         ))}
@@ -334,63 +335,66 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </Select>
                     <Button 
                       variant="outline" 
-                      size="sm" 
-                      className="h-8 text-xs"
+                      className="h-10 px-4 rounded-xl font-semibold border-border/50 shadow-sm hover:bg-muted"
                       onClick={() => {
                         fetchTenants();
                         toast.info('Refreshing tenant data...');
                       }}
                       disabled={tenantsLoading}
                     >
+                      <RefreshCw className={`w-4 h-4 mr-2 ${tenantsLoading ? 'animate-spin' : ''}`} />
                       {t.dashboard.header.refreshData}
                     </Button>
                   </div>
                 )}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
-                      <Bell className="w-4.5 h-4.5 text-gray-500 dark:text-gray-400" />
+                    <button className="relative w-11 h-11 flex items-center justify-center rounded-xl bg-muted/50 hover:bg-amber-500/10 hover:text-amber-600 transition-colors border border-transparent hover:border-amber-500/30 group">
+                      <Bell className="w-5 h-5 text-muted-foreground group-hover:text-amber-600 transition-colors" />
                       {unreadCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white dark:ring-[#0f1117] px-1">
+                        <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-extrabold rounded-full ring-4 ring-background px-1.5 shadow-sm">
                           {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
                       )}
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent align="end" className="w-80 p-0" sideOffset={8}>
-                    <div className="p-3 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">Notifikasi</p>
-                      <div className="flex items-center gap-2">
+                  <PopoverContent align="end" className="w-80 sm:w-96 p-0 rounded-3xl border border-border/50 shadow-2xl overflow-hidden" sideOffset={12}>
+                    <div className="p-4 sm:p-5 border-b border-border/50 flex items-center justify-between bg-muted/30">
+                      <p className="text-base font-bold text-foreground">Notifications</p>
+                      <div className="flex items-center gap-3">
                         {unreadCount > 0 && (
-                          <button onClick={markAllRead} className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium">
-                            Tandai dibaca
+                          <button onClick={markAllRead} className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-bold transition-colors">
+                            Mark all read
                           </button>
                         )}
                         {notifications.length > 0 && (
-                          <button onClick={clearAll} className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                            Hapus semua
+                          <button onClick={clearAll} className="text-xs text-muted-foreground hover:text-foreground font-medium transition-colors">
+                            Clear
                           </button>
                         )}
                       </div>
                     </div>
                     <div className="max-h-[60vh] overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div className="py-8 text-center text-xs text-gray-400 dark:text-gray-500">Belum ada notifikasi</div>
+                        <div className="py-12 text-center flex flex-col items-center">
+                           <Bell className="w-10 h-10 text-muted-foreground opacity-20 mb-3" />
+                           <p className="text-sm font-medium text-muted-foreground">You're all caught up!</p>
+                        </div>
                       ) : (
                         notifications.map(n => (
                           <Link
                             key={n.id}
                             href={n.link || '#'}
-                            className={`flex items-start gap-3 p-3 border-b border-gray-50 dark:border-gray-800/30 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors ${n.read ? '' : 'bg-amber-50/30 dark:bg-amber-500/5'}`}
+                            className={`flex items-start gap-4 p-4 border-b border-border/50 last:border-0 hover:bg-muted/50 transition-colors group ${n.read ? '' : 'bg-amber-500/5'}`}
                           >
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${n.type === 'order' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : n.type === 'payment' ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400'}`}>
-                              {n.type === 'order' ? <ShoppingCart className="w-3.5 h-3.5" /> : n.type === 'payment' ? <CreditCard className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-border/50 group-hover:scale-105 transition-transform ${n.type === 'order' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : n.type === 'payment' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                              {n.type === 'order' ? <ShoppingCart className="w-5 h-5" /> : n.type === 'payment' ? <CreditCard className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{n.title}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{n.message}</p>
-                              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
-                                {new Date(n.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                            <div className="min-w-0 flex-1 pt-0.5">
+                              <p className={`text-sm font-bold truncate ${n.read ? 'text-foreground' : 'text-amber-700 dark:text-amber-400'}`}>{n.title}</p>
+                              <p className="text-xs font-medium text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{n.message}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-2 opacity-70">
+                                {new Date(n.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
                           </Link>
@@ -399,15 +403,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                   </PopoverContent>
                 </Popover>
-                <Badge variant="outline" className="text-[11px] font-medium text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hidden sm:inline-flex">
+                <Badge className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0 shadow-sm hidden sm:inline-flex rounded-lg">
                   {isSuperAdmin ? 'Super Admin' : 'Pro Plan'}
                 </Badge>
-                <LanguageSwitcherCompact />
+                <div className="hidden sm:block pl-2 border-l border-border/50 ml-1">
+                   <LanguageSwitcherCompact />
+                </div>
               </div>
             </div>
           </header>
 
-          <main className="p-4 sm:p-6 lg:p-8">
+          <main className="p-4 sm:p-6 lg:p-8 flex-1">
             <CurrencyProvider businessId={user?.businessId}>
               {children}
             </CurrencyProvider>

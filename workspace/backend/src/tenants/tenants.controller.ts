@@ -13,6 +13,22 @@ export class TenantsController {
     return await this.tenantsService.create(body.name, body.slug);
   }
 
+  @Post('real')
+  @Roles(UserRole.SUPER_ADMIN)
+  async createRealTenant(
+    @Body() body: { name: string; slug: string; email: string; password: string; businessName?: string },
+  ) {
+    return await this.tenantsService.createRealTenant(body);
+  }
+
+  @Post('quick')
+  @Roles(UserRole.SUPER_ADMIN)
+  async createQuickTenant(
+    @Body() body: { name: string; email: string; password: string },
+  ) {
+    return await this.tenantsService.createQuickTenant(body);
+  }
+
   @Get()
   @Roles(UserRole.SUPER_ADMIN)
   async findAll() {

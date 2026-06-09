@@ -10,7 +10,7 @@ async function bootstrap() {
             const allowed = [
                 'http://localhost:3000',
                 'http://127.0.0.1:3000',
-                /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:3000$/,
+                /^https?:\/\/(?:localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}):3000$/,
             ];
             if (!origin || allowed.some(a => typeof a === 'string' ? a === origin : a.test(origin))) {
                 callback(null, true);

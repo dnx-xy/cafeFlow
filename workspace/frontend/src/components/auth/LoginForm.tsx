@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ interface LoginFormStrings {
   emailPlaceholder: string;
   password: string;
   passwordPlaceholder: string;
+  rememberMe: string;
   forgotPassword: string;
   submit: string;
   submitting: string;
@@ -29,8 +30,11 @@ interface LoginFormStrings {
 export function LoginForm({ d, onSuccess }: { d: LoginFormStrings; onSuccess?: () => void }) {
   const router = useRouter();
   const { login, loading } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', rememberMe: false });
+
+  useEffect(() => { setMounted(true); }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -105,13 +109,13 @@ export function LoginForm({ d, onSuccess }: { d: LoginFormStrings; onSuccess?: (
           <div className="flex items-center space-x-2">
             <Checkbox id="rememberMe" name="rememberMe" checked={formData.rememberMe}
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, rememberMe: checked as boolean }))} />
-            <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">Remember me</Label>
+            <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">{d.rememberMe}</Label>
           </div>
           <a href="#" className="text-sm text-amber-600 hover:text-amber-700 font-medium">{d.forgotPassword}</a>
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? <><Loader2 className="mr-2 w-4 h-4 animate-spin" />{d.submitting}</> : <>{d.submit}<ArrowRight className="ml-2 w-4 h-4" /></>}
+        <Button type="submit" size="lg" className="w-full h-12 text-base font-semibold shadow-xl shadow-amber-500/10 bg-amber-500 hover:bg-amber-600 text-white transition-all hover:scale-[1.02]" disabled={mounted && loading}>
+          {loading ? <><Loader2 className="mr-2 w-5 h-5 animate-spin" />{d.submitting}</> : <>{d.submit}<ArrowRight className="ml-2 w-5 h-5" /></>}
         </Button>
       </form>
     </>

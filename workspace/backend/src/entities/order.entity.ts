@@ -95,7 +95,7 @@ export class Order extends BaseEntity {
   @ManyToOne(() => User, (user) => user.orders, { nullable: true })
   user: User;
 
-  @OneToMany(() => OrderItem, (item) => item.order)
+  @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   orderItems: OrderItem[];
 
   @OneToMany(() => OrderStatusUpdate, (update) => update.order)

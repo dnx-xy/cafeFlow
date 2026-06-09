@@ -30,6 +30,7 @@ export declare class Business extends BaseEntity {
     currentPeriodEnd: Date;
     stripeCustomerId: string;
     stripeSubscriptionId: string;
+    whatsappNumber: string;
     tenant: Tenant;
     outlets: Outlet[];
     users: User[];

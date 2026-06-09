@@ -4,8 +4,6 @@ import { Order } from './order.entity';
 import { CustomAttributeValue } from './custom-attribute-value.entity';
 import { OrderItemMenuOption } from './order-item-menu-option.entity';
 export declare class OrderItem extends BaseEntity {
-    menuItemId: string;
-    orderId: string;
     quantity: number;
     unitPrice: number;
     totalPrice: number;

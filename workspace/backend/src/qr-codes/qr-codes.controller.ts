@@ -33,6 +33,14 @@ export class QrCodesController {
     return await this.qrCodesService.scanQrCode(code);
   }
 
+  @Post('business/generate')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
+  async generateBusinessQrCode(
+    @AuthenticatedUser() user: any,
+  ) {
+    return await this.qrCodesService.generateBusinessQrCode(user.businessId, user.tenantId);
+  }
+
   @Get('business/:businessId')
   @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_OWNER, UserRole.MANAGER, UserRole.STAFF)
   async getQrCodesByBusiness(

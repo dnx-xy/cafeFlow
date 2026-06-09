@@ -80,89 +80,99 @@ export default function SettingsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full overflow-x-auto">
-          <TabsTrigger value="general" className="sm:flex-1"><Store className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.general}</TabsTrigger>
-          <TabsTrigger value="hours" className="sm:flex-1"><Clock className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.hours}</TabsTrigger>
-          <TabsTrigger value="notifications" className="sm:flex-1"><Bell className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.notifications}</TabsTrigger>
+        <TabsList className="w-full overflow-x-auto bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="general" className="sm:flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"><Store className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.general}</TabsTrigger>
+          <TabsTrigger value="hours" className="sm:flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"><Clock className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.hours}</TabsTrigger>
+          <TabsTrigger value="notifications" className="sm:flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"><Bell className="w-4 h-4 mr-2" /> {t.dashboard.settings.tabs.notifications}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-5 space-y-5">
           {loading ? (
-            <div className="flex items-center justify-center h-32"><div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
+            <div className="flex items-center justify-center h-32"><div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>
           ) : (
-            <>
-              <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t.dashboard.settings.general.businessInformation}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t.dashboard.settings.general.businessInfoDesc}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">{t.dashboard.settings.general.businessName}</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="h-9 text-sm" /></div>
-                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">{t.dashboard.settings.general.description}</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} className="text-sm" /></div>
-                  <div className="space-y-2"><Label className="text-xs">{t.dashboard.settings.general.address}</Label><Input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="h-9 text-sm" /></div>
-                  <div className="space-y-2"><Label className="text-xs">{t.dashboard.settings.general.city}</Label><Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className="h-9 text-sm" /></div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">{t.dashboard.settings.general.currency}</Label>
-                    <Select value={form.currency} onValueChange={v => { setForm(p => ({ ...p, currency: v })); setCurrency(v as any); }}>
-                      <SelectTrigger className="h-9 text-sm w-full">
-                        <span className="w-5 text-center text-gray-500 dark:text-gray-400 font-medium text-sm shrink-0">{getCurrencyInfo(form.currency).symbol}</span>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-60">
-                        {CURRENCIES.map(c => (
-                          <SelectItem key={c.code} value={c.code} className="text-sm">{c.symbol} {c.code} - {c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-card rounded-3xl border border-border/50 p-6 shadow-sm hover:border-amber-500/30 transition-all">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-foreground">{t.dashboard.settings.general.businessInformation}</h3>
+                    <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.settings.general.businessInfoDesc}</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">No. WhatsApp Notifikasi</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input value={form.whatsappNumber} onChange={e => setForm(p => ({ ...p, whatsappNumber: e.target.value }))} placeholder="+6281234567890" className="h-9 text-sm pl-9" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2 md:col-span-2"><Label className="text-sm font-medium">{t.dashboard.settings.general.businessName}</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
+                    <div className="space-y-2 md:col-span-2"><Label className="text-sm font-medium">{t.dashboard.settings.general.description}</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} className="bg-muted/50 border-0 focus-visible:ring-amber-500 resize-none" /></div>
+                    <div className="space-y-2"><Label className="text-sm font-medium">{t.dashboard.settings.general.address}</Label><Input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
+                    <div className="space-y-2"><Label className="text-sm font-medium">{t.dashboard.settings.general.city}</Label><Input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">{t.dashboard.settings.general.currency}</Label>
+                      <Select value={form.currency} onValueChange={v => { setForm(p => ({ ...p, currency: v })); setCurrency(v as any); }}>
+                        <SelectTrigger className="h-11 bg-muted/50 border-0 focus:ring-amber-500 w-full">
+                          <span className="w-6 text-center text-muted-foreground font-bold shrink-0">{getCurrencyInfo(form.currency).symbol}</span>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {CURRENCIES.map(c => (
+                            <SelectItem key={c.code} value={c.code} className="font-medium">{c.symbol} {c.code} - {c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <p className="text-[10px] text-gray-400">Pesan masuk pelanggan & notifikasi akan dikirim ke nomor ini</p>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">WhatsApp Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input value={form.whatsappNumber} onChange={e => setForm(p => ({ ...p, whatsappNumber: e.target.value }))} placeholder="+6281234567890" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 pl-10" />
+                      </div>
+                      <p className="text-xs font-medium text-muted-foreground mt-1">For receiving customer orders & notifications</p>
+                    </div>
+                    <div className="space-y-2 md:col-span-2"><Label className="text-sm font-medium">{t.dashboard.settings.general.logoUrl}</Label><Input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder={t.dashboard.settings.general.logoUrlPlaceholder} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
                   </div>
-                  <div className="space-y-2 md:col-span-2"><Label className="text-xs">{t.dashboard.settings.general.logoUrl}</Label><Input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder={t.dashboard.settings.general.logoUrlPlaceholder} className="h-9 text-sm" /></div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4">
+                  <Button variant="ghost" className="h-12 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold" onClick={handleDeleteBusiness}>
+                    <Trash2 className="w-4 h-4 mr-2" /> {t.dashboard.settings.general.deleteBusiness}
+                  </Button>
+                  <Button onClick={handleSave} disabled={saving} className="h-12 px-8 font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 hover:scale-105 transition-all">
+                    {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Save className="w-4 h-4 mr-2" />{t.dashboard.settings.general.saveChanges}
+                  </Button>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t.dashboard.settings.general.branding}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t.dashboard.settings.general.brandingDesc}</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800/60 rounded-xl flex items-center justify-center text-gray-400 overflow-hidden shrink-0">
-                    {form.logoUrl ? <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" /> : <Image className="w-7 h-7" />}
+              <div className="lg:col-span-1">
+                <div className="bg-card rounded-3xl border border-border/50 p-6 shadow-sm hover:border-amber-500/30 transition-all sticky top-24">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-foreground">{t.dashboard.settings.general.branding}</h3>
+                    <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.settings.general.brandingDesc}</p>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{form.name || t.dashboard.settings.general.yourBusiness}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{form.city || t.dashboard.settings.general.noCitySet}</p>
+                  <div className="flex flex-col items-center text-center gap-4">
+                    <div className="w-24 h-24 bg-muted/50 rounded-2xl flex items-center justify-center text-muted-foreground overflow-hidden shadow-sm border border-border/50">
+                      {form.logoUrl ? <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" /> : <Image className="w-10 h-10 opacity-50" />}
+                    </div>
+                    <div>
+                      <p className="text-lg font-extrabold text-foreground">{form.name || t.dashboard.settings.general.yourBusiness}</p>
+                      <p className="text-sm font-medium text-muted-foreground">{form.city || t.dashboard.settings.general.noCitySet}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="flex justify-between pt-2">
-                <Button variant="destructive" size="sm" className="h-9 text-xs" onClick={handleDeleteBusiness}>
-                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> {t.dashboard.settings.general.deleteBusiness}
-                </Button>
-                <Button onClick={handleSave} disabled={saving} size="sm">
-                  {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Save className="w-4 h-4 mr-2" />{t.dashboard.settings.general.saveChanges}
-                </Button>
-              </div>
-            </>
+            </div>
           )}
         </TabsContent>
 
         <TabsContent value="hours" className="mt-5">
-          <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t.dashboard.settings.hours.title}</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t.dashboard.settings.hours.description}</p>
-            <div className="space-y-2">
+          <div className="bg-card rounded-3xl border border-border/50 p-6 shadow-sm hover:border-amber-500/30 transition-all max-w-3xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-foreground">{t.dashboard.settings.hours.title}</h3>
+              <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.settings.hours.description}</p>
+            </div>
+            <div className="space-y-1">
               {operatingHours.map(h => (
-                <div key={h.day} className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-800/50 last:border-0 gap-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24 shrink-0">{t.dashboard.settings.hours.days[h.day.toLowerCase() as keyof typeof t.dashboard.settings.hours.days]}</span>
-                  <div className="flex items-center gap-2">
-                    <Input className="w-20 text-center h-9 text-sm" defaultValue={h.open} type="time" />
-                    <span className="text-xs text-gray-400">{t.dashboard.settings.hours.to}</span>
-                    <Input className="w-20 text-center h-9 text-sm" defaultValue={h.close} type="time" />
+                <div key={h.day} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl hover:bg-muted/30 transition-colors gap-4">
+                  <span className="text-base font-bold text-foreground w-32 shrink-0">{t.dashboard.settings.hours.days[h.day.toLowerCase() as keyof typeof t.dashboard.settings.hours.days]}</span>
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <Input className="flex-1 sm:w-28 text-center h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 font-semibold" defaultValue={h.open} type="time" />
+                    <span className="text-sm font-medium text-muted-foreground">{t.dashboard.settings.hours.to}</span>
+                    <Input className="flex-1 sm:w-28 text-center h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 font-semibold" defaultValue={h.close} type="time" />
                   </div>
                 </div>
               ))}
@@ -171,10 +181,12 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-5">
-          <div className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-5">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t.dashboard.settings.notifications.title}</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t.dashboard.settings.notifications.description}</p>
-            <div className="space-y-3">
+          <div className="bg-card rounded-3xl border border-border/50 p-6 shadow-sm hover:border-amber-500/30 transition-all max-w-3xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-foreground">{t.dashboard.settings.notifications.title}</h3>
+              <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.settings.notifications.description}</p>
+            </div>
+            <div className="space-y-2">
               {[
                 { label: t.dashboard.settings.notifications.items.newOrders, desc: t.dashboard.settings.notifications.items.newOrdersDesc },
                 { label: t.dashboard.settings.notifications.items.orderUpdates, desc: t.dashboard.settings.notifications.items.orderUpdatesDesc },
@@ -182,12 +194,12 @@ export default function SettingsPage() {
                 { label: t.dashboard.settings.notifications.items.lowStock, desc: t.dashboard.settings.notifications.items.lowStockDesc },
                 { label: t.dashboard.settings.notifications.items.dailyReports, desc: t.dashboard.settings.notifications.items.dailyReportsDesc },
               ].map(n => (
-                <div key={n.label} className="flex items-center justify-between py-2.5 gap-4">
+                <div key={n.label} className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/30 transition-colors gap-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{n.label}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{n.desc}</p>
+                    <p className="text-base font-bold text-foreground">{n.label}</p>
+                    <p className="text-sm font-medium text-muted-foreground mt-0.5">{n.desc}</p>
                   </div>
-                  <Badge variant="outline" className="text-[10px] text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 shrink-0">{t.dashboard.settings.notifications.enabled}</Badge>
+                  <Badge className="px-3 py-1 text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 shrink-0 shadow-sm">{t.dashboard.settings.notifications.enabled}</Badge>
                 </div>
               ))}
             </div>

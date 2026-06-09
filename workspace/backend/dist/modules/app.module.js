@@ -24,6 +24,7 @@ const notifications_module_1 = require("../notifications/notifications.module");
 const payments_module_1 = require("../payments/payments.module");
 const integration_module_1 = require("../integration/integration.module");
 const qr_codes_module_1 = require("../qr-codes/qr-codes.module");
+const whatsapp_module_1 = require("../whatsapp/whatsapp.module");
 const public_module_1 = require("../public/public.module");
 const plans_module_1 = require("../plans/plans.module");
 const business_entity_1 = require("../entities/business.entity");
@@ -53,6 +54,7 @@ const point_transaction_entity_1 = require("../entities/point-transaction.entity
 const promotion_entity_1 = require("../entities/promotion.entity");
 const promotion_item_entity_1 = require("../entities/promotion-item.entity");
 const qr_code_entity_1 = require("../entities/qr-code.entity");
+const whatsapp_message_entity_1 = require("../entities/whatsapp-message.entity");
 const staff_entity_1 = require("../entities/staff.entity");
 const table_entity_1 = require("../entities/table.entity");
 const tenant_entity_1 = require("../entities/tenant.entity");
@@ -81,7 +83,7 @@ exports.AppModule = AppModule = __decorate([
                     order_note_entity_1.OrderNote, order_status_update_entity_1.OrderStatusUpdate,
                     outlet_entity_1.Outlet, point_transaction_entity_1.PointTransaction,
                     promotion_entity_1.Promotion, promotion_item_entity_1.PromotionItem,
-                    qr_code_entity_1.QrCode, staff_entity_1.Staff, table_entity_1.Table, tenant_entity_1.Tenant, user_entity_1.User,
+                    qr_code_entity_1.QrCode, staff_entity_1.Staff, table_entity_1.Table, tenant_entity_1.Tenant, user_entity_1.User, whatsapp_message_entity_1.WhatsAppMessage,
                 ],
                 synchronize: true,
             }),
@@ -99,6 +101,7 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             payments_module_1.PaymentsModule,
             integration_module_1.IntegrationModule,
+            whatsapp_module_1.WhatsAppModule,
             qr_codes_module_1.QrCodesModule,
             public_module_1.PublicModule,
             plans_module_1.PlansModule,

@@ -11,12 +11,13 @@ import {
   Package, CheckCircle, XCircle, AlertCircle, User, Phone, Mail,
   ChevronRight, FileText, UtensilsCrossed, Coffee, Store
 } from 'lucide-react';
-import { useOrders } from '@/hooks/useAuth';
+import { useOrders, useAuth } from '@/hooks/useAuth';
+import { useBusiness } from '@/hooks/useBusiness';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useI18n } from '@/i18n/context';
-import { formatCurrency } from '@/lib/currency';
+import { formatCurrency, getCurrencyInfo } from '@/lib/currency';
 import { toast } from 'sonner';
-import { printOrderReceipt, exportOrder } from '@/lib/orderExportUtils';
+import { printOrderReceipt, exportOrder, BusinessHeaderInfo } from '@/lib/orderExportUtils';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -24,9 +25,25 @@ export default function OrderDetailsPage() {
   const { currency } = useCurrency();
   const { t } = useI18n();
   const { fetchOrderById, updateOrderStatus } = useOrders();
+  const { user } = useAuth();
+  const { business, fetchBusiness } = useBusiness();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.businessId) fetchBusiness(user.businessId);
+  }, [user?.businessId]);
+
+  const exportHeader: BusinessHeaderInfo | undefined = business ? {
+    name: business.name,
+    description: business.description,
+    logoUrl: business.logoUrl,
+    address: business.address,
+    city: business.city,
+    phone: business.whatsappNumber,
+    currencySymbol: getCurrencyInfo(currency).symbol,
+  } : undefined;
 
   useEffect(() => {
     const loadOrder = async () => {
@@ -64,9 +81,9 @@ export default function OrderDetailsPage() {
     }
   };
 
-  const handleExportOrder = async (format: 'csv' | 'xlsx' | 'pdf' | 'jpg') => {
+  const handleExportOrder = async (format: 'xlsx' | 'pdf' | 'jpg') => {
     if (order) {
-      await exportOrder(order, format);
+      await exportOrder(order, format, exportHeader);
     }
   };
 
@@ -254,14 +271,14 @@ export default function OrderDetailsPage() {
                   {t.dashboard.orders.detail.orderItems}
                 </CardTitle>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {t.dashboard.orders.detail.items.replace('{{count}}', String(order.items?.length || 0))}
+                  {t.dashboard.orders.detail.items.replace('{{count}}', String(order.orderItems?.length || 0))}
                 </span>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-0">
-                {order.items && order.items.length > 0 ? (
-                  order.items.map((item: any, index: number) => (
+                {order.orderItems && order.orderItems.length > 0 ? (
+                  order.orderItems.map((item: any, index: number) => (
                     <div key={item.id || index} className="flex items-start justify-between py-3 border-b border-gray-100 dark:border-gray-800/50 last:border-0">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start gap-3">
@@ -269,7 +286,7 @@ export default function OrderDetailsPage() {
                             <Coffee className="w-3.5 h-3.5 text-rose-500" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 dark:text-white text-sm">{item.itemName}</p>
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">{item.menuItem?.name}</p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-xs text-gray-500 dark:text-gray-400">
                                 Qty: {item.quantity}
@@ -454,14 +471,6 @@ export default function OrderDetailsPage() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={async () => await handleExportOrder('csv')}
-                >
-                  {t.dashboard.orders.detail.exportFormats.csv}
-                </Button>
                 <Button 
                   variant="outline" 
                   size="sm"

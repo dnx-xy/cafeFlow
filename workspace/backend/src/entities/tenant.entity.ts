@@ -13,6 +13,9 @@ export class Tenant extends BaseEntity {
   @Column({ unique: true })
   slug: string;
 
+  @Column({ type: 'varchar', default: 'real', nullable: true })
+  type: string;
+
   @OneToMany(() => Business, (business) => business.tenant)
   businesses: Business[];
 

@@ -6,6 +6,7 @@ import { CustomerSegment } from './customer-segment.entity';
 export declare class Tenant extends BaseEntity {
     name: string;
     slug: string;
+    type: string;
     businesses: Business[];
     customers: Customer[];
     users: User[];

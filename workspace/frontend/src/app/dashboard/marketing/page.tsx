@@ -79,45 +79,45 @@ export default function MarketingPage() {
   const activeCampaigns = campaigns.filter(c => c.status === 'Active').length;
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.dashboard.marketing.title}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t.dashboard.marketing.subtitle}</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground">{t.dashboard.marketing.title}</h2>
+          <p className="text-sm font-medium text-muted-foreground mt-1">{t.dashboard.marketing.subtitle}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger render={<Button size="sm"><Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.marketing.newCampaign}</Button>} />
-          <DialogContent>
+          <DialogTrigger render={<Button className="h-11 px-6 font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 rounded-xl hover:scale-105 transition-all"><Plus className="w-5 h-5 mr-2" /> {t.dashboard.marketing.newCampaign}</Button>} />
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{t.dashboard.marketing.createCampaign}</DialogTitle>
-              <DialogDescription>Set up a new marketing campaign</DialogDescription>
+              <DialogTitle className="text-xl font-bold">{t.dashboard.marketing.createCampaign}</DialogTitle>
+              <DialogDescription className="text-sm font-medium">Set up a new marketing campaign to drive sales</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2"><Label>{t.dashboard.marketing.campaignName}</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Summer Special" /></div>
+            <div className="space-y-5 py-4">
+              <div className="space-y-2"><Label className="text-sm font-medium">{t.dashboard.marketing.campaignName}</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Summer Special" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
               <div className="space-y-2">
-                <Label>{t.dashboard.marketing.campaignType}</Label>
+                <Label className="text-sm font-medium">{t.dashboard.marketing.campaignType}</Label>
                 <Select value={form.type} onValueChange={v => setForm(p => ({ ...p, type: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {['Discount', 'Time-based', 'Event', 'Reward'].map(type => <SelectItem key={type} value={type}>{typeLabels[type]}</SelectItem>)}
+                    {['Discount', 'Time-based', 'Event', 'Reward'].map(type => <SelectItem key={type} value={type} className="font-medium">{typeLabels[type]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>{t.dashboard.marketing.description}</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe your campaign" /></div>
+              <div className="space-y-2"><Label className="text-sm font-medium">{t.dashboard.marketing.description}</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe your campaign" className="bg-muted/50 border-0 focus-visible:ring-amber-500 resize-none" /></div>
               <div className="space-y-2">
-                <Label>{t.dashboard.marketing.targetAudience}</Label>
+                <Label className="text-sm font-medium">{t.dashboard.marketing.targetAudience}</Label>
                 <Select value={form.target} onValueChange={v => setForm(p => ({ ...p, target: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {['All Customers', 'Regulars', 'New Customers', 'Weekend Visitors', 'Lunch Crowd'].map(target => <SelectItem key={target} value={target}>{targetLabels[target]}</SelectItem>)}
+                    {['All Customers', 'Regulars', 'New Customers', 'Weekend Visitors', 'Lunch Crowd'].map(target => <SelectItem key={target} value={target} className="font-medium">{targetLabels[target]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>{t.dashboard.marketing.budget} ($)</Label><Input type="number" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: Number(e.target.value) }))} /></div>
+              <div className="space-y-2"><Label className="text-sm font-medium">{t.dashboard.marketing.budget} ($)</Label><Input type="number" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: Number(e.target.value) }))} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500" /></div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>{t.dashboard.marketing.cancel}</Button>
-              <Button onClick={handleCreate} disabled={submitting}>
+            <DialogFooter className="gap-3 sm:gap-0">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="h-11 px-6 font-semibold rounded-xl border-border/50">{t.dashboard.marketing.cancel}</Button>
+              <Button onClick={handleCreate} disabled={submitting} className="h-11 px-6 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg shadow-amber-500/20">
                 {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}<Send className="w-4 h-4 mr-2" />{t.dashboard.marketing.createCampaign}
               </Button>
             </DialogFooter>
@@ -125,55 +125,78 @@ export default function MarketingPage() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: t.dashboard.marketing.activeCampaigns, value: activeCampaigns, icon: Megaphone, color: 'text-amber-500' },
-          { label: t.dashboard.marketing.totalReach, value: totalReach.toLocaleString(), icon: Users, color: 'text-blue-500' },
-          { label: t.dashboard.marketing.conversions, value: totalConversions, icon: TrendingUp, color: 'text-green-500' },
-          { label: t.dashboard.marketing.conversionRate, value: `${totalConversions > 0 ? Math.round((totalConversions / totalReach) * 100) : 0}%`, icon: BarChart3, color: 'text-purple-500' },
+          { label: t.dashboard.marketing.activeCampaigns, value: activeCampaigns, icon: Megaphone, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30' },
+          { label: t.dashboard.marketing.totalReach, value: totalReach.toLocaleString(), icon: Users, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { label: t.dashboard.marketing.conversions, value: totalConversions, icon: TrendingUp, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
+          { label: t.dashboard.marketing.conversionRate, value: `${totalConversions > 0 ? Math.round((totalConversions / totalReach) * 100) : 0}%`, icon: BarChart3, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-100 dark:bg-indigo-900/30' },
         ].map((s, i) => (
-          <div key={i} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-3.5">
-            <div className="flex items-center gap-2 mb-1.5"><s.icon className={`w-5 h-5 ${s.color}`} /></div>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">{s.value}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
+          <div key={i} className="bg-card rounded-3xl border border-border/50 p-6 flex flex-col justify-between hover:shadow-md hover:border-amber-500/30 transition-all group">
+            <div className="flex items-center gap-2 mb-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform ${s.bg}`}>
+                <s.icon className={`w-6 h-6 ${s.color}`} />
+              </div>
+            </div>
+            <div>
+              <p className="text-3xl font-extrabold text-foreground tracking-tight mb-1">{s.value}</p>
+              <p className="text-sm font-medium text-muted-foreground">{s.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {campaigns.map(campaign => {
           const Icon = typeIcons[campaign.type] || Megaphone;
           return (
-            <div key={campaign.id} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-50 dark:bg-gray-800/60 rounded-xl flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{campaign.name}</p>
-                      <span className="text-xs text-gray-400">·</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{typeLabels[campaign.type]}</span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400 dark:text-gray-500">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{campaign.startDate} - {campaign.endDate}</span>
-                      <span className="flex items-center gap-1"><Target className="w-3 h-3" />{campaign.target}</span>
-                    </div>
-                    {campaign.reach > 0 && (
-                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                        <span>{t.dashboard.marketing.reach}: <strong className="text-gray-700 dark:text-gray-300">{campaign.reach}</strong></span>
-                        <span>{t.dashboard.marketing.conversions}: <strong className="text-gray-700 dark:text-gray-300">{campaign.conversions}</strong></span>
-                        <span>{t.dashboard.marketing.rate}: <strong className="text-gray-700 dark:text-gray-300">{Math.round((campaign.conversions / campaign.reach) * 100)}%</strong></span>
-                      </div>
-                    )}
-                  </div>
+            <div key={campaign.id} className="bg-card rounded-3xl border border-border/50 p-6 sm:p-8 shadow-sm hover:shadow-md hover:border-amber-500/30 transition-all flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-[40px] pointer-events-none" />
+              <div className="flex items-start justify-between mb-6 relative z-10">
+                <div className="w-12 h-12 bg-muted/50 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform shrink-0 border border-border/50">
+                  <Icon className="w-6 h-6 text-foreground/70" />
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{formatCurrency(campaign.budget, currency)}</span>
-                  <Badge variant="outline" className={`text-[10px] ${statusColors[campaign.status] || ''}`}>{statusLabels[campaign.status]}</Badge>
+                <Badge className={`text-xs font-bold uppercase tracking-wider px-3 py-1 border-0 shadow-sm ${campaign.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : campaign.status === 'Scheduled' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : campaign.status === 'Completed' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' : 'bg-muted text-muted-foreground'}`}>
+                  {statusLabels[campaign.status]}
+                </Badge>
+              </div>
+              <div className="relative z-10 flex-1">
+                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider mb-3 bg-background border-border/50 shadow-sm">{typeLabels[campaign.type]}</Badge>
+                <h3 className="text-xl font-extrabold text-foreground leading-tight group-hover:text-amber-600 transition-colors mb-4">{campaign.name}</h3>
+                
+                <div className="space-y-2.5 mb-6">
+                  <div className="flex items-center text-sm font-medium text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/30">
+                    <Calendar className="w-4 h-4 mr-3 text-amber-500 shrink-0" />
+                    <span className="truncate">{campaign.startDate} - {campaign.endDate}</span>
+                  </div>
+                  <div className="flex items-center text-sm font-medium text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/30">
+                    <Target className="w-4 h-4 mr-3 text-amber-500 shrink-0" />
+                    <span className="truncate">{campaign.target}</span>
+                  </div>
                 </div>
               </div>
+
+              {campaign.reach > 0 ? (
+                <div className="relative z-10 grid grid-cols-3 gap-2 pt-4 border-t border-border/50">
+                  <div className="text-center bg-muted/20 p-2 rounded-lg">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">{t.dashboard.marketing.reach}</p>
+                    <p className="text-sm font-extrabold text-foreground">{campaign.reach}</p>
+                  </div>
+                  <div className="text-center bg-muted/20 p-2 rounded-lg">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">{t.dashboard.marketing.conversions}</p>
+                    <p className="text-sm font-extrabold text-foreground">{campaign.conversions}</p>
+                  </div>
+                  <div className="text-center bg-amber-500/10 dark:bg-amber-500/5 p-2 rounded-lg border border-amber-500/20">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-0.5">{t.dashboard.marketing.rate}</p>
+                    <p className="text-sm font-extrabold text-amber-700 dark:text-amber-400">{Math.round((campaign.conversions / campaign.reach) * 100)}%</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative z-10 pt-4 border-t border-border/50 flex items-center justify-between">
+                   <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Budget</span>
+                   <span className="text-base font-extrabold text-foreground">{formatCurrency(campaign.budget, currency)}</span>
+                </div>
+              )}
             </div>
           );
         })}

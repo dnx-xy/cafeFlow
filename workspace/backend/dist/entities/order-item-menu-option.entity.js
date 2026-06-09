@@ -18,10 +18,6 @@ let OrderItemMenuOption = class OrderItemMenuOption extends base_entity_1.BaseEn
 };
 exports.OrderItemMenuOption = OrderItemMenuOption;
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
-    __metadata("design:type", String)
-], OrderItemMenuOption.prototype, "optionId", void 0);
-__decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], OrderItemMenuOption.prototype, "optionValueId", void 0);
@@ -33,10 +29,6 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'float', nullable: true }),
     __metadata("design:type", Number)
 ], OrderItemMenuOption.prototype, "priceAdjustment", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'varchar' }),
-    __metadata("design:type", String)
-], OrderItemMenuOption.prototype, "orderItemId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)

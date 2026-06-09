@@ -24,6 +24,7 @@ const customer_entity_1 = require("../entities/customer.entity");
 const customer_feedback_entity_1 = require("../entities/customer-feedback.entity");
 const loyalty_program_entity_1 = require("../entities/loyalty-program.entity");
 const point_transaction_entity_1 = require("../entities/point-transaction.entity");
+const notifications_module_1 = require("../notifications/notifications.module");
 let PublicModule = class PublicModule {
 };
 exports.PublicModule = PublicModule;
@@ -35,6 +36,7 @@ exports.PublicModule = PublicModule = __decorate([
                 order_entity_1.Order, order_item_entity_1.OrderItem, order_item_menu_option_entity_1.OrderItemMenuOption, customer_entity_1.Customer, customer_feedback_entity_1.CustomerFeedback,
                 loyalty_program_entity_1.LoyaltyProgram, point_transaction_entity_1.PointTransaction,
             ]),
+            notifications_module_1.NotificationsModule,
         ],
         controllers: [public_controller_1.PublicController],
         providers: [public_service_1.PublicService],

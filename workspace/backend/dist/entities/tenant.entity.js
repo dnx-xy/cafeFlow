@@ -28,6 +28,10 @@ __decorate([
     __metadata("design:type", String)
 ], Tenant.prototype, "slug", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'real', nullable: true }),
+    __metadata("design:type", String)
+], Tenant.prototype, "type", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => business_entity_1.Business, (business) => business.tenant),
     __metadata("design:type", Array)
 ], Tenant.prototype, "businesses", void 0);

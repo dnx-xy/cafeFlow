@@ -56,7 +56,7 @@ exports.MenuGateway = MenuGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/menu-updates',
         cors: {
-            origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+            origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://192.168.101.2:3000'],
             credentials: true,
         },
     })

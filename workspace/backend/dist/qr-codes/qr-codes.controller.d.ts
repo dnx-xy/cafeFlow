@@ -7,11 +7,12 @@ export declare class QrCodesController {
     }): Promise<import("../entities/qr-code.entity").QrCode>;
     getQrCodeByTable(tableId: string, user: any): Promise<import("../entities/qr-code.entity").QrCode>;
     scanQrCode(code: string): Promise<{
-        tableId: string;
+        tableId: string | null;
         code: string;
-        outletId: string;
+        outletId?: string;
         tenantId: string;
         businessId: string;
     }>;
+    generateBusinessQrCode(user: any): Promise<import("../entities/qr-code.entity").QrCode>;
     getQrCodesByBusiness(user: any, businessId: string, active?: boolean): Promise<import("../entities/qr-code.entity").QrCode[]>;
 }

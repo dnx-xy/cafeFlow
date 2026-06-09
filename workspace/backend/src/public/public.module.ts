@@ -15,6 +15,7 @@ import { Customer } from '../entities/customer.entity';
 import { CustomerFeedback } from '../entities/customer-feedback.entity';
 import { LoyaltyProgram } from '../entities/loyalty-program.entity';
 import { PointTransaction } from '../entities/point-transaction.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PointTransaction } from '../entities/point-transaction.entity';
       Order, OrderItem, OrderItemMenuOption, Customer, CustomerFeedback,
       LoyaltyProgram, PointTransaction,
     ]),
+    NotificationsModule,
   ],
   controllers: [PublicController],
   providers: [PublicService],

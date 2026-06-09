@@ -8,7 +8,7 @@ export interface Order {
   orderType: 'DINING_IN' | 'TAKEAWAY' | 'DELIVERY';
   tableNumber?: string;
   totalAmount: number;
-  items?: OrderItem[];
+  orderItems?: OrderItem[];
   paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   createdAt: string;
   updatedAt: string;
@@ -16,7 +16,7 @@ export interface Order {
 
 export interface OrderItem {
   id: string;
-  itemName: string;
+  menuItem: { id: string; name: string } | null;
   quantity: number;
   unitPrice: number;
   totalPrice: number;

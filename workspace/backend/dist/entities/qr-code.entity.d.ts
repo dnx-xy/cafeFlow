@@ -5,6 +5,7 @@ export declare class QrCode extends BaseEntity {
     code: string;
     tableId: string;
     businessId: string;
+    tenantId: string;
     scannedAt: Date;
     isActive: boolean;
     table: Table;

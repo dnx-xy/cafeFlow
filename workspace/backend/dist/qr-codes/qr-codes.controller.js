@@ -30,6 +30,9 @@ let QrCodesController = class QrCodesController {
     async scanQrCode(code) {
         return await this.qrCodesService.scanQrCode(code);
     }
+    async generateBusinessQrCode(user) {
+        return await this.qrCodesService.generateBusinessQrCode(user.businessId, user.tenantId);
+    }
     async getQrCodesByBusiness(user, businessId, active) {
         return await this.qrCodesService.getQrCodesByBusiness(businessId, active);
     }
@@ -61,6 +64,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], QrCodesController.prototype, "scanQrCode", null);
+__decorate([
+    (0, common_1.Post)('business/generate'),
+    (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),
+    __param(0, (0, auth_decorators_1.AuthenticatedUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], QrCodesController.prototype, "generateBusinessQrCode", null);
 __decorate([
     (0, common_1.Get)('business/:businessId'),
     (0, auth_decorators_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.TENANT_OWNER, user_entity_1.UserRole.MANAGER, user_entity_1.UserRole.STAFF),

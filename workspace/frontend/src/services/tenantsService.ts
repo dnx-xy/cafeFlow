@@ -5,6 +5,7 @@ export interface Tenant {
   id: string;
   name: string;
   slug: string;
+  type?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -18,6 +19,21 @@ export interface TenantDetails extends Tenant {
   orders?: number;
   revenue?: number;
   businessId?: string;
+  qrCode?: { code: string; id: string };
+}
+
+export interface CreateTenantData {
+  name: string;
+  slug: string;
+  email: string;
+  password: string;
+  businessName?: string;
+}
+
+export interface CreateQuickTenantData {
+  name: string;
+  email: string;
+  password: string;
 }
 
 class TenantsService {
@@ -53,6 +69,39 @@ class TenantsService {
       return response.data;
     } catch (error) {
       console.error(`[FE Service] GET /tenants/${id} error:`, error);
+      throw this.handleError(error);
+    }
+  }
+
+  async createRealTenant(data: CreateTenantData): Promise<any> {
+    try {
+      console.log('[FE Service] Calling POST /tenants/real');
+      const response = await apiClient.post('/tenants/real', data);
+      console.log('[FE Service] POST /tenants/real response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[FE Service] POST /tenants/real error:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async createQuickTenant(data: CreateQuickTenantData): Promise<any> {
+    try {
+      console.log('[FE Service] Calling POST /tenants/quick');
+      const response = await apiClient.post('/tenants/quick', data);
+      console.log('[FE Service] POST /tenants/quick response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[FE Service] POST /tenants/quick error:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async generateBusinessQr(): Promise<any> {
+    try {
+      const response = await apiClient.post('/qr-codes/business/generate');
+      return response.data;
+    } catch (error) {
       throw this.handleError(error);
     }
   }

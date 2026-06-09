@@ -198,18 +198,18 @@ export default function MenuPage() {
         )}
 
         <Dialog open={showCreateMenu || editingMenu !== null} onOpenChange={open => { if (!open) { setShowCreateMenu(false); setEditingMenu(null); } }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader><DialogTitle>{editingMenu ? t.dashboard.menu.editMenu : t.dashboard.menu.createMenu}</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.name} *</label><Input value={menuForm.name} onChange={e => setMenuForm({ ...menuForm, name: e.target.value })} placeholder="Main Menu" className="h-9 text-sm" /></div>
-              <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.description}</label><Textarea value={menuForm.description} onChange={e => setMenuForm({ ...menuForm, description: e.target.value })} placeholder="Describe your menu" className="text-sm" /></div>
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={menuForm.isActive} onChange={e => setMenuForm({ ...menuForm, isActive: e.target.checked })} className="rounded" />{t.dashboard.menu.active}</label>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => { setShowCreateMenu(false); setEditingMenu(null); }}>{t.dashboard.menu.cancel}</Button>
-                <Button size="sm" onClick={editingMenu ? handleUpdateMenu : handleCreateMenu}>{editingMenu ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
-              </div>
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/50">
+          <DialogHeader><DialogTitle className="text-xl font-bold">{editingMenu ? t.dashboard.menu.editMenu : t.dashboard.menu.createMenu}</DialogTitle></DialogHeader>
+          <div className="space-y-5 py-4">
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.name} *</label><Input value={menuForm.name} onChange={e => setMenuForm({ ...menuForm, name: e.target.value })} placeholder="Main Menu" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.description}</label><Textarea value={menuForm.description} onChange={e => setMenuForm({ ...menuForm, description: e.target.value })} placeholder="Describe your menu" className="bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl resize-none" /></div>
+            <label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={menuForm.isActive} onChange={e => setMenuForm({ ...menuForm, isActive: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500" />{t.dashboard.menu.active}</label>
+            <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+              <Button variant="outline" className="h-11 px-6 rounded-xl font-semibold border-border/50" onClick={() => { setShowCreateMenu(false); setEditingMenu(null); }}>{t.dashboard.menu.cancel}</Button>
+              <Button className="h-11 px-6 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20" onClick={editingMenu ? handleUpdateMenu : handleCreateMenu}>{editingMenu ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
             </div>
-          </DialogContent>
+          </div>
+        </DialogContent>
         </Dialog>
       </div>
     );
@@ -238,65 +238,67 @@ export default function MenuPage() {
       </div>
 
       {categories.map(cat => (
-        <div key={cat.id} className="bg-white dark:bg-[#16181f] rounded-xl border border-gray-100 dark:border-gray-800/50 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 bg-gray-50/50 dark:bg-gray-800/20 border-b border-gray-100 dark:border-gray-800/50">
-            <div className="flex items-center gap-2">
-              <FolderTree className="w-5 h-5 text-amber-500" />
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">{cat.name}</span>
-              {cat.description && <span className="text-xs text-gray-400 hidden sm:inline">{cat.description}</span>}
+        <div key={cat.id} className="bg-card rounded-3xl border border-border/50 overflow-hidden shadow-sm hover:border-amber-500/30 transition-all">
+          <div className="flex items-center justify-between px-6 py-4 bg-muted/50 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <FolderTree className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="text-base font-bold text-foreground">{cat.name}</span>
+              {cat.description && <span className="text-xs font-medium text-muted-foreground hidden sm:inline ml-2">{cat.description}</span>}
             </div>
-            <div className="flex gap-1">
-              <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => openEditCategory(cat)}><Edit className="w-4 h-4" /></Button>
-              <Button variant="ghost" size="icon" className="w-7 h-7 text-red-500" onClick={async () => { try { await deleteCategory(cat.id); toast.success(t.dashboard.menu.categoryDeleted); } catch { toast.error('Failed to delete'); } }}><Trash2 className="w-4 h-4" /></Button>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-background" onClick={() => openEditCategory(cat)}><Edit className="w-4 h-4" /></Button>
+              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 text-muted-foreground" onClick={async () => { try { await deleteCategory(cat.id); toast.success(t.dashboard.menu.categoryDeleted); } catch { toast.error('Failed to delete'); } }}><Trash2 className="w-4 h-4" /></Button>
             </div>
           </div>
-          <div className="p-5">
+          <div className="p-6">
             {(!cat.menuItems || cat.menuItems.length === 0) && (
-              <p className="text-sm text-gray-400 text-center py-4">{t.dashboard.menu.noItemsInCategory}</p>
+              <p className="text-sm font-medium text-muted-foreground text-center py-6">{t.dashboard.menu.noItemsInCategory}</p>
             )}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(cat.menuItems ?? []).map(item => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center shrink-0">
+                <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/50 hover:bg-muted/30 transition-colors group">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.name} className="w-9 h-9 rounded-xl object-cover" />
+                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
-                        <Beef className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
+                        <Beef className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                       )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{item.name}</p>
-                        {item.hidden && <EyeOff className="w-3 h-3 text-gray-400 shrink-0" />}
-                        {!item.available && <Badge variant="destructive" className="text-[10px] px-1 py-0">{t.dashboard.menu.unavailable}</Badge>}
+                        <p className="text-base font-bold text-foreground truncate group-hover:text-amber-600 transition-colors">{item.name}</p>
+                        {item.hidden && <EyeOff className="w-4 h-4 text-muted-foreground shrink-0" />}
+                        {!item.available && <Badge variant="destructive" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">{t.dashboard.menu.unavailable}</Badge>}
                       </div>
-                      {item.description && <p className="text-xs text-gray-400 truncate">{item.description}</p>}
+                      {item.description && <p className="text-sm font-medium text-muted-foreground truncate mt-0.5">{item.description}</p>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">{formatCurrency(item.price, currency)}</span>
+                  <div className="flex items-center gap-4 shrink-0 pl-4">
+                    <span className="text-base font-extrabold text-foreground">{formatCurrency(item.price, currency)}</span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="w-7 h-7"><MoreHorizontal className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-muted"><MoreHorizontal className="w-4 h-4" /></Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => openEditItem(item)}><Edit className="mr-2 w-4 h-4" />{t.dashboard.menu.editItem}</DropdownMenuItem>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => openEditItem(item)} className="font-medium"><Edit className="mr-2 w-4 h-4" />{t.dashboard.menu.editItem}</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => {
                           setEditingItem(item);
                           setShowImageUpload(true);
-                        }}><Image className="mr-2 w-4 h-4" />{t.dashboard.menu.uploadImage}</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600" onClick={async () => { try { await deleteItem(item.id); toast.success(t.dashboard.menu.itemDeleted); } catch { toast.error('Failed to delete'); } }}><Trash2 className="mr-2 w-4 h-4" />{t.dashboard.menu.deleteItem}</DropdownMenuItem>
+                        }} className="font-medium"><Image className="mr-2 w-4 h-4" />{t.dashboard.menu.uploadImage}</DropdownMenuItem>
+                        <DropdownMenuItem className="font-medium text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-500/10" onClick={async () => { try { await deleteItem(item.id); toast.success(t.dashboard.menu.itemDeleted); } catch { toast.error('Failed to delete'); } }}><Trash2 className="mr-2 w-4 h-4" />{t.dashboard.menu.deleteItem}</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
               ))}
-              <Button variant="ghost" size="sm" className="w-full mt-1 text-xs text-gray-400 h-8" onClick={() => {
+              <Button variant="ghost" size="sm" className="w-full mt-2 text-sm font-medium text-muted-foreground hover:text-foreground h-10 rounded-xl border border-dashed border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all" onClick={() => {
                 setShowCreateItem(true);
                 setItemForm({ name: '', description: '', price: 0, menuCategoryId: cat.id, available: true, hidden: false, categorySortIndex: (cat.menuItems?.length ?? 0) + 1 });
               }}>
-                <PlusCircle className="w-4 h-4 mr-1.5" />{t.dashboard.menu.addItemTo.replace('{name}', cat.name)}
+                <PlusCircle className="w-4 h-4 mr-2" />{t.dashboard.menu.addItemTo.replace('{name}', cat.name)}
               </Button>
             </div>
           </div>
@@ -304,10 +306,10 @@ export default function MenuPage() {
       ))}
 
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="h-9 text-xs" onClick={() => { setShowCreateCategory(true); setCatForm({ name: '', description: '', sortIndex: 0 }); }}>
+        <Button variant="outline" size="sm" className="h-9 font-medium" onClick={() => { setShowCreateCategory(true); setCatForm({ name: '', description: '', sortIndex: 0 }); }}>
           <Plus className="w-4 h-4 mr-1.5" /> {t.dashboard.menu.addCategory}
         </Button>
-        <Button variant="outline" size="sm" className="h-9 text-xs" onClick={() => {
+        <Button variant="default" size="sm" className="h-9 font-medium bg-amber-500 hover:bg-amber-600 text-white" onClick={() => {
           setShowCreateItem(true);
           setItemForm({ name: '', description: '', price: 0, menuCategoryId: categories[0]?.id || undefined, available: true, hidden: false, categorySortIndex: 0 });
         }}>
@@ -316,58 +318,60 @@ export default function MenuPage() {
       </div>
 
       <Dialog open={showCreateCategory || editingCategory !== null} onOpenChange={open => { if (!open) { setShowCreateCategory(false); setEditingCategory(null); } }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{editingCategory ? t.dashboard.menu.editCategory : t.dashboard.menu.addCategory}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.name} *</label><Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder="e.g. Coffee" className="h-9 text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.description}</label><Textarea value={catForm.description} onChange={e => setCatForm({ ...catForm, description: e.target.value })} placeholder="Category description" className="text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.sortOrder}</label><Input type="number" min="0" value={catForm.sortIndex} onChange={e => setCatForm({ ...catForm, sortIndex: parseInt(e.target.value) || 0 })} className="h-9 text-sm" /></div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => { setShowCreateCategory(false); setEditingCategory(null); }}>{t.dashboard.menu.cancel}</Button>
-              <Button size="sm" onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}>{editingCategory ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/50">
+          <DialogHeader><DialogTitle className="text-xl font-bold">{editingCategory ? t.dashboard.menu.editCategory : t.dashboard.menu.addCategory}</DialogTitle></DialogHeader>
+          <div className="space-y-5 py-4">
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.name} *</label><Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder="e.g. Coffee" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.description}</label><Textarea value={catForm.description} onChange={e => setCatForm({ ...catForm, description: e.target.value })} placeholder="Category description" className="bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl resize-none" /></div>
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.sortOrder}</label><Input type="number" min="0" value={catForm.sortIndex} onChange={e => setCatForm({ ...catForm, sortIndex: parseInt(e.target.value) || 0 })} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+              <Button variant="outline" className="h-11 px-6 rounded-xl font-semibold border-border/50" onClick={() => { setShowCreateCategory(false); setEditingCategory(null); }}>{t.dashboard.menu.cancel}</Button>
+              <Button className="h-11 px-6 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20" onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}>{editingCategory ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showCreateItem || editingItem !== null} onOpenChange={open => { if (!open) { setShowCreateItem(false); setEditingItem(null); } }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{editingItem ? t.dashboard.menu.editItem : t.dashboard.menu.addItem}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.name} *</label><Input value={itemForm.name} onChange={e => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g. Signature Latte" className="h-9 text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.description}</label><Textarea value={itemForm.description} onChange={e => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Item description" className="text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.price} *</label><Input type="number" min="0" step="0.01" value={itemForm.price || ''} onChange={e => setItemForm({ ...itemForm, price: parseFloat(e.target.value) || 0 })} placeholder="9.99" className="h-9 text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.sortOrder}</label><Input type="number" min="0" value={itemForm.categorySortIndex} onChange={e => setItemForm({ ...itemForm, categorySortIndex: parseInt(e.target.value) || 0 })} className="h-9 text-sm" /></div>
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/50">
+          <DialogHeader><DialogTitle className="text-xl font-bold">{editingItem ? t.dashboard.menu.editItem : t.dashboard.menu.addItem}</DialogTitle></DialogHeader>
+          <div className="space-y-4 py-2">
+            <div><label className="text-sm font-medium text-muted-foreground mb-1 block">{t.dashboard.menu.name} *</label><Input value={itemForm.name} onChange={e => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g. Signature Latte" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            <div><label className="text-sm font-medium text-muted-foreground mb-1 block">{t.dashboard.menu.description}</label><Textarea value={itemForm.description} onChange={e => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Item description" className="bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl resize-none" /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="text-sm font-medium text-muted-foreground mb-1 block">{t.dashboard.menu.price} *</label><Input type="number" min="0" step="0.01" value={itemForm.price || ''} onChange={e => setItemForm({ ...itemForm, price: parseFloat(e.target.value) || 0 })} placeholder="9.99" className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+              <div><label className="text-sm font-medium text-muted-foreground mb-1 block">{t.dashboard.menu.sortOrder}</label><Input type="number" min="0" value={itemForm.categorySortIndex} onChange={e => setItemForm({ ...itemForm, categorySortIndex: parseInt(e.target.value) || 0 })} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            </div>
             <div>
-              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.category}</label>
-              <select className="flex h-9 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#16181f] px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              <label className="text-sm font-medium text-muted-foreground mb-1 block">{t.dashboard.menu.category}</label>
+              <select className="flex h-11 w-full rounded-xl border-0 bg-muted/50 px-3 py-2 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                 value={itemForm.menuCategoryId} onChange={e => setItemForm({ ...itemForm, menuCategoryId: e.target.value })}>
                 <option value="">{t.dashboard.menu.noCategory}</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={itemForm.available} onChange={e => setItemForm({ ...itemForm, available: e.target.checked })} className="rounded" />{t.dashboard.menu.available}</label>
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={itemForm.hidden} onChange={e => setItemForm({ ...itemForm, hidden: e.target.checked })} className="rounded" />{t.dashboard.menu.hidden}</label>
+            <div className="flex items-center gap-6 pt-2">
+              <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={itemForm.available} onChange={e => setItemForm({ ...itemForm, available: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500" />{t.dashboard.menu.available}</label>
+              <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={itemForm.hidden} onChange={e => setItemForm({ ...itemForm, hidden: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500" />{t.dashboard.menu.hidden}</label>
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => { setShowCreateItem(false); setEditingItem(null); }}>{t.dashboard.menu.cancel}</Button>
-              <Button size="sm" onClick={editingItem ? handleUpdateItem : handleCreateItem}>{editingItem ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
+            <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+              <Button variant="outline" className="h-11 px-6 rounded-xl font-semibold border-border/50" onClick={() => { setShowCreateItem(false); setEditingItem(null); }}>{t.dashboard.menu.cancel}</Button>
+              <Button className="h-11 px-6 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20" onClick={editingItem ? handleUpdateItem : handleCreateItem}>{editingItem ? t.dashboard.menu.update : t.dashboard.menu.create}</Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={editingMenu !== null && selectedMenu !== null} onOpenChange={open => { if (!open) setEditingMenu(null); }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{t.dashboard.menu.editMenu}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.name} *</label><Input value={menuForm.name} onChange={e => setMenuForm({ ...menuForm, name: e.target.value })} className="h-9 text-sm" /></div>
-            <div><label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">{t.dashboard.menu.description}</label><Textarea value={menuForm.description} onChange={e => setMenuForm({ ...menuForm, description: e.target.value })} className="text-sm" /></div>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={menuForm.isActive} onChange={e => setMenuForm({ ...menuForm, isActive: e.target.checked })} className="rounded" />{t.dashboard.menu.active}</label>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => setEditingMenu(null)}>{t.dashboard.menu.cancel}</Button>
-              <Button size="sm" onClick={handleUpdateMenu}>{t.dashboard.menu.update}</Button>
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/50">
+          <DialogHeader><DialogTitle className="text-xl font-bold">{t.dashboard.menu.editMenu}</DialogTitle></DialogHeader>
+          <div className="space-y-5 py-4">
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.name} *</label><Input value={menuForm.name} onChange={e => setMenuForm({ ...menuForm, name: e.target.value })} className="h-11 bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl" /></div>
+            <div><label className="text-sm font-medium text-muted-foreground mb-2 block">{t.dashboard.menu.description}</label><Textarea value={menuForm.description} onChange={e => setMenuForm({ ...menuForm, description: e.target.value })} className="bg-muted/50 border-0 focus-visible:ring-amber-500 rounded-xl resize-none" /></div>
+            <label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={menuForm.isActive} onChange={e => setMenuForm({ ...menuForm, isActive: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-500" />{t.dashboard.menu.active}</label>
+            <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+              <Button variant="outline" className="h-11 px-6 rounded-xl font-semibold border-border/50" onClick={() => setEditingMenu(null)}>{t.dashboard.menu.cancel}</Button>
+              <Button className="h-11 px-6 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20" onClick={handleUpdateMenu}>{t.dashboard.menu.update}</Button>
             </div>
           </div>
         </DialogContent>
@@ -375,27 +379,28 @@ export default function MenuPage() {
 
       {/* Image Upload Dialog */}
       <Dialog open={showImageUpload} onOpenChange={open => { if (!open) { setShowImageUpload(false); setImagePreview(null); setImageFile(null); } }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{t.dashboard.menu.uploadImage}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/50">
+          <DialogHeader><DialogTitle className="text-xl font-bold">{t.dashboard.menu.uploadImage}</DialogTitle></DialogHeader>
+          <div className="space-y-6 py-4">
             {imagePreview ? (
               <div className="flex justify-center">
-                <img src={imagePreview} alt="Preview" className="max-h-40 rounded-lg object-contain" />
+                <img src={imagePreview} alt="Preview" className="h-48 w-48 object-cover rounded-2xl shadow-md border border-border/50" />
               </div>
             ) : (
               <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                  <Image className="w-8 h-8 text-gray-400" />
+                <div className="w-48 h-48 rounded-2xl bg-muted/50 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-2">
+                  <Image className="w-10 h-10 text-muted-foreground opacity-50" />
+                  <span className="text-sm font-medium text-muted-foreground">Upload Image</span>
                 </div>
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t.dashboard.menu.chooseImage}</label>
-              <Input type="file" accept="image/*" onChange={handleImageChange} />
+              <label className="block text-sm font-medium text-muted-foreground mb-2">{t.dashboard.menu.chooseImage}</label>
+              <Input type="file" accept="image/*" onChange={handleImageChange} className="h-11 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-amber-900/30 dark:file:text-amber-400 bg-muted/30 pt-2" />
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => { setShowImageUpload(false); setImagePreview(null); setImageFile(null); }}>{t.dashboard.menu.cancel}</Button>
-              <Button size="sm" onClick={handleImageUpload} disabled={!imageFile}>{t.dashboard.menu.uploadImage}</Button>
+            <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+              <Button variant="outline" className="h-11 px-6 rounded-xl font-semibold border-border/50" onClick={() => { setShowImageUpload(false); setImagePreview(null); setImageFile(null); }}>{t.dashboard.menu.cancel}</Button>
+              <Button className="h-11 px-6 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20" onClick={handleImageUpload} disabled={!imageFile}>{t.dashboard.menu.uploadImage}</Button>
             </div>
           </div>
         </DialogContent>
